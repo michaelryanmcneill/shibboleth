@@ -500,12 +500,12 @@ function shibboleth_update_user_data($user_id, $force_update = false) {
 
 
 /**
- * Sanitize the nicename using sanitize_user
+ * Sanitize the nicename using sanitize_title
  * See discussion: http://wordpress.org/support/topic/377030
  *
  * @since 1.4
  */
-add_filter( 'shibboleth_user_nicename', 'sanitize_user' );
+add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
 
 /**
  * Add a "Login with Shibboleth" link to the WordPress login form.  This link
