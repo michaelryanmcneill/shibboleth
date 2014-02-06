@@ -118,7 +118,7 @@ function shibboleth_activate_plugin() {
 
 	if ( function_exists('restore_current_blog') ) restore_current_blog();
 }
-register_activation_hook('shibboleth/shibboleth.php', 'shibboleth_activate_plugin');
+register_activation_hook(__FILE__, 'shibboleth_activate_plugin');
 
 
 /**
@@ -127,7 +127,7 @@ register_activation_hook('shibboleth/shibboleth.php', 'shibboleth_activate_plugi
 function shibboleth_deactivate_plugin() {
 	shibboleth_remove_htaccess();
 }
-register_deactivation_hook('shibboleth/shibboleth.php', 'shibboleth_deactivate_plugin');
+register_deactivation_hook(__FILE__, 'shibboleth_deactivate_plugin');
 
 
 /**
