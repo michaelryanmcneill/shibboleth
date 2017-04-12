@@ -320,6 +320,23 @@ function shibboleth_authenticate_user() {
 	}
 
 	$username = shibboleth_getenv($shib_headers['username']['name']);
+
+	/**
+	 * Allows a bypass mechanism for native Shibboleth authentication.
+	 *
+	 * Returning a non-null value from this filter will result in your value being
+	 * returned to WordPress. You can prevent a user from being authenticated
+	 * by returning a WP_Error object.
+	 *
+	 * @param null   $auth
+	 * @param string $username
+	 */
+	$authenticate = apply_filters( 'shibboleth_authenticate_user', null, $username );
+	if ( null !== $authenticate ) {
+		return $authenticate;
+	}
+
+
 	$user = get_user_by('login', $username);
 
 	if ( $user->ID ) {
