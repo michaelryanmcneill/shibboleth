@@ -469,7 +469,8 @@ add_action('login_form', 'shibboleth_login_form');
  * Insert directives into .htaccess file to enable Shibboleth Lazy Sessions.
  */
 function shibboleth_insert_htaccess() {
-	if ( got_mod_rewrite() ) {
+	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
+	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
 		$rules = array('AuthType shibboleth', 'Require shibboleth');
 		insert_with_markers($htaccess, 'Shibboleth', $rules);
@@ -481,7 +482,8 @@ function shibboleth_insert_htaccess() {
  * Remove directives from .htaccess file to enable Shibboleth Lazy Sessions.
  */
 function shibboleth_remove_htaccess() {
-	if ( got_mod_rewrite() ) {
+	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
+	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
 		insert_with_markers($htaccess, 'Shibboleth', array());
 	}
