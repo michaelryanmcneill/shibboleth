@@ -24,8 +24,9 @@ if ($shibboleth_plugin_revision === false || SHIBBOLETH_PLUGIN_REVISION != $shib
  */
 function shibboleth_getenv( $var ) {
     $var_under = str_replace('-', '_', $var);
-		$var_upper = strtoupper($var);
-		$var_under_upper = strtoupper($var_under);
+    $var_upper = strtoupper($var);
+    $var_under_upper = strtoupper($var_under);
+
     $check_vars = array(
         $var => TRUE,
         'REDIRECT_' . $var => TRUE,
@@ -40,11 +41,13 @@ function shibboleth_getenv( $var ) {
         'REDIRECT_' . $var_under_upper => TRUE,
         'HTTP_' . $var_under_upper => TRUE,
     );
+
     foreach ($check_vars as $check_var => $true) {
         if ( ($result = getenv($check_var)) !== FALSE ) {
             return $result;
         }
     }
+
     return FALSE;
 }
 
