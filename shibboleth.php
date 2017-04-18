@@ -29,14 +29,14 @@ function shibboleth_getenv( $var ) {
     $check_vars = array(
         $var => TRUE,
         'REDIRECT_' . $var => TRUE,
-				'HTTP_' . $var => TRUE,
+	'HTTP_' . $var => TRUE,
         $var_under => TRUE,
         'REDIRECT_' . $var_under => TRUE,
         'HTTP_' . $var_under => TRUE,
         $var_upper => TRUE,
         'REDIRECT_' . $var_upper => TRUE,
-				'HTTP_' . $var_upper => TRUE,
-				$var_under_upper => TRUE,
+	'HTTP_' . $var_upper => TRUE,
+	$var_under_upper => TRUE,
         'REDIRECT_' . $var_under_upper => TRUE,
         'HTTP_' . $var_under_upper => TRUE,
     );
