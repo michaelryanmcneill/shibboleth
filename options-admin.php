@@ -65,6 +65,8 @@ function shibboleth_help_text() {
  */
 function shibboleth_options_page() {
 	global $wp_roles;
+	$message = null;
+	$type = null;
 
 	if ( isset($_POST['submit']) ) {
 		check_admin_referer('shibboleth_update_options');
@@ -95,10 +97,18 @@ function shibboleth_options_page() {
 		shibboleth_update_option('shibboleth_logout_url', $_POST['logout_url']);
 		shibboleth_update_option('shibboleth_password_change_url', $_POST['password_change_url']);
 		shibboleth_update_option('shibboleth_password_reset_url', $_POST['password_reset_url']);
-		shibboleth_update_option('shibboleth_default_login', (boolean) $_POST['default_login']);
-		shibboleth_update_option('shibboleth_auto_login', (boolean) $_POST['auto_login']);
-		shibboleth_update_option('shibboleth_update_users', (boolean) $_POST['update_users']);
-		shibboleth_update_option('shibboleth_update_roles', (boolean) $_POST['update_roles']);
+		shibboleth_update_option('shibboleth_default_login', !empty($_POST['default_login']));
+		shibboleth_update_option('shibboleth_auto_login', !empty($_POST['auto_login']));
+		shibboleth_update_option('shibboleth_update_users', !empty($_POST['update_users']));
+		shibboleth_update_option('shibboleth_update_roles', !empty($_POST['update_roles']));
+
+		$type = 'updated';
+		$message = __( 'Settings saved.', 'shibboleth' );
+
+		if ( function_exists( 'add_settings_error' ) ) {
+			add_settings_error( 'shibboleth_settings_updated', esc_attr( 'shibboleth_settings_updated' ), $message, $type );
+			settings_errors( 'shibboleth_settings_updated' );
+		}
 
 		/**
 		 * action shibboleth_form_submit
