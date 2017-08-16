@@ -229,7 +229,7 @@ function shibboleth_retrieve_password( $user_login ) {
 	$password_reset_url = shibboleth_get_option('shibboleth_password_reset_url');
 
 	if ( !empty($password_reset_url) ) {
-		$user = get_userdatabylogin($user_login);
+		$user = get_user_by( 'login', $user_login );
 		if ( $user && get_user_meta($user->ID, 'shibboleth_account') ) {
 			wp_redirect($password_reset_url);
 			exit;
@@ -363,7 +363,7 @@ function shibboleth_authenticate_user() {
 	}
 
 	// update user data
-	update_usermeta($user->ID, 'shibboleth_account', true);
+	update_user_meta($user->ID, 'shibboleth_account', true);
 	shibboleth_update_user_data($user->ID);
 	if ( shibboleth_get_option('shibboleth_update_roles') ) {
 		$user->set_role($user_role);
@@ -387,7 +387,7 @@ function shibboleth_create_new_user($user_login) {
 	require_once( ABSPATH . WPINC . '/registration.php' );
 	$user_id = wp_insert_user(array('user_login'=>$user_login));
 	$user = new WP_User($user_id);
-	update_usermeta($user->ID, 'shibboleth_account', true);
+	update_user_meta($user->ID, 'shibboleth_account', true);
 
 	// always update user data and role on account creation
 	shibboleth_update_user_data($user->ID, true);
