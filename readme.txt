@@ -141,6 +141,9 @@ have to make that call as to what is most appropriate.
 2. Specify which Shibboleth headers map to user profile fields
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
+== Upgrade Notice ==
+This update brings with it numerous changes, including support for PHP 7.x. Please see the changelog for additional details.
+
 == Changelog ==
 
 = version 1.8 (2017-08-23) =
