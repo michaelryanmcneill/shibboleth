@@ -4,7 +4,7 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Will Norris, mitcho (Michael 芳貴 Erlewine), Michael McNeill
- Version: 1.7-alpha
+ Version: 1.8
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 

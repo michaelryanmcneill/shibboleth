@@ -1,26 +1,26 @@
 === Shibboleth ===
-Contributors: willnorris, mitchoyoshitaka
+Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
-Tested up to: 4.5
-Stable tag: 1.7
+Tested up to: 4.8.1
+Stable tag: 1.8
 
 Allows WordPress to externalize user authentication and account creation to a
 Shibboleth Service Provider.
 
 == Description ==
 
-This plugin is designed to support integrating your WordPress or WordPress MU
-blog into your existing identity management infrastructure using a
-[Shibboleth][] Service Provider.  
+This plugin is designed to support integrating your WordPress
+site into your existing identity management infrastructure using a
+[Shibboleth] Service Provider.
 
 WordPress can be configured so that all standard login requests will be sent to
 your configured Shibboleth Identity Provider or Discovery Service.  Upon
 successful authentication, a new WordPress account will be automatically
-provisioned for the user if one does not already exist.  User attributes
+provisioned for the user if one does not already exist. User attributes
 (username, first name, last name, display name, nickname, and email address)
 can be synchronized with your enterprise's system of record each time the user
-logs into WordPress.  
+logs into WordPress.
 
 Finally, the user's role within WordPress can be automatically set (and
 continually updated) based on any attribute Shibboleth provides.  For example,
@@ -33,10 +33,10 @@ access to WordPress altogether using a special eduPersonEntitlement value.
 
 = Contribute on GitHub =
 
-This plugin is actively maintained by the community, [using 
-GitHub](https://github.com/mitcho/shibboleth). Contributions are welcome, via
-pull request, [on GitHub](https://github.com/mitcho/shibboleth). Issues can be
-submitted [on the issue tracker](https://github.com/mitcho/shibboleth/issues).
+This plugin is actively maintained by the community, [using
+GitHub](https://github.com/michaelryanmcneill/shibboleth). Contributions are welcome, via
+pull request, [on GitHub](https://github.com/michaelryanmcneill/shibboleth). Issues can be
+submitted [on the issue tracker](https://github.com/michaelryanmcneill/shibboleth/issues).
 
 == Installation ==
 
@@ -55,7 +55,7 @@ The option to automatically login the users into WordPress also works when not
 using the lazy session options as it will force login into WordPress. In other
 words, if the user has an active session and you are requiring authentication
 to access this WordPress site and they need to be logged into WordPress, then
-they will be logged in without having to use the WordPress login page. 
+they will be logged in without having to use the WordPress login page.
 
 This works very well for sites that use WordPress for internal ticketing and
 helpdesk functions where any access to content requires authentication.
@@ -90,10 +90,9 @@ Upload the `shibboleth` folder to your WordPress plugins folder (probably
 `/wp-content/plugins`), and activate it through the WordPress admin panel.
 Configure it from the Shibboleth settings page.
 
-= For WordPress MU =
+= For WordPress Multisite =
 
-Shibboleth works equally well with WordPress MU using either vhosts or folders
-for blogs.  Upload the `shibboleth` folder to your `mu-plugins` folder
+Upload the `shibboleth` folder to your `mu-plugins` folder
 (probably `/wp-content/mu-plugins`).  Move the file `shibboleth-mu.php` from
 the `shibboleth` folder up one directory so that it is in `mu-plugins`
 alongside the `shibboleth` folder.  No need to activate it, just configure it
@@ -105,7 +104,7 @@ from the Shibboleth settings page, found under "Site Admin".
 
 = What is Shibboleth? =
 
-From [the Shibboleth homepage][]: 
+From [the Shibboleth homepage][]:
 
 > The Shibboleth System is a standards based, open source software package for
 > web single sign-on across or within organizational boundaries. It allows
@@ -118,7 +117,7 @@ From [the Shibboleth homepage][]:
 
 Yes, the plugin provides a number of new [actions][] and [filters][] that can
 be used to extend the functionality of the plugin.  Search `shibboleth.php` for
-occurances of the function calls `apply_filters` and `do_action` to find them
+occurrences of the function calls `apply_filters` and `do_action` to find them
 all.  Then [write a new plugin][] that makes use of the hooks.  If your require
 additional hooks to allow for extending other parts of the plugin, please
 notify the plugin authors via the [support forum][].
@@ -144,6 +143,18 @@ have to make that call as to what is most appropriate.
 
 == Changelog ==
 
+= version 1.8 (2017-08-23) =
+ - The Shibboleth plugin is now being maintained by [michaelryanmcneill](https://profiles.wordpress.org/michaelryanmcneill). Contributions are welcome on [GitHub](https://github.com/michaelryanmcneill/shibboleth)!
+ - Adding the ability to disable .htaccess modifications with a wp-config.php constant (`SHIBBOLETH_DISALLOW_FILE_MODS`).
+ - Added `shibboleth_getenv()` to support various prefixed environment variables from Shibboleth, including`REDIRECT_` and `HTTP_`; props [@cjbnc and @jrchamp](https://github.com/mitcho/shibboleth/pull/13).
+ - Update various deprecated WordPress functions, including `update_usermeta()` and `get_userdatabylogin()`; props [@skoranda](https://github.com/mitcho/shibboleth/pull/21).
+ - Resolved undefined index when calling `shibboleth_session_initiator_url()`; props [@skoranda](https://github.com/mitcho/shibboleth/pull/21).
+ - Added support for PHP 7.x; props to many people.
+ - Added `shibboleth_authenticate_user` filter; props [@boonebgorges](https://github.com/mitcho/shibboleth/pull/29).
+ - Resolved undefined index on `admin-options.php`; props [@HirotoKagotani](https://github.com/mitcho/shibboleth/pull/31), [@jrchamp, and @stepmeul](https://github.com/mitcho/shibboleth/pull/23).
+ - Resolved HTML markup mistake; [props @HirotoKagotani](https://github.com/mitcho/shibboleth/pull/31).
+ - Adds an update success message to let user's know their settings were saved, using the Settings API.
+
 = version 1.7 (2016-03-20) =
  - fixed a security vulnerability reported by WordPress security team
  - load multisite options correctly; [thanks to jdelsemme for reporting](https://github.com/mitcho/shibboleth/issues/8)
@@ -165,7 +176,7 @@ have to make that call as to what is most appropriate.
  - new hooks for developers to override the default user role mapping controls
  - now applies `sanitize_name()` to the Shibboleth user's `nicename` column
 
-= version 1.3 (2009-10-02) = 
+= version 1.3 (2009-10-02) =
  - required WordPress version bumped to 2.8
  - much cleaner integration with WordPress authentication system
  - individual user profile fields can be designated as managed by Shibboleth
@@ -192,4 +203,3 @@ have to make that call as to what is most appropriate.
 
 = version 0.1 =
  - initial public release
-
