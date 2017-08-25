@@ -148,6 +148,7 @@ This update brings with it numerous changes, including support for PHP 7.x. Plea
 
 = version 1.8 (2017-08-23) =
 The Shibboleth plugin is now being maintained by [michaelryanmcneill](https://profiles.wordpress.org/michaelryanmcneill). Contributions are welcome on [GitHub](https://github.com/michaelryanmcneill/shibboleth)!
+
  - Adding the ability to disable .htaccess modifications with a wp-config.php constant (`SHIBBOLETH_DISALLOW_FILE_MODS`).
  - Added `shibboleth_getenv()` to support various prefixed environment variables from Shibboleth, including`REDIRECT_` and `HTTP_`; props [@cjbnc and @jrchamp](https://github.com/mitcho/shibboleth/pull/13).
  - Update various deprecated WordPress functions, including `update_usermeta()` and `get_userdatabylogin()`; props [@skoranda](https://github.com/mitcho/shibboleth/pull/21).
