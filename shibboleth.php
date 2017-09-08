@@ -4,7 +4,7 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Will Norris, mitcho (Michael 芳貴 Erlewine), Michael McNeill
- Version: 1.8
+ Version: 1.8.1-alpha
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
@@ -43,7 +43,7 @@ function shibboleth_getenv( $var ) {
     );
 
     foreach ($check_vars as $check_var => $true) {
-        if ( ($result = getenv($check_var)) !== FALSE ) {
+        if ( isset($_SERVER[$check_var]) && ($result = $_SERVER[$check_var]) !== FALSE ) {
             return $result;
         }
     }
