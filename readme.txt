@@ -93,9 +93,9 @@ This update brings with it numerous changes, including support for PHP 7.x. Plea
 
 == Changelog ==
 = version 1.8.1 (2017-09-08) =
- - Use sanitize_title rather than sanitize_user to sanitize user_nicename; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/4)
- - Changed activation and deactivation hooks to use `__FILE__`; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/5)
- - Reverted to using `$_SERVER` in `shibboleth_getenv()` to handle use cases where `getenv()` doesn't return data; thanks to [@jmdemuth for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/7). 
+ - Use sanitize_title rather than sanitize_user to sanitize user_nicename; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/4).
+ - Changed activation and deactivation hooks to use `__FILE__`; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/5).
+ - Reverted to using `$_SERVER` in `shibboleth_getenv()` to handle use cases where `getenv()` doesn't return data; [thanks to @jmdemuth for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/7). 
 
 = version 1.8 (2017-08-23) =
 The Shibboleth plugin is now being maintained by [michaelryanmcneill](https://profiles.wordpress.org/michaelryanmcneill). Contributions are welcome on [GitHub](https://github.com/michaelryanmcneill/shibboleth)!
