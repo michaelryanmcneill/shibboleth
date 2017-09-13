@@ -3,7 +3,7 @@ Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
 Tested up to: 4.8.1
-Stable tag: 1.8
+Stable tag: 1.9-alpha
 
 Allows WordPress to externalize user authentication and account creation to a
 Shibboleth Service Provider.
@@ -142,7 +142,8 @@ have to make that call as to what is most appropriate.
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Upgrade Notice ==
-This update brings with it numerous changes, including support for PHP 7.x. Please see the changelog for additional details.
+
+This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the release notes for additional details: https://github.com/michaelryanmcneill/shibboleth/releases/tag/1.9
 
 == Changelog ==
 
