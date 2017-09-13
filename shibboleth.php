@@ -210,6 +210,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
  *
  * @uses apply_filters calls 'shibboleth_session_active' before returning final result
  * @param boolean $auto_login whether this is being triggered by an auto_login request or not
+ * @var constant SHIBBOLETH_BYPASS_SPOOF_CHECKING set in wp-config.php to bypass spoofkey checking
  * @return boolean|WP_Error
  * @since 1.3
  */
@@ -602,6 +603,7 @@ add_action( 'login_form', 'shibboleth_login_form' );
  * Insert directives into .htaccess file to enable Shibboleth Lazy Sessions.
  *
  * @since 1.0
+ * @var constant SHIBBOLETH_DISALLOW_FILE_MODS set in wp-config.php to prevent .htaccess modifications
  */
 function shibboleth_insert_htaccess() {
 	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
@@ -617,6 +619,7 @@ function shibboleth_insert_htaccess() {
  * Remove directives from .htaccess file to enable Shibboleth Lazy Sessions.
  *
  * @since 1.1
+ * @var constant SHIBBOLETH_DISALLOW_FILE_MODS set in wp-config.php to prevent .htaccess modifications
  */
 function shibboleth_remove_htaccess() {
 	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
