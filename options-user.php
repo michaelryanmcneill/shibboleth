@@ -53,7 +53,7 @@ function shibboleth_admin_footer_edit_user() {
 
 		$shibboleth_fields = array_merge($shibboleth_fields, shibboleth_get_managed_user_fields());
 
-		if (shibboleth_get_option('shibboleth_update_roles')) {
+		if (get_site_option('shibboleth_update_roles')) {
 			$shibboleth_fields = array_merge($shibboleth_fields, array('role'));
 		}
 
@@ -83,7 +83,7 @@ function shibboleth_admin_footer_edit_user() {
  */
 function shibboleth_show_user_profile() {
 	$user = wp_get_current_user();
-	$password_change_url = shibboleth_get_option('shibboleth_password_change_url');
+	$password_change_url = get_site_option('shibboleth_password_change_url');
 	if (get_user_meta($user->ID, 'shibboleth_account') && !empty($password_change_url) ) {
 ?>
 	<table class="form-table">
