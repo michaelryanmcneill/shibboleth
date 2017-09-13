@@ -145,7 +145,12 @@ have to make that call as to what is most appropriate.
 
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the release notes for additional details: https://github.com/michaelryanmcneill/shibboleth/releases/tag/1.9
 
+
 == Changelog ==
+= version 1.8.1 (2017-09-08) =
+ - Use sanitize_title rather than sanitize_user to sanitize user_nicename; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/4).
+ - Changed activation and deactivation hooks to use `__FILE__`; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/5).
+ - Reverted to using `$_SERVER` in `shibboleth_getenv()` to handle use cases where `getenv()` doesn't return data; [thanks to @jmdemuth for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/7). 
 
 = version 1.8 (2017-08-23) =
 The Shibboleth plugin is now being maintained by [michaelryanmcneill](https://profiles.wordpress.org/michaelryanmcneill). Contributions are welcome on [GitHub](https://github.com/michaelryanmcneill/shibboleth)!
