@@ -75,7 +75,7 @@ function shibboleth_getenv( $var ) {
  */
 function shibboleth_auto_login() {
 	$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
-	if ( ! is_user_logged_in() && shibboleth_session_active() && $shibboleth_auto_login ) {
+	if ( ! is_user_logged_in() && shibboleth_session_active( true ) && $shibboleth_auto_login ) {
 		do_action( 'login_form_shibboleth' );
 
 		$userobj = wp_signon( '', true );
@@ -209,10 +209,11 @@ add_action( 'init', 'shibboleth_admin_hooks' );
  * we do additional testing to see if a spoofkey needs to be vaildated.
  *
  * @uses apply_filters calls 'shibboleth_session_active' before returning final result
- * @return boolean
+ * @param boolean $auto_login whether this is being triggered by an auto_login request or not
+ * @return boolean|WP_Error
  * @since 1.3
  */
- function shibboleth_session_active() {
+ function shibboleth_session_active( $auto_login = false ) {
  	$active = false;
  	$method = get_site_option( 'shibboleth_attribute_access' );
  	$session = shibboleth_getenv( 'Shib-Session-ID' );
@@ -229,12 +230,21 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 	 */
  	if ( $session && $method == 'http' ) {
  		$spoofkey = get_site_option( 'shibboleth_spoofkey' );
- 		if ( $spoofkey !== false ) {
+		$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
+
+ 		if ( $spoofkey !== false && $spoofkey !== '' ) {
+			$bypass = defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING;
  			$checkkey = shibboleth_getenv( 'Shib-Spoof-Check' );
- 			if ( $checkkey == $spoofkey ) {
+ 			if ( $checkkey == $spoofkey || $bypass ) {
  				$active = true;
- 			}
- 		}
+			} elseif ( $auto_login ) {
+				$active = false;
+ 			} else {
+				wp_die( __( 'The Shibboleth request you submitted failed vaildation. Please contact your site administrator for further assistance.', 'shibboleth' ) );
+			}
+ 		} else {
+			$active = true;
+		}
  	}
 
  	$active = apply_filters( 'shibboleth_session_active', $active );
