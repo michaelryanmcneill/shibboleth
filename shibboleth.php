@@ -8,14 +8,18 @@
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
-define ( 'SHIBBOLETH_PLUGIN_REVISION', preg_replace( '/\$Rev: (.+) \$/', '\\1',
-	'$Rev$') ); // this needs to be on a separate line so that svn:keywords can work its magic
+define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '3.3' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '1.9-alpha' );
 
-
-// run activation function if new revision of plugin
-$shibboleth_plugin_revision = shibboleth_get_option('shibboleth_plugin_revision');
-if ($shibboleth_plugin_revision === false || SHIBBOLETH_PLUGIN_REVISION != $shibboleth_plugin_revision) {
-	add_action('admin_init', 'shibboleth_activate_plugin');
+/**
+ * Determine if this is a new install or upgrade and, if so, run the
+ * shibboleth_activate_plugin() function.
+ *
+ * @since 1.0
+ */
+$plugin_version = get_site_option( 'shibboleth_plugin_version', '0' );
+if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
+	add_action( 'admin_init', 'shibboleth_activate_plugin' );
 }
 
 /**
@@ -89,9 +93,23 @@ add_action('init', 'shibboleth_auto_login');
  * Activate the plugin.  This registers default values for all of the
  * Shibboleth options and attempts to add the appropriate mod_rewrite rules to
  * WordPress's .htaccess file.
+ *
+ * @since 1.0
  */
 function shibboleth_activate_plugin() {
-	if ( function_exists('switch_to_blog') ) switch_to_blog($GLOBALS['current_site']->blog_id);
+
+	if ( version_compare( $GLOBALS['wp_version'], SHIBBOLETH_MINIMUM_WP_VERSION, '<' ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+    wp_die( __( 'Shibboleth requires WordPress '. SHIBBOLETH_MINIMUM_WP_VERSION . 'or higher!', 'shibboleth' ) );
+	}
+
+	if ( function_exists( 'switch_to_blog' ) ) {
+		if ( is_multisite() ) {
+			switch_to_blog( $GLOBALS['current_blog']->blog_id );
+		} else {
+			switch_to_blog( $GLOBALS['current_site']->blog_id );
+		}
+	}
 
 	shibboleth_add_option('shibboleth_login_url', get_option('home') . '/Shibboleth.sso/Login');
 	shibboleth_add_option('shibboleth_default_login', false);
