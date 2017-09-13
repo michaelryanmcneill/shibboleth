@@ -4,7 +4,7 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Will Norris, mitcho (Michael 芳貴 Erlewine), Michael McNeill
- Version: 1.8
+ Version: 1.9-alpha
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
@@ -20,30 +20,44 @@ if ($shibboleth_plugin_revision === false || SHIBBOLETH_PLUGIN_REVISION != $shib
 
 /**
  * HTTP and FastCGI friendly getenv() replacement that handles
- * REDIRECT_ and HTTP_ environment variables automatically.
+ * standard and REDIRECT_ environment variables, as well as HTTP
+ * headers. Users select which method to use to allow for the most
+ * secure configuration possible.
+ *
+ * @since 1.8
+ *
+ * @param string $var
+ *
+ * @return string|bool
  */
 function shibboleth_getenv( $var ) {
-    $var_under = str_replace('-', '_', $var);
-    $var_upper = strtoupper($var);
-    $var_under_upper = strtoupper($var_under);
+		$method = get_site_option( 'shibboleth_attribute_access', 'standard' );
+
+		switch ( $method ) {
+			case 'standard' :
+				$var_method = '';
+		    break;
+			case 'redirect' :
+				$var_method = 'REDIRECT_';
+				break;
+	    case 'http':
+				$var_method = 'HTTP_';
+		    break;
+		}
+
+    $var_under = str_replace( '-', '_', $var );
+    $var_upper = strtoupper( $var );
+    $var_under_upper = strtoupper( $var_under );
 
     $check_vars = array(
-        $var => TRUE,
-        'REDIRECT_' . $var => TRUE,
-	'HTTP_' . $var => TRUE,
-        $var_under => TRUE,
-        'REDIRECT_' . $var_under => TRUE,
-        'HTTP_' . $var_under => TRUE,
-        $var_upper => TRUE,
-        'REDIRECT_' . $var_upper => TRUE,
-	'HTTP_' . $var_upper => TRUE,
-	$var_under_upper => TRUE,
-        'REDIRECT_' . $var_under_upper => TRUE,
-        'HTTP_' . $var_under_upper => TRUE,
+        $var_method . $var => TRUE,
+        $var_method . $var_under => TRUE,
+        $var_method . $var_upper => TRUE,
+        $var_method . $var_under_upper => TRUE,
     );
 
-    foreach ($check_vars as $check_var => $true) {
-        if ( ($result = getenv($check_var)) !== FALSE ) {
+    foreach ( $check_vars as $check_var => $true ) {
+        if ( isset( $_SERVER[$check_var] ) && ( $result = $_SERVER[$check_var] ) !== FALSE ) {
             return $result;
         }
     }
