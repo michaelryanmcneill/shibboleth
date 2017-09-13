@@ -115,7 +115,7 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_auto_login', false );
 	add_site_option( 'shibboleth_logout_url', get_option( 'home' ) . '/Shibboleth.sso/Logout' );
 	add_site_option( 'shibboleth_attribute_access', 'standard' );
-	add_site_option( 'shibboleth_default_role', '(none)' );
+	add_site_option( 'shibboleth_default_role', '' );
 	add_site_option( 'shibboleth_plugin_version', SHIBBOLETH_PLUGIN_VERSION );
 	add_site_option( 'shibboleth_update_roles', false );
 
@@ -477,7 +477,7 @@ function shibboleth_get_user_role() {
 	if ( !$wp_roles ) $wp_roles = new WP_Roles();
 
 	$shib_roles = apply_filters( 'shibboleth_roles', get_site_option( 'shibboleth_roles' ) );
-	$user_role = $shib_roles['default'];
+	$user_role = get_site_option( 'shibboleth_default_role' );
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
 		$role_header = $shib_roles[$key]['header'];
