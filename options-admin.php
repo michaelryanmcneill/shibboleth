@@ -185,14 +185,18 @@ function shibboleth_options_page() {
 							<option value="redirect" <?php selected( get_site_option('shibboleth_attribute_access'), 'redirect' ); ?>>Redirected Environment Variables</option>
 							<option value="http" <?php selected( get_site_option('shibboleth_attribute_access'), 'http' ); ?>>HTTP Headers</option>
 						</select>
-						<p><?php _e('Come up with better informational text to insert here.', 'shibboleth') ?></p>
+						<p><?php _e('By default, attributes passed from your Shibboleth Service Provider will be accessed using standard environment variables. '
+						. 'For most users, leaving these defaults is perfectly fine. If you are running a special server configuration that results in environment variables '
+						. 'being sent with the prefix <code>REDIRECT_</code>, you should select the "Redirected Environment Variables" option. If you are running '
+						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.', 'shibboleth') ?></p>
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth') ?></label></th>
 					<td>
 						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo get_site_option('shibboleth_spoofkey') ?>" size="50" /><br />
-						<p><?php _e('Come up with better informational text to insert here.', 'shibboleth') ?></p>
+						<p><?php _e('This option only applies when using the "HTTP Headers" attribute access method. For more details on setting a spoof key on the Shibboleth Service Provider, see <a href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking">this wiki document</a>. '
+						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth') ?></p>
 					</td>
 				</tr>
 				<tr>
