@@ -71,7 +71,7 @@ function shibboleth_options_page() {
 	if ( isset($_POST['submit']) ) {
 		check_admin_referer('shibboleth_update_options');
 
-		$shib_headers = (array) shibboleth_get_option('shibboleth_headers');
+		$shib_headers = (array) get_site_option('shibboleth_headers');
 		$shib_headers = array_merge($shib_headers, $_POST['headers']);
 		/**
 		 * filter shibboleth_form_submit_headers
@@ -80,9 +80,9 @@ function shibboleth_options_page() {
 		 * Hint: access $_POST within the filter.
 		 */
 		$shib_headers = apply_filters( 'shibboleth_form_submit_headers', $shib_headers );
-		shibboleth_update_option('shibboleth_headers', $shib_headers);
+		update_site_option('shibboleth_headers', $shib_headers);
 
-		$shib_roles = (array) shibboleth_get_option('shibboleth_roles');
+		$shib_roles = (array) get_site_option('shibboleth_roles');
 		$shib_roles = array_merge($shib_roles, $_POST['shibboleth_roles']);
 		/**
 		 * filter shibboleth_form_submit_roles
@@ -91,17 +91,18 @@ function shibboleth_options_page() {
 		 * Hint: access $_POST within the filter.
 		 */
 		$shib_roles = apply_filters( 'shibboleth_form_submit_roles', $shib_roles );
-		shibboleth_update_option('shibboleth_roles', $shib_roles);
-		shibboleth_update_option('shibboleth_attribute_access', $_POST['attribute_access']);
-		shibboleth_update_option('shibboleth_login_url', $_POST['login_url']);
-		shibboleth_update_option('shibboleth_logout_url', $_POST['logout_url']);
-		shibboleth_update_option('shibboleth_spoofkey', $_POST['spoofkey']);
-		shibboleth_update_option('shibboleth_password_change_url', $_POST['password_change_url']);
-		shibboleth_update_option('shibboleth_password_reset_url', $_POST['password_reset_url']);
-		shibboleth_update_option('shibboleth_default_login', !empty($_POST['default_login']));
-		shibboleth_update_option('shibboleth_auto_login', !empty($_POST['auto_login']));
-		shibboleth_update_option('shibboleth_update_users', !empty($_POST['update_users']));
-		shibboleth_update_option('shibboleth_update_roles', !empty($_POST['update_roles']));
+		update_site_option('shibboleth_roles', $shib_roles);
+		update_site_option('shibboleth_attribute_access', $_POST['attribute_access']);
+		update_site_option('shibboleth_login_url', $_POST['login_url']);
+		update_site_option('shibboleth_logout_url', $_POST['logout_url']);
+		update_site_option('shibboleth_spoofkey', $_POST['spoofkey']);
+		update_site_option('shibboleth_password_change_url', $_POST['password_change_url']);
+		update_site_option('shibboleth_password_reset_url', $_POST['password_reset_url']);
+		update_site_option('shibboleth_default_login', !empty($_POST['default_login']));
+		update_site_option('shibboleth_auto_login', !empty($_POST['auto_login']));
+		update_site_option('shibboleth_update_users', !empty($_POST['update_users']));
+		update_site_option('shibboleth_update_roles', !empty($_POST['update_roles']));
+		update_site_option('shibboleth_default_role', $_POST['default_role']);
 
 		$type = 'updated';
 		$message = __( 'Settings saved.', 'shibboleth' );
@@ -119,8 +120,8 @@ function shibboleth_options_page() {
 		do_action( 'shibboleth_form_submit' );
 	}
 
-	$shib_headers = shibboleth_get_option('shibboleth_headers');
-	$shib_roles = shibboleth_get_option('shibboleth_roles');
+	$shib_headers = get_site_option('shibboleth_headers');
+	$shib_roles = get_site_option('shibboleth_roles');
 
 	$shibboleth_plugin_path = apply_filters('shibboleth_plugin_path', plugins_url('shibboleth'));
 
@@ -140,7 +141,7 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="login_url"><?php _e('Session Initiator URL', 'shibboleth') ?></label></th>
 					<td>
-						<input type="text" id="login_url" name="login_url" value="<?php echo shibboleth_get_option('shibboleth_login_url') ?>" size="50" /><br />
+						<input type="text" id="login_url" name="login_url" value="<?php echo get_site_option('shibboleth_login_url') ?>" size="50" /><br />
 						<?php _e('This URL is constructed from values found in your main Shibboleth'
 							. ' SP configuration file: your site hostname, the Sessions handlerURL,'
 							. ' and the SessionInitiator Location.', 'shibboleth'); ?>
@@ -152,7 +153,7 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="logout_url"><?php _e('Logout URL', 'shibboleth') ?></label></th>
 					<td>
-						<input type="text" id="logout_url" name="logout_url" value="<?php echo shibboleth_get_option('shibboleth_logout_url') ?>" size="50" /><br />
+						<input type="text" id="logout_url" name="logout_url" value="<?php echo get_site_option('shibboleth_logout_url') ?>" size="50" /><br />
 						<?php _e('This URL is constructed from values found in your main Shibboleth'
 							. ' SP configuration file: your site hostname, the Sessions handlerURL,'
 							. ' and the LogoutInitiator Location (also known as the'
@@ -165,14 +166,14 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="password_change_url"><?php _e('Password Change URL', 'shibboleth') ?></label></th>
 					<td>
-						<input type="text" id="password_change_url" name="password_change_url" value="<?php echo shibboleth_get_option('shibboleth_password_change_url') ?>" size="50" /><br />
+						<input type="text" id="password_change_url" name="password_change_url" value="<?php echo get_site_option('shibboleth_password_change_url') ?>" size="50" /><br />
 						<?php _e('If this option is set, Shibboleth users will see a "change password" link on their profile page directing them to this URL.', 'shibboleth') ?>
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="password_reset_url"><?php _e('Password Reset URL', 'shibboleth') ?></label></th>
 					<td>
-						<input type="text" id="password_reset_url" name="password_reset_url" value="<?php echo shibboleth_get_option('shibboleth_password_reset_url') ?>" size="50" /><br />
+						<input type="text" id="password_reset_url" name="password_reset_url" value="<?php echo get_site_option('shibboleth_password_reset_url') ?>" size="50" /><br />
 						<?php _e('If this option is set, Shibboleth users who try to reset their forgotten password using WordPress will be redirected to this URL.', 'shibboleth') ?>
 					</td>
 				</tr>
@@ -180,9 +181,9 @@ function shibboleth_options_page() {
 					<th scope="row"><label for="attribute_access"><?php _e('Attribute Access', 'shibboleth') ?></label></th>
 					<td>
 						<select id="attribute_access" name="attribute_access">
-							<option value="standard" <?php selected( shibboleth_get_option('shibboleth_attribute_access'), 'standard' ); ?>>Environment Variables</option>
-							<option value="redirect" <?php selected( shibboleth_get_option('shibboleth_attribute_access'), 'redirect' ); ?>>Redirected Environment Variables</option>
-							<option value="http" <?php selected( shibboleth_get_option('shibboleth_attribute_access'), 'http' ); ?>>HTTP Headers</option>
+							<option value="standard" <?php selected( get_site_option('shibboleth_attribute_access'), 'standard' ); ?>>Environment Variables</option>
+							<option value="redirect" <?php selected( get_site_option('shibboleth_attribute_access'), 'redirect' ); ?>>Redirected Environment Variables</option>
+							<option value="http" <?php selected( get_site_option('shibboleth_attribute_access'), 'http' ); ?>>HTTP Headers</option>
 						</select>
 						<p><?php _e('Come up with better informational text to insert here.', 'shibboleth') ?></p>
 					</td>
@@ -190,14 +191,14 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth') ?></label></th>
 					<td>
-						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo shibboleth_get_option('shibboleth_spoofkey') ?>" size="50" /><br />
+						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo get_site_option('shibboleth_spoofkey') ?>" size="50" /><br />
 						<p><?php _e('Come up with better informational text to insert here.', 'shibboleth') ?></p>
 					</td>
 				</tr>
 				<tr>
 				<th scope="row"><label for="default_login"><?php _e('Shibboleth is default login', 'shibboleth') ?></label></th>
 					<td>
-						<input type="checkbox" id="default_login" name="default_login" <?php echo shibboleth_get_option('shibboleth_default_login') ? ' checked="checked"' : '' ?> />
+						<input type="checkbox" id="default_login" name="default_login" <?php echo get_site_option('shibboleth_default_login') ? ' checked="checked"' : '' ?> />
 						<label for="default_login"><?php _e('Use Shibboleth as the default login method for users.', 'shibboleth'); ?></label>
 
 						<p><?php _e('If set, this will cause all standard WordPress login links to initiate Shibboleth'
@@ -208,7 +209,7 @@ function shibboleth_options_page() {
 				<tr>
 				<th scope="row"><label for="auto_login"><?php _e('Shibboleth automatic login', 'shibboleth') ?></label></th>
 					<td>
-						<input type="checkbox" id="auto_login" name="auto_login" <?php echo shibboleth_get_option('shibboleth_auto_login') ? ' checked="checked"' : '' ?> />
+						<input type="checkbox" id="auto_login" name="auto_login" <?php echo get_site_option('shibboleth_auto_login') ? ' checked="checked"' : '' ?> />
 						<label for="auto_login"><?php _e('Use Shibboleth to auto-login users.', 'shibboleth'); ?></label>
 
 						<p><?php _e('If set, this will force a wp_signon() call and wp_safe_redirect()'
@@ -366,12 +367,12 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 				<tr>
 					<th scope="row"><?php _e('Default Role', 'shibboleth') ?></th>
 					<td>
-						<select id="default_role" name="shibboleth_roles[default]">
-						<option value=""><?php _e('(none)') ?></option>
+						<select id="default_role" name="default_role">
+						<option value="" <?php selected( get_site_option('shibboleth_default_role'), '' ); ?>><?php _e('(none)') ?></option>
 <?php
 			foreach ($wp_roles->role_names as $key => $name) {
 				echo '
-						<option value="' . $key . '"' . ($shib_roles['default'] == $key ? ' selected="selected"' : '') . '>' . __($name) . '</option>';
+						<option value="' . $key . '"' .  selected( get_site_option('shibboleth_default_role'), $key ) . '>' . __($name) . '</option>';
 			}
 ?>
 						</select>
@@ -385,7 +386,7 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 				<tr>
 					<th scope="row"><label for="update_roles"><?php _e('Update User Roles', 'shibboleth') ?></label></th>
 					<td>
-						<input type="checkbox" id="update_roles" name="update_roles" <?php echo shibboleth_get_option('shibboleth_update_roles') ? ' checked="checked"' : '' ?> />
+						<input type="checkbox" id="update_roles" name="update_roles" <?php echo get_site_option('shibboleth_update_roles') ? ' checked="checked"' : '' ?> />
 						<label for="update_roles"><?php _e('Use Shibboleth data to update user role mappings each time the user logs in.', 'shibboleth') ?></label>
 
 						<p><?php _e('Be aware that if you use this option, you should <strong>not</strong> update user roles manually,'
