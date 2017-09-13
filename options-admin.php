@@ -92,9 +92,10 @@ function shibboleth_options_page() {
 		 */
 		$shib_roles = apply_filters( 'shibboleth_form_submit_roles', $shib_roles );
 		shibboleth_update_option('shibboleth_roles', $shib_roles);
-
+		shibboleth_update_option('shibboleth_attribute_access', $_POST['attribute_access']);
 		shibboleth_update_option('shibboleth_login_url', $_POST['login_url']);
 		shibboleth_update_option('shibboleth_logout_url', $_POST['logout_url']);
+		shibboleth_update_option('shibboleth_spoofkey', $_POST['spoofkey']);
 		shibboleth_update_option('shibboleth_password_change_url', $_POST['password_change_url']);
 		shibboleth_update_option('shibboleth_password_reset_url', $_POST['password_reset_url']);
 		shibboleth_update_option('shibboleth_default_login', !empty($_POST['default_login']));
@@ -173,6 +174,24 @@ function shibboleth_options_page() {
 					<td>
 						<input type="text" id="password_reset_url" name="password_reset_url" value="<?php echo shibboleth_get_option('shibboleth_password_reset_url') ?>" size="50" /><br />
 						<?php _e('If this option is set, Shibboleth users who try to reset their forgotten password using WordPress will be redirected to this URL.', 'shibboleth') ?>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><label for="attribute_access"><?php _e('Attribute Access', 'shibboleth') ?></label></th>
+					<td>
+						<select id="attribute_access" name="attribute_access">
+							<option value="standard" <?php selected( shibboleth_get_option('shibboleth_attribute_access'), 'standard' ); ?>>Environment Variables</option>
+							<option value="redirect" <?php selected( shibboleth_get_option('shibboleth_attribute_access'), 'redirect' ); ?>>Redirected Environment Variables</option>
+							<option value="http" <?php selected( shibboleth_get_option('shibboleth_attribute_access'), 'http' ); ?>>HTTP Headers</option>
+						</select>
+						<p><?php _e('Come up with better informational text to insert here.', 'shibboleth') ?></p>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth') ?></label></th>
+					<td>
+						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo shibboleth_get_option('shibboleth_spoofkey') ?>" size="50" /><br />
+						<p><?php _e('Come up with better informational text to insert here.', 'shibboleth') ?></p>
 					</td>
 				</tr>
 				<tr>
