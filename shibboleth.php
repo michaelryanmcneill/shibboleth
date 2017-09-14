@@ -248,25 +248,6 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 		$active = false;
 	}
 
- 	if ( $session && $method == 'http' ) {
- 		$spoofkey = get_site_option( 'shibboleth_spoofkey' );
-		$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
-
- 		if ( $spoofkey !== false && $spoofkey !== '' ) {
-			$bypass = defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING;
- 			$checkkey = shibboleth_getenv( 'Shib-Spoof-Check' );
- 			if ( $checkkey == $spoofkey || $bypass ) {
- 				$active = true;
-			} elseif ( $auto_login ) {
-				$active = false;
- 			} else {
-				wp_die( __( 'The Shibboleth request you submitted failed vaildation. Please contact your site administrator for further assistance.', 'shibboleth' ) );
-			}
- 		} else {
-			$active = true;
-		}
- 	}
-
  	$active = apply_filters( 'shibboleth_session_active', $active );
  	return $active;
  }
