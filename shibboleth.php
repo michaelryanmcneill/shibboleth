@@ -219,7 +219,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
  	$method = get_site_option( 'shibboleth_attribute_access' );
  	$session = shibboleth_getenv( 'Shib-Session-ID' );
 
- 	if ( $session && $method != 'http' ) {
+ 	if ( $session && $method !== 'http' ) {
  		$active = true;
  	} elseif ( $session && $method === 'http' ) {
 		/**
