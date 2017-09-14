@@ -33,38 +33,38 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
  * @return string|bool
  */
 function shibboleth_getenv( $var ) {
-		$method = get_site_option( 'shibboleth_attribute_access', 'standard' );
+	$method = get_site_option( 'shibboleth_attribute_access', 'standard' );
 
-		switch ( $method ) {
-			case 'standard' :
-				$var_method = '';
-		    break;
-			case 'redirect' :
-				$var_method = 'REDIRECT_';
-				break;
-	    case 'http':
-				$var_method = 'HTTP_';
-		    break;
+	switch ( $method ) {
+		case 'standard' :
+			$var_method = '';
+			break;
+		case 'redirect' :
+			$var_method = 'REDIRECT_';
+			break;
+		case 'http':
+			$var_method = 'HTTP_';
+			break;
+	}
+
+	$var_under = str_replace( '-', '_', $var );
+	$var_upper = strtoupper( $var );
+	$var_under_upper = strtoupper( $var_under );
+
+	$check_vars = array(
+		$var_method . $var => TRUE,
+		$var_method . $var_under => TRUE,
+		$var_method . $var_upper => TRUE,
+		$var_method . $var_under_upper => TRUE,
+	);
+
+	foreach ( $check_vars as $check_var => $true ) {
+		if ( isset( $_SERVER[$check_var] ) && ( $result = $_SERVER[$check_var] ) !== FALSE ) {
+			return $result;
 		}
+	}
 
-    $var_under = str_replace( '-', '_', $var );
-    $var_upper = strtoupper( $var );
-    $var_under_upper = strtoupper( $var_under );
-
-    $check_vars = array(
-        $var_method . $var => TRUE,
-        $var_method . $var_under => TRUE,
-        $var_method . $var_upper => TRUE,
-        $var_method . $var_under_upper => TRUE,
-    );
-
-    foreach ( $check_vars as $check_var => $true ) {
-        if ( isset( $_SERVER[$check_var] ) && ( $result = $_SERVER[$check_var] ) !== FALSE ) {
-            return $result;
-        }
-    }
-
-    return FALSE;
+	return FALSE;
 }
 
 /**
