@@ -221,14 +221,33 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 
  	if ( $session && $method != 'http' ) {
  		$active = true;
- 	}
+ 	} elseif ( $session && $method === 'http' ) {
+		/**
+		 * Handling HTTP header cases with a spoofkey to better protect against
+		 * HTTP header spoofing.
+		 *
+		 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
+		 */
+		$spoofkey = get_site_option( 'shibboleth_spoofkey' );
+		$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
 
-	/**
-	 * Handling HTTP header cases with a spoofkey to better protect against
-	 * HTTP header spoofing.
-	 *
-	 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
-	 */
+		if ( $spoofkey !== false && $spoofkey !== '' ) {
+			$bypass = defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING;
+			$checkkey = shibboleth_getenv( 'Shib-Spoof-Check' );
+			if ( $checkkey == $spoofkey || $bypass ) {
+				$active = true;
+			} elseif ( $auto_login ) {
+				$active = false;
+			} else {
+				wp_die( __( 'The Shibboleth request you submitted failed vaildation. Please contact your site administrator for further assistance.', 'shibboleth' ) );
+			}
+		} else {
+			$active = true;
+		}
+	} else {
+		$active = false;
+	}
+
  	if ( $session && $method == 'http' ) {
  		$spoofkey = get_site_option( 'shibboleth_spoofkey' );
 		$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
