@@ -99,7 +99,7 @@ add_action( 'init', 'shibboleth_auto_login' );
 function shibboleth_activate_plugin() {
 	if ( version_compare( $GLOBALS['wp_version'], SHIBBOLETH_MINIMUM_WP_VERSION, '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
-    wp_die( __( 'Shibboleth requires WordPress '. SHIBBOLETH_MINIMUM_WP_VERSION . 'or higher!', 'shibboleth' ) );
+		wp_die( __( 'Shibboleth requires WordPress '. SHIBBOLETH_MINIMUM_WP_VERSION . 'or higher!', 'shibboleth' ) );
 	}
 
 	if ( function_exists( 'switch_to_blog' ) ) {
