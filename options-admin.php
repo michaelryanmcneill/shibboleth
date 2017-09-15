@@ -1,109 +1,108 @@
 <?php
-// functions for managing Shibboleth options through the WordPress administration panel
+/**
+ * @todo this file should be cleaned up and organized better
+ */
 
-if ( is_multisite() ) {
-	add_action('network_admin_menu', 'shibboleth_network_admin_panels');
-} else {
-	add_action('admin_menu', 'shibboleth_admin_panels');
+/**
+ * Setup admin tabs for the Shibboleth option page.
+ *
+ * @param string $current the current tab
+ * @since 1.9-alpha
+ */
+function shibboleth_admin_tabs( $current = 'general' ) {
+	$tabs = array( 'general' => 'General', 'user' => 'User', 'authorization' => 'Authorization' );
+	echo '<h2 class="nav-tab-wrapper">';
+	foreach( $tabs as $tab => $name ){
+		$class = ( $tab == $current ) ? ' nav-tab-active' : '';
+		echo "<a class='nav-tab$class' href='?page=shibboleth-options&tab=$tab'>$name</a>";
+	}
+	echo '</h2>';
 }
 
 /**
  * Setup admin menus for Shibboleth options.
  *
- * @action: admin_menu
- **/
+ * @since ?
+ */
 function shibboleth_admin_panels() {
-	$hookname = add_options_page(__('Shibboleth options', 'shibboleth'),
-		__('Shibboleth', 'shibboleth'), 'manage_options', 'shibboleth-options', 'shibboleth_options_page' );
-
-	$screen = WP_Screen::get($hookname);
-	$screen->add_help_tab(array(
-		'title' => 'Shibboleth Help',
-		'id' => 'shibboleth-help',
-		'content' => shibboleth_help_text(),
-	));
+	if ( ! is_multisite() )
+		add_options_page( __( 'Shibboleth options', 'shibboleth' ), __( 'Shibboleth', 'shibboleth' ), 'manage_options', 'shibboleth-options', 'shibboleth_options_page' );
 }
+add_action( 'admin_menu', 'shibboleth_admin_panels' );
 
 /**
  * Setup multisite admin menus for Shibboleth options.
  *
- * @action: network_admin_menu
- **/
-function shibboleth_network_admin_panels() {
-	$hookname = add_submenu_page('settings.php', __('Shibboleth options', 'shibboleth'),
-		__('Shibboleth', 'shibboleth'), 'manage_network_options', 'shibboleth-options', 'shibboleth_options_page' );
-
-	$screen = WP_Screen::get($hookname);
-	$screen->add_help_tab(array(
-		'title' => 'Shibboleth Help',
-		'id' => 'shibboleth-help',
-		'content' => shibboleth_help_text(),
-	));
-}
-
-
-/**
- * Add Shibboleth links to the "help" pull down panel.
+ * @since ?
  */
-function shibboleth_help_text() {
-	$text = '
-	<ul>
-		<li><a href="https://spaces.internet2.edu/display/SHIB/" target="_blank">' . __('Shibboleth 1.3 Wiki', 'shibboleth') . '</a></li>
-		<li><a href="https://spaces.internet2.edu/display/SHIB2/" target="_blank">' . __('Shibboleth 2 Wiki', 'shibboleth') . '</a></li>
-		<li><a href="http://shibboleth.internet2.edu/lists.html" target="_blank">' . __('Shibboleth Mailing Lists', 'shibboleth') . '</a></li>
-	</ul>';
-
-	return apply_filters( 'shibboleth_help_text_filter', $text );
-
+function shibboleth_network_admin_panels() {
+	if ( is_multisite() )
+		add_submenu_page( 'settings.php', __( 'Shibboleth options', 'shibboleth' ), __( 'Shibboleth', 'shibboleth' ), 'manage_network_options', 'shibboleth-options', 'shibboleth_options_page' );
 }
-
+add_action( 'network_admin_menu', 'shibboleth_network_admin_panels' );
 
 /**
  * WordPress options page to configure the Shibboleth plugin.
  *
  * @uses apply_filters() Calls 'shibboleth_plugin_path'
+ * @since ?
  */
 function shibboleth_options_page() {
 	global $wp_roles;
 	$message = null;
 	$type = null;
 
-	if ( isset($_POST['submit']) ) {
+	if ( isset( $_POST['submit'] ) ) {
 		check_admin_referer('shibboleth_update_options');
 
-		$shib_headers = (array) get_site_option('shibboleth_headers');
-		$shib_headers = array_merge($shib_headers, $_POST['headers']);
-		/**
-		 * filter shibboleth_form_submit_headers
-		 * @param $shib_headers array
-		 * @since 1.4
-		 * Hint: access $_POST within the filter.
-		 */
-		$shib_headers = apply_filters( 'shibboleth_form_submit_headers', $shib_headers );
-		update_site_option('shibboleth_headers', $shib_headers);
+		if ( isset ( $_GET['tab'] ) )
+			$tab = $_GET['tab'];
+		else
+			$tab = 'general';
 
-		$shib_roles = (array) get_site_option('shibboleth_roles');
-		$shib_roles = array_merge($shib_roles, $_POST['shibboleth_roles']);
-		/**
-		 * filter shibboleth_form_submit_roles
-		 * @param $shib_roles array
-		 * @since 1.4
-		 * Hint: access $_POST within the filter.
-		 */
-		$shib_roles = apply_filters( 'shibboleth_form_submit_roles', $shib_roles );
-		update_site_option('shibboleth_roles', $shib_roles);
-		update_site_option('shibboleth_attribute_access', $_POST['attribute_access']);
-		update_site_option('shibboleth_login_url', $_POST['login_url']);
-		update_site_option('shibboleth_logout_url', $_POST['logout_url']);
-		update_site_option('shibboleth_spoofkey', $_POST['spoofkey']);
-		update_site_option('shibboleth_password_change_url', $_POST['password_change_url']);
-		update_site_option('shibboleth_password_reset_url', $_POST['password_reset_url']);
-		update_site_option('shibboleth_default_login', !empty($_POST['default_login']));
-		update_site_option('shibboleth_auto_login', !empty($_POST['auto_login']));
-		update_site_option('shibboleth_update_users', !empty($_POST['update_users']));
-		update_site_option('shibboleth_update_roles', !empty($_POST['update_roles']));
-		update_site_option('shibboleth_default_role', $_POST['default_role']);
-
+		switch ( $tab ) {
+			case 'general' :
+				update_site_option( 'shibboleth_attribute_access', $_POST['attribute_access'] );
+				update_site_option( 'shibboleth_login_url', $_POST['login_url'] );
+				update_site_option( 'shibboleth_logout_url', $_POST['logout_url'] );
+				update_site_option( 'shibboleth_spoofkey', $_POST['spoofkey'] );
+				update_site_option( 'shibboleth_password_change_url', $_POST['password_change_url'] );
+				update_site_option( 'shibboleth_password_reset_url', $_POST['password_reset_url'] );
+				update_site_option( 'shibboleth_default_login', ! empty( $_POST['default_login'] ) );
+				update_site_option( 'shibboleth_auto_login', ! empty( $_POST['auto_login'] ) );
+				update_site_option( 'shibboleth_update_users', ! empty( $_POST['update_users'] ) );
+				update_site_option( 'shibboleth_button_text', $_POST['button_text'] );
+				update_site_option( 'shibboleth_disable_local_auth', ! empty( $_POST['disable_local_auth'] ) );
+				break;
+			case 'user' :
+				$shib_headers = (array) get_site_option( 'shibboleth_headers' );
+				$shib_headers = array_merge( $shib_headers, $_POST['headers'] );
+				/**
+				 * filter shibboleth_form_submit_headers
+				 * @param $shib_headers array
+				 * @since 1.4
+				 * Hint: access $_POST within the filter.
+				 */
+				$shib_headers = apply_filters( 'shibboleth_form_submit_headers', $shib_headers );
+				update_site_option( 'shibboleth_headers', $shib_headers );
+				update_site_option( 'shibboleth_create_accounts', ! empty( $_POST['create_accounts'] ) );
+				update_site_option( 'shibboleth_combine_accounts', $_POST['combine_accounts'] );
+				break;
+			case 'authorization' :
+				$shib_roles = (array) get_site_option( 'shibboleth_roles' );
+				$shib_roles = array_merge( $shib_roles, $_POST['shibboleth_roles'] );
+				/**
+				 * filter shibboleth_form_submit_roles
+				 * @param $shib_roles array
+				 * @since 1.4
+				 * Hint: access $_POST within the filter.
+				 */
+				$shib_roles = apply_filters( 'shibboleth_form_submit_roles', $shib_roles );
+				update_site_option( 'shibboleth_roles', $shib_roles );
+				update_site_option( 'shibboleth_default_role', $_POST['default_role'] );
+				update_site_option( 'shibboleth_update_roles', ! empty( $_POST['update_roles'] ) );
+				break;
+		}
 		$type = 'updated';
 		$message = __( 'Settings saved.', 'shibboleth' );
 
@@ -118,14 +117,12 @@ function shibboleth_options_page() {
 		 * Hint: use global $_POST within the action.
 		 */
 		do_action( 'shibboleth_form_submit' );
-	}
 
+	}
 	$shib_headers = get_site_option('shibboleth_headers');
 	$shib_roles = get_site_option('shibboleth_roles');
 
 	$shibboleth_plugin_path = apply_filters('shibboleth_plugin_path', plugins_url('shibboleth'));
-
-	screen_icon('shibboleth');
 
 ?>
 	<style type="text/css">
@@ -135,11 +132,19 @@ function shibboleth_options_page() {
 	<div class="wrap">
 		<form method="post">
 
-			<h2><?php _e('Shibboleth Options', 'shibboleth') ?></h2>
+			<h1><?php _e('Shibboleth Options', 'shibboleth') ?></h1>
 
+			<?php if ( isset ( $_GET['tab'] ) ) shibboleth_admin_tabs($_GET['tab']); else shibboleth_admin_tabs('general');
+			if ( isset ( $_GET['tab'] ) ) $tab = $_GET['tab']; else $tab = 'general'; ?>
+
+			<?php
+			switch ( $tab ) {
+	       case 'general' : ?>
+
+			<h3><?php _e('General Configuration', 'shibboleth') ?></h3>
 			<table class="form-table">
 				<tr valign="top">
-					<th scope="row"><label for="login_url"><?php _e('Session Initiator URL', 'shibboleth') ?></label></th>
+					<th scope="row"><label for="login_url"><?php _e('Login URL', 'shibboleth') ?></label></th>
 					<td>
 						<input type="text" id="login_url" name="login_url" value="<?php echo get_site_option('shibboleth_login_url') ?>" size="50" /><br />
 						<?php _e('This URL is constructed from values found in your main Shibboleth'
@@ -200,7 +205,7 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-				<th scope="row"><label for="default_login"><?php _e('Shibboleth is default login', 'shibboleth') ?></label></th>
+				<th scope="row"><label for="default_login"><?php _e('Default Login Method', 'shibboleth') ?></label></th>
 					<td>
 						<input type="checkbox" id="default_login" name="default_login" <?php echo get_site_option('shibboleth_default_login') ? ' checked="checked"' : '' ?> />
 						<label for="default_login"><?php _e('Use Shibboleth as the default login method for users.', 'shibboleth'); ?></label>
@@ -211,13 +216,29 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-				<th scope="row"><label for="auto_login"><?php _e('Shibboleth automatic login', 'shibboleth') ?></label></th>
+				<th scope="row"><label for="auto_login"><?php _e('Automatic Login', 'shibboleth') ?></label></th>
 					<td>
 						<input type="checkbox" id="auto_login" name="auto_login" <?php echo get_site_option('shibboleth_auto_login') ? ' checked="checked"' : '' ?> />
 						<label for="auto_login"><?php _e('Use Shibboleth to auto-login users.', 'shibboleth'); ?></label>
 
-						<p><?php _e('If set, this will force a wp_signon() call and wp_safe_redirect()'
-							. ' to the site_url option.' , 'shibboleth'); ?></p>
+						<p><?php _e('If set, this option checks to see if a Shibboleth session exists on every page load, and, '
+						. 'if it does, forces a <code>wp_signon()</code> call and <code>wp_safe_redirect()</code> back to the <code>$_SERVER[\'REQUEST_URI\']</code>.' , 'shibboleth'); ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="disable_local_auth"><?php _e('Disable Local Authentication', 'shibboleth') ?></label></th>
+					<td>
+						<input type="checkbox" id="disable_local_auth" name="disable_local_auth" <?php echo get_site_option('shibboleth_disable_local_auth') ? ' checked="checked"' : '' ?> />
+						<label for="disable_local_auth"><?php _e('Disables local WordPress authentication.', 'shibboleth'); ?></label>
+						<p><?php _e('<b>WARNING:</b> Disabling local authentication can potentially lock you out of WordPress if you have misconfigured the plugin or have a non-functional Shibboleth Service Provider. '
+						. 'Make sure that you are confident your configuration is functional before enabling this option.', 'shibboleth') ?></p>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><label for="button_text"><?php _e('Button Text', 'shibboleth') ?></label></th>
+					<td>
+						<input type="text" id="button_text" name="button_text" value="<?php echo get_site_option('shibboleth_button_text') ?>" size="50" /><br />
+						<p><?php _e('Set the text of the button that appears on the <code>wp-login.php</code> page.', 'shibboleth') ?></p>
 					</td>
 				</tr>
 <?php
@@ -236,7 +257,11 @@ function shibboleth_options_page() {
 
 			<br class="clear" />
 
-			<h3><?php _e('User Profile Data', 'shibboleth') ?></h3>
+<?php 	break;
+	case 'user' : ?>
+
+			<h2><?php _e('User Configuration', 'shibboleth') ?></h2>
+			<h4><?php _e('User Profile Data', 'shibboleth') ?></h4>
 
 			<p><?php _e('Define the Shibboleth headers which should be mapped to each user profile attribute.  These'
 				. ' header names are configured in <code>attribute-map.xml</code> (for Shibboleth 2.x) or'
@@ -253,7 +278,7 @@ function shibboleth_options_page() {
 					<th scope="row"><label for="username"><?php _e('Username') ?></label></th>
 					<td><input type="text" id="username" name="headers[username][name]" value="<?php echo
 						$shib_headers['username']['name'] ?>" /></td>
-					<td width="60%"></td>
+						<td width="60%"><input type="checkbox" id="username_managed" name="headers[username][managed]" checked="checked" disabled="true" /> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="first_name"><?php _e('First name') ?></label></th>
@@ -290,14 +315,51 @@ function shibboleth_options_page() {
 					<td><input type="checkbox" id="email_managed" name="headers[email][managed]" <?php
 						if (isset($shib_headers['email']['managed'])) checked($shib_headers['email']['managed'], 'on') ?> /> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
+			</tr>
+		</table>
+
+		<p><?php _e('<em>Managed</em> profile fields are updated each time the user logs in using the current'
+			. ' data provided by Shibboleth.  Additionally, users will be prevented from manually updating these'
+			. ' fields from within WordPress.  Note that Shibboleth data is always used to populate the user'
+			. ' profile during initial account creation.', 'shibboleth'); ?></p>
+
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row"><label for="create_accounts"><?php _e('Automatically Create Accounts', 'shibboleth') ?></label></th>
+					<td>
+						<input type="checkbox" id="create_accounts" name="create_accounts" <?php echo get_site_option('shibboleth_create_accounts') ? ' checked="checked"' : '' ?> />
+						<label for="create_accounts"><?php _e('Automatically create new users if they do not exist in the WordPress database.', 'shibboleth'); ?></label>
+						<p><?php _e('Automatically created users will be provisioned with the role that they map to, as defined on the <a href="?page=shibboleth-options&tab=authorization">Authorization</a> tab. '
+						. 'If a user does not match any mappings, they will be placed into the role selected under "Default Role" on the <a href="?page=shibboleth-options&tab=authorization">Authorization</a> tab.', 'shibboleth') ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="combine_accounts"><?php _e('Combine Local and Shibboleth Accounts', 'shibboleth') ?></label></th>
+					<!-- <td>
+						<input type="checkbox" id="combine_accounts" name="combine_accounts" <?php echo get_site_option('shibboleth_combine_accounts') ? ' checked="checked"' : '' ?> />
+						<label for="combine_accounts"><?php _e('Automatically merge local WordPress and Shibboleth user accounts which share an username.', 'shibboleth'); ?></label>
+						<p><?php _e('By default, if a user shares an username with a local and a Shibboleth account, they will receive an error if they attempt to login via Shibboleth. '
+						. 'Selecting this option prevents the user from experiencing an error and merges their account in the WordPress database.', 'shibboleth') ?></p>
+					</td> -->
+						<td>
+							<select id="combine_accounts" name="combine_accounts">
+								<option value="prevent" <?php selected( get_site_option('shibboleth_combine_accounts'), 'disallow' ); ?>>Prevent Automatic Account Merging</option>
+								<option value="allow" <?php selected( get_site_option('shibboleth_combine_accounts'), 'allow' ); ?>>Allow Automatic Account Merging</option>
+								<option value="bypass" <?php selected( get_site_option('shibboleth_combine_accounts'), 'bypass' ); ?>>Allow Automatic Account Merging (Bypass Username Management)</option>
+							</select>
+							<p><?php _e('By default, users will receive an error if they log in via Shibboleth and have a pre-existing local WordPress user account that has not previously been linked with Shibboleth. '
+							. 'There are two options available to prevent users from experiencing these errors: <br />'
+							. '<code>Allow Automatic Account Merging</code>: This option prevents users from experiencing an error if they share a username with both a local and a Shibboleth account. '
+							. 'This option <b>WILL NOT</b> prevent an error if another user shares the email passed via Shibboleth attributes.<br /> '
+							. '<code>Allow Automatic Account Merging (Bypass Username Management)</code>: Occasionally, users have pre-existing local WordPress user accounts with a different username than that provided via Shibboleth attributes. '
+							. 'This option prevents users from experiencing an error in this case by bypassing the username management requirement.', 'shibboleth') ?></p>
+						</td>
+					</tr>
+				</tr>
 			</table>
 
-			<p><?php _e('<em>Managed</em> profile fields are updated each time the user logs in using the current'
-				. ' data provided by Shibboleth.  Additionally, users will be prevented from manually updating these'
-				. ' fields from within WordPress.  Note that Shibboleth data is always used to populate the user'
-				. ' profile during initial account creation.', 'shibboleth'); ?></p>
-
-			<br class="clear" />
+<?php 	break;
+	case 'authorization' : ?>
 
 			<h3><?php _e('User Role Mappings', 'shibboleth') ?></h3>
 
@@ -372,7 +434,6 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 					<th scope="row"><?php _e('Default Role', 'shibboleth') ?></th>
 					<td>
 						<select id="default_role" name="default_role">
-						<option value="" <?php selected( get_site_option('shibboleth_default_role'), '' ); ?>><?php _e('(none)') ?></option>
 <?php
 			foreach ($wp_roles->role_names as $key => $name) {
 				echo '
@@ -416,6 +477,7 @@ else:
 	do_action( 'shibboleth_role_mapping_form', $shib_headers, $shib_roles );
 endif; // if ( form override )
 ?>
+<?php       break; } ?>
 
 			<?php wp_nonce_field('shibboleth_update_options') ?>
 			<p class="submit"><input type="submit" name="submit" class="button-primary" value="<?php _e('Save Changes') ?>" /></p>

@@ -110,22 +110,24 @@ function shibboleth_activate_plugin() {
 		}
 	}
 
-	add_site_option( 'shibboleth_login_url', get_option( 'home' ) . '/Shibboleth.sso/Login' );
+	add_site_option( 'shibboleth_login_url', get_site_option( 'home' ) . '/Shibboleth.sso/Login' );
 	add_site_option( 'shibboleth_default_login', false );
 	add_site_option( 'shibboleth_auto_login', false );
-	add_site_option( 'shibboleth_logout_url', get_option( 'home' ) . '/Shibboleth.sso/Logout' );
+	add_site_option( 'shibboleth_logout_url', get_site_option( 'home' ) . '/Shibboleth.sso/Logout' );
 	add_site_option( 'shibboleth_attribute_access', 'standard' );
-	add_site_option( 'shibboleth_default_role', '' );
-	add_site_option( 'shibboleth_plugin_version', SHIBBOLETH_PLUGIN_VERSION );
+	add_site_option( 'shibboleth_default_role', 'subscriber' );
 	add_site_option( 'shibboleth_update_roles', false );
+	add_site_option( 'shibboleth_button_text', 'Login with Shibboleth' );
+	add_site_option( 'shibboleth_combine_accounts', 'disallow' );
+	add_site_option( 'shibboleth_disable_local_auth', false );
 
 	$headers = array(
-		'username' => array( 'name' => 'eppn', 'managed' => true ),
-		'first_name' => array( 'name' => 'givenName', 'managed' => true ),
-		'last_name' => array( 'name' => 'sn', 'managed' => true ),
-		'nickname' => array( 'name' => 'eppn', 'managed' => false ),
-		'display_name' => array( 'name' => 'displayName', 'managed' => false ),
-		'email' => array( 'name' => 'mail', 'managed' => true ),
+		'username' => array( 'name' => 'eppn', 'managed' => 'on' ),
+		'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ),
+		'last_name' => array( 'name' => 'sn', 'managed' => 'on' ),
+		'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ),
+		'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ),
+		'email' => array( 'name' => 'mail', 'managed' => 'on' ),
 	);
 	add_site_option( 'shibboleth_headers', $headers );
 
@@ -144,6 +146,8 @@ function shibboleth_activate_plugin() {
 	shibboleth_insert_htaccess();
 
 	shibboleth_migrate_old_data();
+
+	update_site_option( 'shibboleth_plugin_version', SHIBBOLETH_PLUGIN_VERSION );
 
 	if ( function_exists( 'restore_current_blog' ) ) {
 		restore_current_blog();
@@ -164,18 +168,22 @@ register_activation_hook( __FILE__, 'shibboleth_activate_plugin' );
  register_deactivation_hook( __FILE__, 'shibboleth_deactivate_plugin' );
 
 /**
- * Migrate old (before version 1.3) data to a newer format that
- * allows each header to be marked as 'managed' individually.
- *
- * @since 1.3
+ * Migrate old (before version 1.9) data to a newer format that
+ * doesn't allow the default role to be stored with the rest of
+ * the role mappings.
  */
 function shibboleth_migrate_old_data() {
-	$managed = get_site_option( 'shibboleth_update_users' );
-	$headers = get_site_option( 'shibboleth_headers' );
+	/**
+	 * Moves data from before version 1.3 to a new header format,
+	 * allowing each header to be marked as 'managed' individually
+	 *
+	 * @since 1.3
+	 */
+	$managed = get_site_option( 'shibboleth_update_users', 'off' );
+	$headers = get_site_option( 'shibboleth_headers', array() );
 	$updated = false;
-
 	foreach ( $headers as $key => $value ) {
-		if ( is_string( $value ) ) {
+		if ( is_string($value) ) {
 			$headers[$key] = array(
 				'name' => $value,
 				'managed' => $managed,
@@ -183,11 +191,31 @@ function shibboleth_migrate_old_data() {
 			$updated = true;
 		}
 	}
-
 	if ( $updated ) {
 		update_site_option( 'shibboleth_headers', $headers );
 	}
 	delete_site_option( 'shibboleth_update_users' );
+
+	/**
+	 * Moves data from before version 1.9 to a new default role format,
+	 * preventing a possible conflict with custom roles.
+	 *
+	 * @since 1.9
+	 */
+	$roles = get_site_option( 'shibboleth_roles', array() );
+	if ( isset( $roles['default'] ) && $roles['default'] != '' ) {
+		update_site_option( 'shibboleth_testing', '1' );
+		update_site_option( 'shibboleth_default_role', $roles['default'] );
+		update_site_option( 'shibboleth_create_accounts', true );
+		unset( $roles['default'] );
+		update_site_option( 'shibboleth_roles', $roles );
+	} elseif ( isset( $roles['default'] ) && $roles['default'] === '' ) {
+		update_site_option( 'shibboleth_testing', '2' );
+		update_site_option( 'shibboleth_default_role', 'subscriber' );
+		update_site_option( 'shibboleth_create_accounts', false );
+		unset( $roles['default'] );
+		update_site_option( 'shibboleth_roles', $roles );
+	}
 }
 
 /**
@@ -202,7 +230,6 @@ function shibboleth_admin_hooks() {
 	}
 }
 add_action( 'init', 'shibboleth_admin_hooks' );
-
 
 /**
  * Check if a Shibboleth session is active. If HTTP headers are being used
@@ -388,6 +415,7 @@ function shibboleth_session_initiator_url( $redirect = null ) {
  */
 function shibboleth_authenticate_user() {
 	$shib_headers = get_site_option( 'shibboleth_headers' );
+	$combine_accounts = get_site_option( 'shibboleth_combine_accounts', 'disallow');
 
 	// ensure user is authorized to login
 	$user_role = shibboleth_get_user_role();
@@ -397,6 +425,7 @@ function shibboleth_authenticate_user() {
 	}
 
 	$username = shibboleth_getenv( $shib_headers['username']['name'] );
+	$email = shibboleth_getenv( $shib_headers['email']['name'] );
 
 	/**
 	 * Allows a bypass mechanism for native Shibboleth authentication.
@@ -415,23 +444,32 @@ function shibboleth_authenticate_user() {
 
 	$user = get_user_by( 'login', $username );
 
+	$combine_accounts = get_site_option( 'shibboleth_combine_accounts', 'disallow' );
+
 	if ( $user->ID ) {
 		if ( ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
-			// TODO: what happens if non-shibboleth account by this name already exists?
-			//return new WP_Error('invalid_username', __('Account already exists by this name.'));
+			if ( $combine_accounts === 'allow' || $combine_accounts === 'bypass' ) {
+				update_user_meta( $user->ID, 'shibboleth_account', true );
+			} else {
+				return new WP_Error( 'invalid_username', __( 'An account already exists with this username.', 'shibboleth' ) );
+			}
+		}
+	} elseif ( ! $user->ID ) {
+		$user = get_user_by( 'email', $email );
+		if ( $user->ID && $combine_accounts === 'bypass' ) {
+			update_user_meta( $user->ID, 'shibboleth_account', true );
+		} else {
+			return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
 		}
 	}
 
 	// create account if new user
-	if ( !$user ) {
-		$user = shibboleth_create_new_user( $username );
+	if ( ! $user ) {
+		$user = shibboleth_create_new_user( $username, $email );
 	}
 
 	if ( ! $user ) {
 		$error_message = 'Unable to create account based on data provided.';
-		if ( defined('WP_DEBUG') && WP_DEBUG ) {
-			$error_message .= '<!-- ' . print_r($_SERVER, true) . ' -->';
-		}
 		return new WP_Error( 'missing_data', $error_message );
 	}
 
@@ -451,25 +489,30 @@ function shibboleth_authenticate_user() {
  * Create a new WordPress user account, and mark it as a Shibboleth account.
  *
  * @param string $user_login login name for the new user
+ * @param string $user_email email address for the new user
  * @return object WP_User object for newly created user
  * @since 1.0
  */
-function shibboleth_create_new_user( $user_login ) {
-	if ( empty( $user_login ) ) return null;
+function shibboleth_create_new_user( $user_login, $user_email ) {
+	if ( empty( $user_login ) || empty( $user_email ) ) return null;
 
 	// create account and flag as a shibboleth acount
 	require_once( ABSPATH . WPINC . '/registration.php' );
-	$user_id = wp_insert_user( array( 'user_login' => $user_login ) );
-	$user = new WP_User( $user_id );
-	update_user_meta( $user->ID, 'shibboleth_account', true );
+	$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email ) );
+	if ( is_wp_error( $user_id ) ) {
+    return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
+	} else {
+		$user = new WP_User( $user_id );
+		update_user_meta( $user->ID, 'shibboleth_account', true );
 
-	// always update user data and role on account creation
-	shibboleth_update_user_data( $user->ID, true );
-	$user_role = shibboleth_get_user_role();
-	$user->set_role( $user_role );
-	do_action( 'shibboleth_set_user_roles', $user );
+		// always update user data and role on account creation
+		shibboleth_update_user_data( $user->ID, true );
+		$user_role = shibboleth_get_user_role();
+		$user->set_role( $user_role );
+		do_action( 'shibboleth_set_user_roles', $user );
 
-	return $user;
+		return $user;
+	}
 }
 
 
@@ -488,7 +531,12 @@ function shibboleth_get_user_role() {
 	if ( !$wp_roles ) $wp_roles = new WP_Roles();
 
 	$shib_roles = apply_filters( 'shibboleth_roles', get_site_option( 'shibboleth_roles' ) );
-	$user_role = get_site_option( 'shibboleth_default_role' );
+	$create_accounts = get_site_option( 'shibboleth_create_accounts' );
+	if ( $create_accounts != false ) {
+		$user_role = get_site_option( 'shibboleth_default_role' );
+	} else {
+		$user_role = false;
+	}
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
 		$role_header = $shib_roles[$key]['header'];
@@ -594,7 +642,8 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
 function shibboleth_login_form() {
 	$login_url = add_query_arg( 'action', 'shibboleth' );
 	$login_url = remove_query_arg( 'reauth', $login_url );
-	echo '<p id="shibboleth_login"><a href="' . esc_url( $login_url ) . '">' . __( 'Login with Shibboleth', 'shibboleth' ) . '</a></p>';
+	$button_text = get_site_option( 'shibboleth_button_text', 'Login with Shibboleth' );
+	echo '<p id="shibboleth_login"><a href="' . esc_url( $login_url ) . '">' . esc_html( $button_text ) . '</a></p>';
 }
 add_action( 'login_form', 'shibboleth_login_form' );
 
