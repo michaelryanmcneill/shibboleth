@@ -194,6 +194,7 @@ function shibboleth_migrate_old_data() {
 		update_site_option( 'shibboleth_headers', $headers );
 	}
 	delete_site_option( 'shibboleth_update_users' );
+	delete_site_option( 'shibboleth_plugin_revision' );
 
 	/**
 	 * Moves data from before version 1.9 to a new default role format,
