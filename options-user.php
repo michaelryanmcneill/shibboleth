@@ -140,10 +140,10 @@ function shibboleth_link_accounts_button( $user ) {
 				<td>
 					<?php if ( $linked ) { ?>
 						<button type="button" disabled class="button">Link Shibboleth Account</button>
-						<p class="description"><?php _e("Add some informational text about why this button is disabled."); ?></p>
+						<p class="description"><?php _e("Your account is already linked to Shibboleth."); ?></p>
 					<?php } else { ?>
 						<a href="?shibboleth=link"><button type="button" class="button">Link Shibboleth Account</button></a>
-						<p class="description"><?php _e("Add some informational text."); ?></p>
+						<p class="description"><?php _e("Your account has not been linked to Shibboleth. To link your account, click the button above."); ?></p>
 					<?php } ?>
 				</td>
 			</tr>
@@ -158,7 +158,6 @@ function shibboleth_link_accounts() {
 	if ( is_admin() && $screen->id == 'profile' ) {
 		$user_id = get_current_user_id();
 		if ( isset( $_GET['shibboleth'] ) && $_GET['shibboleth'] === 'link' && current_user_can( 'edit_user', $user_id ) ) {
-			// delete_user_meta( $user_id, 'shibboleth_account' );
 			$allowed = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 			if ( ! get_user_meta( $user_id, 'shibboleth_account' ) ) {
 				if ( $allowed === 'allow' || $allowed === 'bypass' ) {
