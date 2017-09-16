@@ -213,7 +213,7 @@ function shibboleth_options_page() {
 
 						<p><?php _e('If set, this will cause all standard WordPress login links to initiate Shibboleth'
 							. ' login instead of local WordPress authentication.  Shibboleth login can always be'
-							. ' initiated from the WordPress login form by clicking the "Login with Shibboleth" link.', 'shibboleth'); ?></p>
+							. ' initiated from the WordPress login form by clicking the "Log in with Shibboleth" link.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -453,7 +453,7 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 
 						<p><?php _e('If a user does not map into any of the roles above, they will'
 							. ' be placed into the default role.  If there is no default role, the'
-							. ' user will not be able to login with Shibboleth.', 'shibboleth'); ?></p>
+							. ' user will not be able to log in with Shibboleth.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
 

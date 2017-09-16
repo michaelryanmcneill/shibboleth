@@ -115,7 +115,7 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_attribute_access', 'standard' );
 	add_site_option( 'shibboleth_default_role', 'subscriber' );
 	add_site_option( 'shibboleth_update_roles', false );
-	add_site_option( 'shibboleth_button_text', 'Login with Shibboleth' );
+	add_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
 	add_site_option( 'shibboleth_auto_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_disable_local_auth', false );
@@ -630,14 +630,61 @@ function shibboleth_update_user_data( $user_id, $force_update = false ) {
 
 /**
  * Sanitize the nicename using sanitize_title
- * See discussion: http://wordpress.org/support/topic/377030
  *
  * @since 1.4
+ * @see http://wordpress.org/support/topic/377030
  */
 add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
 
 /**
- * Add a "Login with Shibboleth" link to the WordPress login form.  This link
+ * Enqueues scripts and styles necessary for the Shibboleth button.
+ *
+ * @since 1.9
+ */
+function shibboleth_login_enqueue_scripts() {
+	wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
+	wp_enqueue_script( 'shibboleth-login', plugins_url( 'assets/js/shibboleth_login_form.js', __FILE__ ), array( 'jquery' ), SHIBBOLETH_PLUGIN_VERSION );
+}
+add_action( 'login_enqueue_scripts', 'shibboleth_login_enqueue_scripts' );
+
+/**
+ * Prevents local WordPress authentication if disabled by an administrator.
+ *
+ * @since 1.9
+ * @var constant SHIBBOLETH_ALLOW_LOCAL_AUTH set in wp-config.php to bypass disabled logins
+ */
+function shibboleth_disable_login() {
+	$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
+	if ( $disable && ! $bypass ) {
+		if ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
+			 wp_die( __( 'Shibboleth authentication is required.', 'shibboleth' ) );
+		}
+	}
+}
+add_action( 'login_init', 'shibboleth_disable_login' );
+
+/**
+ * Disables wp-login.php login form if disabled by an administrator.
+ *
+ * @since 1.9
+ * @var constant SHIBBOLETH_ALLOW_LOCAL_AUTH set in wp-config.php to bypass disabled logins
+ */
+function shibboleth_disable_login_form() {
+	$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
+	if ( $disable && ! $bypass ) { ?>
+		<style type="text/css">
+			#loginform p {
+			  display: none;
+			}
+		</style>
+	<?php }
+}
+add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
+
+/**
+ * Add a "Log in with Shibboleth" link to the WordPress login form.  This link
  * will be wrapped in a <p> with an id value of "shibboleth_login" so that
  * deployers can style this however they choose.
  *
@@ -646,9 +693,20 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
 function shibboleth_login_form() {
 	$login_url = add_query_arg( 'action', 'shibboleth' );
 	$login_url = remove_query_arg( 'reauth', $login_url );
-	$button_text = get_site_option( 'shibboleth_button_text', 'Login with Shibboleth' );
-	echo '<p id="shibboleth_login"><a href="' . esc_url( $login_url ) . '">' . esc_html( $button_text ) . '</a></p>';
-}
+	$button_text = get_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
+	$disable = get_site_option( 'shibboleth_disable_local_auth', false ); ?>
+	<div id="shibboleth-wrap" <?php echo $disable ? 'style="margin-top:0;"' : '' ?>>
+		<?php if ( ! $disable ) { ?>
+			<div class="shibboleth-or">
+				<span><?php esc_html_e( 'Or', 'shibboleth' ); ?></span>
+			</div>
+		<?php }	?>
+		<a href="<?php echo esc_url( $login_url ); ?>" class="button button-primary default">
+			<span class="shibboleth-icon"></span>
+			<?php esc_html_e( $button_text ); ?>
+		</a>
+	</div>
+<?php }
 add_action( 'login_form', 'shibboleth_login_form' );
 
 

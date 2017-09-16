@@ -1,0 +1,112 @@
+/**
+ * Originally from Automattic's Jetpack SSO module (v5.3)
+ * @see https://github.com/Automattic/jetpack/blob/5.3/modules/sso/jetpack-sso-login.css
+ */
+
+#loginform {
+	/* We set !important because sometimes static is added inline */
+	position: relative !important;
+	padding-bottom: 92px;
+}
+
+.shibboleth-repositioned #loginform {
+	padding-bottom: 26px;
+}
+
+#loginform #shibboleth-wrap,
+#loginform #shibboleth-wrap * {
+	box-sizing: border-box;
+}
+
+#shibboleth-wrap {
+	position: absolute;
+		bottom: 20px;
+	padding: 0 24px;
+	margin-left: -24px;
+	margin-right: -24px;
+	width: 100%;
+}
+
+.shibboleth-repositioned #shibboleth-wrap {
+	position: relative;
+		bottom: auto;
+	padding: 0;
+	margin-top: 16px;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.shibboleth-form-display #shibboleth-wrap {
+	position: relative;
+		bottom: auto;
+	padding: 0;
+	margin-top: 0;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+#loginform #shibboleth-wrap p {
+	color: #777777;
+	margin-bottom: 16px;
+}
+
+#shibboleth-wrap a {
+	display: block;
+	width: 100%;
+	text-align: center;
+	text-decoration: none;
+}
+
+.shibboleth-form-display #loginform > p,
+.shibboleth-form-display #loginform > div {
+	display: none;
+}
+
+.shibboleth-form-display #loginform #shibboleth-wrap {
+	display: block;
+}
+
+.shibboleth-form-display #loginform {
+	padding: 26px 24px;
+}
+
+.shibboleth-or {
+	margin-bottom: 16px;
+	position: relative;
+	text-align: center;
+}
+
+.shibboleth-or:before {
+	background: #E5E5E5;
+	content: '';
+	height: 1px;
+	position: absolute;
+		left: 0;
+		top: 50%;
+	width: 100%;
+}
+.shibboleth-or span {
+	background: #fff;
+	color: #777;
+	position: relative;
+	padding: 0 8px;
+	text-transform: uppercase
+}
+
+.shibboleth-form-display #nav {
+	display: none;
+}
+
+.shibboleth-form-display #backtoblog {
+	margin: 24px 0 0;
+}
+
+.shibboleth-clear:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.shibboleth-repositioned #shibboleth-wrap .button .dashicons {
+	font-size: 24px;
+}
