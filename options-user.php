@@ -130,6 +130,13 @@ function shibboleth_personal_options_update() {
 	}
 }
 
+/**
+ * Adds a button to user profile pages if administrator has allowed
+ * users to manually combine accounts.
+ *
+ * @param object $user WP_User object
+ * @since 1.9
+ */
 function shibboleth_link_accounts_button( $user ) {
 	$allowed = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 	if ( $allowed === 'allow' || $allowed === 'bypass' ) {
@@ -153,6 +160,12 @@ function shibboleth_link_accounts_button( $user ) {
 add_action( 'show_user_profile', 'shibboleth_link_accounts_button' );
 add_action( 'edit_user_profile', 'shibboleth_link_accounts_button' );
 
+/**
+ * Processes the linking of a user's account if administrator has allowed
+ * users to manually combine accounts and redirects them to an admin notice.
+ *
+ * @since 1.9
+ */
 function shibboleth_link_accounts() {
 	$screen = get_current_screen();
 	if ( is_admin() && $screen->id == 'profile' ) {
@@ -206,6 +219,11 @@ function shibboleth_link_accounts() {
 }
 add_action( 'current_screen', 'shibboleth_link_accounts' );
 
+/**
+ * Displays admin notices based off query string.
+ *
+ * @since 1.9
+ */
 function shibboleth_link_accounts_notice() {
 	if ( isset( $_GET['shibboleth'] ) ) {
 		if ( $_GET['shibboleth'] === 'failed' ) {
