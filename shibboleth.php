@@ -271,8 +271,6 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 		} else {
 			$active = true;
 		}
-	} else {
-		$active = false;
 	}
 
  	$active = apply_filters( 'shibboleth_session_active', $active );
