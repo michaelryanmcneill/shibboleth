@@ -699,7 +699,7 @@ function shibboleth_login_form() {
 				<span><?php esc_html_e( 'Or', 'shibboleth' ); ?></span>
 			</div>
 		<?php }	?>
-		<a href="<?php echo esc_url( $login_url ); ?>" class="button button-primary default">
+		<a href="<?php echo esc_url( $login_url ); ?>" class="shibboleth-button button button-primary default">
 			<span class="shibboleth-icon"></span>
 			<?php esc_html_e( $button_text ); ?>
 		</a>
