@@ -79,9 +79,7 @@ function shibboleth_auto_login() {
 		do_action( 'login_form_shibboleth' );
 
 		$userobj = wp_signon( '', true );
-		if ( is_wp_error( $userobj ) ) {
-			// TODO: Proper error return.
-		} else {
+		if ( ! is_wp_error( $userobj ) ) {
 			wp_safe_redirect( $_SERVER['REQUEST_URI'] );
 			exit();
 		}
@@ -118,7 +116,8 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_default_role', 'subscriber' );
 	add_site_option( 'shibboleth_update_roles', false );
 	add_site_option( 'shibboleth_button_text', 'Login with Shibboleth' );
-	add_site_option( 'shibboleth_combine_accounts', 'disallow' );
+	add_site_option( 'shibboleth_auto_combine_accounts', 'disallow' );
+	add_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_disable_local_auth', false );
 
 	$headers = array(
@@ -292,7 +291,7 @@ function shibboleth_authenticate( $user, $username, $password ) {
 	if ( shibboleth_session_active() ) {
 		return shibboleth_authenticate_user();
 	} else {
-		if (isset( $_REQUEST['redirect_to'] )) {
+		if ( isset( $_REQUEST['redirect_to'] ) ) {
 			$initiator_url = shibboleth_session_initiator_url( $_REQUEST['redirect_to'] );
 		} else {
 			$initiator_url = shibboleth_session_initiator_url();
@@ -415,7 +414,8 @@ function shibboleth_session_initiator_url( $redirect = null ) {
  */
 function shibboleth_authenticate_user() {
 	$shib_headers = get_site_option( 'shibboleth_headers' );
-	$combine_accounts = get_site_option( 'shibboleth_combine_accounts', 'disallow');
+	$auto_combine_accounts = get_site_option( 'shibboleth_auto_combine_accounts', 'disallow');
+	$manually_combine_accounts = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 
 	// ensure user is authorized to login
 	$user_role = shibboleth_get_user_role();
@@ -443,29 +443,29 @@ function shibboleth_authenticate_user() {
 	}
 
 	$user = get_user_by( 'login', $username );
-
-	$combine_accounts = get_site_option( 'shibboleth_combine_accounts', 'disallow' );
-
-	if ( $user->ID ) {
+	if ( is_object( $user ) && $user->ID ) {
 		if ( ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
-			if ( $combine_accounts === 'allow' || $combine_accounts === 'bypass' ) {
+			if ( $auto_combine_accounts === 'allow' || $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'allow' || $manually_combine_accounts === 'bypass' ) {
 				update_user_meta( $user->ID, 'shibboleth_account', true );
 			} else {
 				return new WP_Error( 'invalid_username', __( 'An account already exists with this username.', 'shibboleth' ) );
 			}
 		}
-	} elseif ( ! $user->ID ) {
+	} else {
 		$user = get_user_by( 'email', $email );
-		if ( $user->ID && $combine_accounts === 'bypass' ) {
-			update_user_meta( $user->ID, 'shibboleth_account', true );
-		} else {
-			return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
+		if ( is_object( $user ) && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
+			if ( $user->ID && $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'bypass' ) {
+				update_user_meta( $user->ID, 'shibboleth_account', true );
+			} else {
+				return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
+			}
 		}
 	}
 
 	// create account if new user
 	if ( ! $user ) {
 		$user = shibboleth_create_new_user( $username, $email );
+		if ( is_wp_error( $user ) ) return new WP_Error( $user->get_error_code(), $user->get_error_message() );
 	}
 
 	if ( ! $user ) {
@@ -494,24 +494,29 @@ function shibboleth_authenticate_user() {
  * @since 1.0
  */
 function shibboleth_create_new_user( $user_login, $user_email ) {
-	if ( empty( $user_login ) || empty( $user_email ) ) return null;
+	$create_accounts = get_site_option( 'shibboleth_create_accounts' );
+	if ( $create_accounts != false ) {
+		if ( empty( $user_login ) || empty( $user_email ) ) return null;
 
-	// create account and flag as a shibboleth acount
-	require_once( ABSPATH . WPINC . '/registration.php' );
-	$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email ) );
-	if ( is_wp_error( $user_id ) ) {
-    return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
+		// create account and flag as a shibboleth acount
+		require_once( ABSPATH . WPINC . '/registration.php' );
+		$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email ) );
+		if ( is_wp_error( $user_id ) ) {
+	    return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
+		} else {
+			$user = new WP_User( $user_id );
+			update_user_meta( $user->ID, 'shibboleth_account', true );
+
+			// always update user data and role on account creation
+			shibboleth_update_user_data( $user->ID, true );
+			$user_role = shibboleth_get_user_role();
+			$user->set_role( $user_role );
+			do_action( 'shibboleth_set_user_roles', $user );
+
+			return $user;
+		}
 	} else {
-		$user = new WP_User( $user_id );
-		update_user_meta( $user->ID, 'shibboleth_account', true );
-
-		// always update user data and role on account creation
-		shibboleth_update_user_data( $user->ID, true );
-		$user_role = shibboleth_get_user_role();
-		$user->set_role( $user_role );
-		do_action( 'shibboleth_set_user_roles', $user );
-
-		return $user;
+		return new WP_Error( 'no_access', __( 'You do not have sufficient access.' ) );
 	}
 }
 
@@ -535,15 +540,13 @@ function shibboleth_get_user_role() {
 	if ( $create_accounts != false ) {
 		$user_role = get_site_option( 'shibboleth_default_role' );
 	} else {
-		$user_role = false;
+		$user_role = 'none';
 	}
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
-		$role_header = $shib_roles[$key]['header'];
-		$role_value = $shib_roles[$key]['value'];
-
+		if ( isset( $shib_roles[$key]['header'] ) ) $role_header = $shib_roles[$key]['header'];
+		if ( isset( $shib_roles[$key]['value'] ) ) $role_value = $shib_roles[$key]['value'];
 		if ( empty( $role_header ) || empty( $role_value ) ) continue;
-
 		$values = explode( ';', shibboleth_getenv( $role_header ) );
 		if ( in_array( $role_value, $values ) ) {
 			$user_role = $key;

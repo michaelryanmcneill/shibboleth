@@ -129,3 +129,100 @@ function shibboleth_personal_options_update() {
 		}
 	}
 }
+
+function shibboleth_link_accounts_button( $user ) {
+	$allowed = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
+	if ( $allowed === 'allow' || $allowed === 'bypass' ) {
+		$linked = get_user_meta( $user->ID, 'shibboleth_account', true ); ?>
+		<table class="form-table">
+			<tr>
+				<th><label for="link_shibboleth"><?php _e("Link Shibboleth Account"); ?></label></th>
+				<td>
+					<?php if ( $linked ) { ?>
+						<button type="button" disabled class="button">Link Shibboleth Account</button>
+						<p class="description"><?php _e("Add some informational text about why this button is disabled."); ?></p>
+					<?php } else { ?>
+						<a href="?shibboleth=link"><button type="button" class="button">Link Shibboleth Account</button></a>
+						<p class="description"><?php _e("Add some informational text."); ?></p>
+					<?php } ?>
+				</td>
+			</tr>
+		</table>
+	<?php }
+}
+add_action( 'show_user_profile', 'shibboleth_link_accounts_button' );
+add_action( 'edit_user_profile', 'shibboleth_link_accounts_button' );
+
+function shibboleth_link_accounts() {
+	$screen = get_current_screen();
+	if ( is_admin() && $screen->id == 'profile' ) {
+		$user_id = get_current_user_id();
+		if ( isset( $_GET['shibboleth'] ) && $_GET['shibboleth'] === 'link' && current_user_can( 'edit_user', $user_id ) ) {
+			// delete_user_meta( $user_id, 'shibboleth_account' );
+			$allowed = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
+			if ( ! get_user_meta( $user_id, 'shibboleth_account' ) ) {
+				if ( $allowed === 'allow' || $allowed === 'bypass' ) {
+					if ( shibboleth_session_active() ) {
+						$shib_headers = get_site_option( 'shibboleth_headers' );
+						$username = shibboleth_getenv( $shib_headers['username']['name'] );
+						$email = shibboleth_getenv( $shib_headers['email']['name'] );
+						$user = get_user_by( 'id', $user_id );
+						if ( $user->user_login == $username && $user->user_email == $email) {
+							update_user_meta( $user->ID, 'shibboleth_account', true );
+							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
+							exit;
+						} elseif ( $user->user_login == $username ) {
+								$prevent_conflict = get_user_by( 'email', $email );
+								if ( ! $user->ID ) {
+									update_user_meta( $user->ID, 'shibboleth_account', true );
+									wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
+									exit;
+								} else {
+									wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
+									exit;
+								}
+						} elseif ( $user->user_email == $email && $allowed === 'bypass' ) {
+							update_user_meta( $user->ID, 'shibboleth_account', true );
+							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
+							exit;
+						} else {
+							wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
+							exit;
+						}
+					} else {
+						$initator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
+						wp_redirect( $initiator_url );
+						exit;
+					}
+				} else {
+					wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
+					exit;
+				}
+			} else {
+				wp_safe_redirect( get_edit_user_link() . '?shibboleth=duplicate' );
+				exit;
+			}
+		}
+	}
+}
+add_action( 'current_screen', 'shibboleth_link_accounts' );
+
+function shibboleth_link_accounts_notice() {
+	if ( isset( $_GET['shibboleth'] ) ) {
+		if ( $_GET['shibboleth'] === 'failed' ) {
+			$class = 'notice notice-error';
+			$message = __( 'Your account was unable to be linked with Shibboleth.', 'shibboleth' );
+		} elseif ( $_GET['shibboleth'] === 'linked' ) {
+			$class = 'notice notice-success is-dismissible';
+			$message = __( 'Your account has been linked with Shibboleth.', 'shibboleth' );
+		} elseif ( $_GET['shibboleth'] === 'duplicate' ) {
+			$class = 'notice notice-info is-dismissible';
+			$message = __( 'Your account is already linked with Shibboleth.', 'shibboleth' );
+		} else {
+			$class = '';
+			$message = '';
+		}
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+	}
+}
+add_action( 'admin_notices', 'shibboleth_link_accounts_notice' );

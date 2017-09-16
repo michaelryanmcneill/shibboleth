@@ -86,7 +86,8 @@ function shibboleth_options_page() {
 				$shib_headers = apply_filters( 'shibboleth_form_submit_headers', $shib_headers );
 				update_site_option( 'shibboleth_headers', $shib_headers );
 				update_site_option( 'shibboleth_create_accounts', ! empty( $_POST['create_accounts'] ) );
-				update_site_option( 'shibboleth_combine_accounts', $_POST['combine_accounts'] );
+				update_site_option( 'shibboleth_auto_combine_accounts', $_POST['auto_combine_accounts'] );
+				update_site_option( 'shibboleth_manually_combine_accounts', $_POST['manually_combine_accounts'] );
 				break;
 			case 'authorization' :
 				$shib_roles = (array) get_site_option( 'shibboleth_roles' );
@@ -334,28 +335,36 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-				<th scope="row"><label for="combine_accounts"><?php _e('Combine Local and Shibboleth Accounts', 'shibboleth') ?></label></th>
-					<!-- <td>
-						<input type="checkbox" id="combine_accounts" name="combine_accounts" <?php echo get_site_option('shibboleth_combine_accounts') ? ' checked="checked"' : '' ?> />
-						<label for="combine_accounts"><?php _e('Automatically merge local WordPress and Shibboleth user accounts which share an username.', 'shibboleth'); ?></label>
-						<p><?php _e('By default, if a user shares an username with a local and a Shibboleth account, they will receive an error if they attempt to login via Shibboleth. '
-						. 'Selecting this option prevents the user from experiencing an error and merges their account in the WordPress database.', 'shibboleth') ?></p>
-					</td> -->
+				<th scope="row"><label for="auto_combine_accounts"><?php _e('Combine Local and Shibboleth Accounts', 'shibboleth') ?></label></th>
 						<td>
-							<select id="combine_accounts" name="combine_accounts">
-								<option value="prevent" <?php selected( get_site_option('shibboleth_combine_accounts'), 'disallow' ); ?>>Prevent Automatic Account Merging</option>
-								<option value="allow" <?php selected( get_site_option('shibboleth_combine_accounts'), 'allow' ); ?>>Allow Automatic Account Merging</option>
-								<option value="bypass" <?php selected( get_site_option('shibboleth_combine_accounts'), 'bypass' ); ?>>Allow Automatic Account Merging (Bypass Username Management)</option>
+							<select id="auto_combine_accounts" name="auto_combine_accounts">
+								<option value="prevent" <?php selected( get_site_option('shibboleth_auto_combine_accounts'), 'disallow' ); ?>>Prevent Automatic Account Merging</option>
+								<option value="allow" <?php selected( get_site_option('shibboleth_auto_combine_accounts'), 'allow' ); ?>>Allow Automatic Account Merging</option>
+								<option value="bypass" <?php selected( get_site_option('shibboleth_auto_combine_accounts'), 'bypass' ); ?>>Allow Automatic Account Merging (Bypass Username Management)</option>
 							</select>
-							<p><?php _e('By default, users will receive an error if they log in via Shibboleth and have a pre-existing local WordPress user account that has not previously been linked with Shibboleth. '
-							. 'There are two options available to prevent users from experiencing these errors: <br />'
+							<p><?php _e('By default, users will receive an error if they log in via Shibboleth and have a pre-existing local WordPress user account that has not previously been linked with Shibboleth. <br /><br />'
+							. '<code>Prevent Automatic Account Merging</code>: This option prevents automatic merging of accounts.<br /> '
 							. '<code>Allow Automatic Account Merging</code>: This option prevents users from experiencing an error if they share a username with both a local and a Shibboleth account. '
 							. 'This option <b>WILL NOT</b> prevent an error if another user shares the email passed via Shibboleth attributes.<br /> '
 							. '<code>Allow Automatic Account Merging (Bypass Username Management)</code>: Occasionally, users have pre-existing local WordPress user accounts with a different username than that provided via Shibboleth attributes. '
 							. 'This option prevents users from experiencing an error in this case by bypassing the username management requirement.', 'shibboleth') ?></p>
 						</td>
 					</tr>
-				</tr>
+					<th scope="row"><label for="manually_combine_accounts"></label></th>
+							<td>
+								<select id="manually_combine_accounts" name="manually_combine_accounts">
+									<option value="prevent" <?php selected( get_site_option('shibboleth_manually_combine_accounts'), 'disallow' ); ?>>Prevent Manual Account Merging</option>
+									<option value="allow" <?php selected( get_site_option('shibboleth_manually_combine_accounts'), 'allow' ); ?>>Allow Manual Account Merging</option>
+									<option value="bypass" <?php selected( get_site_option('shibboleth_manually_combine_accounts'), 'bypass' ); ?>>Allow Manual Account Merging (Bypass Username Management)</option>
+								</select>
+								<p><?php _e('This option offers users the ability to manually link their local accounts to Shibboleth from their profile page.<br /><br />'
+								. '<code>Prevent Manual Account Merging</code>: This option does not allow users to manually link accounts.<br /> '
+								. '<code>Allow Manual Account Merging</code>: This option allows users to manually link accounts if they share a username with both a local and a Shibboleth account. '
+								. 'This option <b>WILL NOT</b> prevent an error if another user shares the email passed via Shibboleth attributes.<br /> '
+								. '<code>Allow Manual Account Merging (Bypass Username Management)</code>: Occasionally, users have pre-existing local WordPress user accounts with a different username than that provided via Shibboleth attributes. '
+								. 'This option allows users to manually link accounts by bypassing the username management requirement.', 'shibboleth') ?></p>
+							</td>
+						</tr>
 			</table>
 
 <?php 	break;
