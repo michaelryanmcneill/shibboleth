@@ -176,12 +176,12 @@ This update brings with it a major change to the way Shibboleth attributes are a
 = version 2.0 (2018-01-16) =
  - Changed the way we check for Shibboleth attributes. Now, by default, we only check standard environment variables for Shibboleth attributes. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should instead select the option specific to your server configuration. Selecting the "Redirected Environment Variables" option will look for attributes in environment variables prefixed with `REDIRECT_` while selecting the "HTTP Headers" option will look for attributes in environment variables (populated by HTTP Headers) prefixed with `HTTP_`. Most users should be fine leaving the default option selected; [thanks to @jrchamp for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/8).
  - Changed the default behavior to not automatically update user roles.
- - Allow options to be defined via constants. Documentation has been added to the ["FAQ" section of the WordPress.org plugins page](https://wordpress.org/plugins/shibboleth/#can-i-extend-the-shibboleth-plugin-to-provide-custom-logic).
- - Allow automatic and manual merging of local WordPress accounts with Shibboleth accounts. This prevents a collision from occuring if the Shibboleth email attribute matches an email that already exists in the `wp_users` table. This is configurable by an administrator.
+ - Allow options to be defined via constants. Documentation has been added to the ["FAQ" section of the WordPress.org plugins page](https://wordpress.org/plugins/shibboleth/#can-i-control-the-plugin-settings-with-constants-in-wpconfigphp).
+ - Allow automatic and manual merging of local WordPress accounts with Shibboleth accounts. This prevents a collision from occurring if the Shibboleth email attribute matches an email that already exists in the `wp_users` table. This is configurable by an administrator.
  - Changed the options page to utilize a more modern design centered around tabs.
  - Added signifcant customizations to the login page to bring it more in-line with WordPress.com Single Sign On.
  - Disabled the sending of an email notifying user's that their email had changed when the Shibboleth plugin updates user attributes to prevent user confusion; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/19).
- - Removed the shibboleth-mu.php file as it is no longer relevant.
+ - Removed the `shibboleth-mu.php` file as it is no longer relevant.
 
 = version 1.8.1 (2017-09-08) =
  - Use sanitize_title rather than sanitize_user to sanitize user_nicename; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/4).
