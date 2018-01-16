@@ -3,13 +3,13 @@
  Plugin Name: Shibboleth
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
- Author: Will Norris, mitcho (Michael 芳貴 Erlewine), Michael McNeill
- Version: 1.9-alpha
+ Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
+ Version: 2.0-alpha
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '3.3' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '1.9-alpha' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.0-alpha' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -33,7 +33,11 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
  * @return string|bool
  */
 function shibboleth_getenv( $var ) {
-	$method = get_site_option( 'shibboleth_attribute_access', 'standard' );
+	if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) {
+		$method = SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD;
+	} else {
+		$method = get_site_option( 'shibboleth_attribute_access', 'standard' );
+	}
 
 	switch ( $method ) {
 		case 'standard' :
@@ -45,6 +49,8 @@ function shibboleth_getenv( $var ) {
 		case 'http':
 			$var_method = 'HTTP_';
 			break;
+		default :
+			$var_method = '';
 	}
 
 	$var_under = str_replace( '-', '_', $var );
@@ -74,7 +80,12 @@ function shibboleth_getenv( $var ) {
  * @since 1.6
  */
 function shibboleth_auto_login() {
-	$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
+	if ( defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
+		$shibboleth_auto_login = SHIBBOLETH_AUTO_LOGIN;
+	} else {
+		$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
+	}
+
 	if ( ! is_user_logged_in() && shibboleth_session_active( true ) && $shibboleth_auto_login ) {
 		do_action( 'login_form_shibboleth' );
 
@@ -154,17 +165,17 @@ function shibboleth_activate_plugin() {
 }
 register_activation_hook( __FILE__, 'shibboleth_activate_plugin' );
 
- /**
-  * Cleanup .htaccess rules and delete the option shibboleth_plugin_version
-	* on deactivation.
-  *
-  * @since 1.0
-  */
- function shibboleth_deactivate_plugin() {
+/**
+ * Cleanup .htaccess rules and delete the option shibboleth_plugin_version
+ * on deactivation.
+ *
+ * @since 1.0
+ */
+function shibboleth_deactivate_plugin() {
  	shibboleth_remove_htaccess();
  	delete_site_option( 'shibboleth_plugin_version' );
- }
- register_deactivation_hook( __FILE__, 'shibboleth_deactivate_plugin' );
+}
+register_deactivation_hook( __FILE__, 'shibboleth_deactivate_plugin' );
 
 /**
  * Migrate old (before version 1.9) data to a newer format that
@@ -200,7 +211,7 @@ function shibboleth_migrate_old_data() {
 	 * Moves data from before version 1.9 to a new default role format,
 	 * preventing a possible conflict with custom roles.
 	 *
-	 * @since 1.9
+	 * @since 2.0
 	 */
 	$roles = get_site_option( 'shibboleth_roles', array() );
 	if ( isset( $roles['default'] ) && $roles['default'] != '' ) {
@@ -237,13 +248,16 @@ add_action( 'init', 'shibboleth_admin_hooks' );
  *
  * @uses apply_filters calls 'shibboleth_session_active' before returning final result
  * @param boolean $auto_login whether this is being triggered by an auto_login request or not
- * @var constant SHIBBOLETH_BYPASS_SPOOF_CHECKING set in wp-config.php to bypass spoofkey checking
  * @return boolean|WP_Error
  * @since 1.3
  */
  function shibboleth_session_active( $auto_login = false ) {
  	$active = false;
- 	$method = get_site_option( 'shibboleth_attribute_access' );
+	if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) {
+		$method = SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD;
+	} else {
+		$method = get_site_option( 'shibboleth_attribute_access' );
+	}
  	$session = shibboleth_getenv( 'Shib-Session-ID' );
 
  	if ( $session && $method !== 'http' ) {
@@ -255,8 +269,16 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 		 *
 		 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
 		 */
-		$spoofkey = get_site_option( 'shibboleth_spoofkey' );
-		$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
+		if ( defined( 'SHIBBOLETH_SPOOF_KEY' ) ) {
+			$spoofkey = SHIBBOLETH_SPOOF_KEY;
+		} else {
+			$spoofkey = get_site_option( 'shibboleth_spoofkey' );
+		}
+		if ( defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
+			$shibboleth_auto_login = SHIBBOLETH_AUTO_LOGIN;
+		} else {
+			$shibboleth_auto_login = get_site_option( 'shibboleth_auto_login' );
+		}
 
 		if ( $spoofkey !== false && $spoofkey !== '' ) {
 			$bypass = defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING;
@@ -320,7 +342,11 @@ add_action( 'login_form_shibboleth', 'shibboleth_login_form_shibboleth' );
  * @since 1.3
  */
 function shibboleth_retrieve_password( $user_login ) {
-	$password_reset_url = get_site_option( 'shibboleth_password_reset_url' );
+	if ( defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) ) {
+		$password_reset_url = SHIBBOLETH_PASSWORD_RESET_URL;
+	} else {
+		$password_reset_url = get_site_option( 'shibboleth_password_reset_url' );
+	}
 
 	if ( ! empty( $password_reset_url ) ) {
 		$user = get_user_by( 'login', $user_login );
@@ -340,7 +366,13 @@ add_action( 'retrieve_password', 'shibboleth_retrieve_password' );
  * @since 1.0
  */
 function shibboleth_login_url( $login_url ) {
-	if ( get_site_option( 'shibboleth_default_login' ) ) {
+	if ( defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
+		$default = SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN;
+	} else {
+		$default = get_site_option( 'shibboleth_default_login' );
+	}
+
+	if ( $default ) {
 		$login_url = add_query_arg( 'action', 'shibboleth', $login_url );
 	}
 	return $login_url;
@@ -355,7 +387,11 @@ add_filter( 'login_url', 'shibboleth_login_url' );
  * @since 1.0
  */
 function shibboleth_logout() {
-	$logout_url = get_site_option( 'shibboleth_logout_url' );
+	if ( defined( 'SHIBBOLETH_LOGOUT_URL' ) ) {
+		$logout_url = SHIBBOLETH_LOGOUT_URL;
+	} else {
+		$logout_url = get_site_option( 'shibboleth_logout_url' );
+	}
 
 	if ( ! empty( $logout_url ) && shibboleth_session_active() ) {
 		wp_redirect( $logout_url );
@@ -387,7 +423,11 @@ function shibboleth_session_initiator_url( $redirect = null ) {
 	}
 
 	// now build the Shibboleth session initiator URL
-	$initiator_url = get_site_option( 'shibboleth_login_url' );
+	if ( defined( 'SHIBBOLETH_LOGIN_URL' ) ) {
+		$initiator_url = SHIBBOLETH_LOGIN_URL;
+	} else {
+		$initiator_url = get_site_option( 'shibboleth_login_url' );
+	}
 	$initiator_url = add_query_arg( 'target', urlencode($target), $initiator_url );
 
 	$initiator_url = apply_filters( 'shibboleth_session_initiator_url', $initiator_url );
@@ -412,9 +452,24 @@ function shibboleth_session_initiator_url( $redirect = null ) {
  * @since 1.0
  */
 function shibboleth_authenticate_user() {
-	$shib_headers = get_site_option( 'shibboleth_headers' );
-	$auto_combine_accounts = get_site_option( 'shibboleth_auto_combine_accounts', 'disallow');
-	$manually_combine_accounts = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
+	if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( 'SHIBBOLETH_HEADERS' ) ) {
+		$shib_headers = SHIBBOLETH_HEADERS;
+	} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( 'SHIBBOLETH_HEADERS' ) ) {
+		$shib_headers = unserialize( SHIBBOLETH_HEADERS );
+	} else {
+		$shib_headers = get_site_option( 'shibboleth_headers' );
+	}
+
+	if ( defined( 'SHIBBOLETH_AUTO_COMBINE_ACCOUNTS' ) ) {
+		$auto_combine_accounts = SHIBBOLETH_AUTO_COMBINE_ACCOUNTS;
+	} else {
+		$auto_combine_accounts = get_site_option( 'shibboleth_auto_combine_accounts', 'disallow');
+	}
+	if ( defined( 'SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS' ) ) {
+		$manually_combine_accounts = SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS;
+	} else {
+		$manually_combine_accounts = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
+	}
 
 	// ensure user is authorized to login
 	$user_role = shibboleth_get_user_role();
@@ -475,7 +530,14 @@ function shibboleth_authenticate_user() {
 	// update user data
 	update_user_meta( $user->ID, 'shibboleth_account', true );
 	shibboleth_update_user_data( $user->ID );
-	if ( get_site_option( 'shibboleth_update_roles' ) ) {
+
+	if ( defined( 'SHIBBOLETH_UPDATE_ROLES' ) ) {
+		$update = SHIBBOLETH_UPDATE_ROLES;
+	} else {
+		$update = get_site_option( 'shibboleth_update_roles' );
+	}
+
+	if ( $update ) {
 		$user->set_role( $user_role );
 		do_action( 'shibboleth_set_user_roles', $user );
 	}
@@ -493,15 +555,22 @@ function shibboleth_authenticate_user() {
  * @since 1.0
  */
 function shibboleth_create_new_user( $user_login, $user_email ) {
-	$create_accounts = get_site_option( 'shibboleth_create_accounts' );
+	if ( defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) ) {
+		$create_accounts = SHIBBOLETH_CREATE_ACCOUNTS;
+	} else {
+		$create_accounts = get_site_option( 'shibboleth_create_accounts' );
+	}
+
 	if ( $create_accounts != false ) {
-		if ( empty( $user_login ) || empty( $user_email ) ) return null;
+		if ( empty( $user_login ) || empty( $user_email ) ) {
+			return null;
+		}
 
 		// create account and flag as a shibboleth acount
 		require_once( ABSPATH . WPINC . '/registration.php' );
 		$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email ) );
 		if ( is_wp_error( $user_id ) ) {
-	    return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
+	    	return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
 		} else {
 			$user = new WP_User( $user_id );
 			update_user_meta( $user->ID, 'shibboleth_account', true );
@@ -532,10 +601,26 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
  */
 function shibboleth_get_user_role() {
 	global $wp_roles;
-	if ( !$wp_roles ) $wp_roles = new WP_Roles();
+	if ( ! $wp_roles ) {
+		$wp_roles = new WP_Roles();
+	}
 
-	$shib_roles = apply_filters( 'shibboleth_roles', get_site_option( 'shibboleth_roles' ) );
-	$create_accounts = get_site_option( 'shibboleth_create_accounts' );
+	if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( 'SHIBBOLETH_ROLES' ) ) {
+		$shib_roles = apply_filters( 'shibboleth_roles', SHIBBOLETH_ROLES );
+	} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( 'SHIBBOLETH_ROLES' ) ) {
+		$shib_roles = apply_filters( 'shibboleth_roles', unserialize( SHIBBOLETH_ROLES ) );
+	} else {
+		$shib_roles = apply_filters( 'shibboleth_roles', get_site_option( 'shibboleth_roles' ) );
+	}
+
+
+
+	if ( defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) ) {
+		$create_accounts = SHIBBOLETH_CREATE_ACCOUNTS;
+	} else {
+		$create_accounts = get_site_option( 'shibboleth_create_accounts' );
+	}
+
 	if ( $create_accounts != false ) {
 		$user_role = get_site_option( 'shibboleth_default_role' );
 	} else {
@@ -543,9 +628,15 @@ function shibboleth_get_user_role() {
 	}
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
-		if ( isset( $shib_roles[$key]['header'] ) ) $role_header = $shib_roles[$key]['header'];
-		if ( isset( $shib_roles[$key]['value'] ) ) $role_value = $shib_roles[$key]['value'];
-		if ( empty( $role_header ) || empty( $role_value ) ) continue;
+		if ( isset( $shib_roles[$key]['header'] ) ) {
+			$role_header = $shib_roles[$key]['header'];
+		}
+		if ( isset( $shib_roles[$key]['value'] ) ) {
+			$role_value = $shib_roles[$key]['value'];
+		}
+		if ( empty( $role_header ) || empty( $role_value ) ) {
+			continue;
+		}
 		$values = explode( ';', shibboleth_getenv( $role_header ) );
 		if ( in_array( $role_value, $values ) ) {
 			$user_role = $key;
@@ -566,7 +657,14 @@ function shibboleth_get_user_role() {
  * @since 1.3
  */
 function shibboleth_get_managed_user_fields() {
-	$headers = get_site_option( 'shibboleth_headers' );
+	if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( 'SHIBBOLETH_HEADERS' ) ) {
+		$headers = SHIBBOLETH_HEADERS;
+	} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( 'SHIBBOLETH_HEADERS' ) ) {
+		$headers = unserialize( SHIBBOLETH_HEADERS );
+	} else {
+		$headers = get_site_option( 'shibboleth_headers' );
+	}
+
 	$managed = array();
 
 	foreach ( $headers as $name => $value ) {
@@ -595,7 +693,13 @@ function shibboleth_get_managed_user_fields() {
  */
 function shibboleth_update_user_data( $user_id, $force_update = false ) {
 
-	$shib_headers = get_site_option( 'shibboleth_headers' );
+	if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( 'SHIBBOLETH_HEADERS' ) ) {
+		$shib_headers = SHIBBOLETH_HEADERS;
+	} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( 'SHIBBOLETH_HEADERS' ) ) {
+		$shib_headers = unserialize( SHIBBOLETH_HEADERS );
+	} else {
+		$shib_headers = get_site_option( 'shibboleth_headers' );
+	}
 
 	$user_fields = array(
 		'user_login' => 'username',
@@ -637,7 +741,7 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
 /**
  * Enqueues scripts and styles necessary for the Shibboleth button.
  *
- * @since 1.9
+ * @since 2.0
  */
 function shibboleth_login_enqueue_scripts() {
 	wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
@@ -648,11 +752,14 @@ add_action( 'login_enqueue_scripts', 'shibboleth_login_enqueue_scripts' );
 /**
  * Prevents local WordPress authentication if disabled by an administrator.
  *
- * @since 1.9
- * @var constant SHIBBOLETH_ALLOW_LOCAL_AUTH set in wp-config.php to bypass disabled logins
+ * @since 2.0
  */
 function shibboleth_disable_login() {
-	$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	if ( defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) ) {
+		$disable = SHIBBOLETH_DISABLE_LOCAL_AUTH;
+	} else {
+		$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	}
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 	if ( $disable && ! $bypass ) {
 		if ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
@@ -665,19 +772,24 @@ add_action( 'login_init', 'shibboleth_disable_login' );
 /**
  * Disables wp-login.php login form if disabled by an administrator.
  *
- * @since 1.9
- * @var constant SHIBBOLETH_ALLOW_LOCAL_AUTH set in wp-config.php to bypass disabled logins
+ * @since 2.0
  */
 function shibboleth_disable_login_form() {
-	$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	if ( defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) ) {
+		$disable = SHIBBOLETH_DISABLE_LOCAL_AUTH;
+	} else {
+		$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	}
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
-	if ( $disable && ! $bypass ) { ?>
+	if ( $disable && ! $bypass ) {
+	?>
 		<style type="text/css">
 			#loginform p {
 			  display: none;
 			}
 		</style>
-	<?php }
+	<?php
+	}
 }
 add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
 
@@ -691,20 +803,33 @@ add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
 function shibboleth_login_form() {
 	$login_url = add_query_arg( 'action', 'shibboleth' );
 	$login_url = remove_query_arg( 'reauth', $login_url );
-	$button_text = get_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
-	$disable = get_site_option( 'shibboleth_disable_local_auth', false ); ?>
+	if ( defined( 'SHIBBOLETH_BUTTON_TEXT' ) ) {
+		$button_text = SHIBBOLETH_BUTTON_TEXT;
+	} else {
+		$button_text = get_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
+	}
+	if ( defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) ) {
+		$disable = SHIBBOLETH_DISABLE_LOCAL_AUTH;
+	} else {
+		$disable = get_site_option( 'shibboleth_disable_local_auth', false );
+	} ?>
 	<div id="shibboleth-wrap" <?php echo $disable ? 'style="margin-top:0;"' : '' ?>>
-		<?php if ( ! $disable ) { ?>
+		<?php
+		if ( ! $disable ) {
+		?>
 			<div class="shibboleth-or">
 				<span><?php esc_html_e( 'Or', 'shibboleth' ); ?></span>
 			</div>
-		<?php }	?>
-		<a href="<?php echo esc_url( $login_url ); ?>" class="shibboleth-button button button-primary default">
+		<?php
+		}
+		?>
+		<a href="<?php echo esc_url( $login_url ); ?>" rel="nofollow" class="shibboleth-button button button-primary default">
 			<span class="shibboleth-icon"></span>
 			<?php esc_html_e( $button_text ); ?>
 		</a>
 	</div>
-<?php }
+<?php
+}
 add_action( 'login_form', 'shibboleth_login_form' );
 
 
@@ -712,7 +837,6 @@ add_action( 'login_form', 'shibboleth_login_form' );
  * Insert directives into .htaccess file to enable Shibboleth Lazy Sessions.
  *
  * @since 1.0
- * @var constant SHIBBOLETH_DISALLOW_FILE_MODS set in wp-config.php to prevent .htaccess modifications
  */
 function shibboleth_insert_htaccess() {
 	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
@@ -728,7 +852,6 @@ function shibboleth_insert_htaccess() {
  * Remove directives from .htaccess file to enable Shibboleth Lazy Sessions.
  *
  * @since 1.1
- * @var constant SHIBBOLETH_DISALLOW_FILE_MODS set in wp-config.php to prevent .htaccess modifications
  */
 function shibboleth_remove_htaccess() {
 	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
