@@ -106,8 +106,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
  - Changed the options page to utilize a more modern design centered around tabs.
  - Added signifcant customizations to the login page to bring it more in-line with WordPress.com Single Sign On.
  - Disabled the sending of an email notifying user's that their email had changed when the Shibboleth plugin updates user attributes to prevent user confusion; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/19).
-
-
+ - Removed the shibboleth-mu.php file as it is no longer relevant.
 
 = version 1.8.1 (2017-09-08) =
  - Use sanitize_title rather than sanitize_user to sanitize user_nicename; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/4).
