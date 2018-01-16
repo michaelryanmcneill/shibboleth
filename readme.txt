@@ -84,9 +84,84 @@ Before extending the plugin in this manner, please ensure that it is not actuall
 
 = Can I control the plugin settings with constants in wp-config.php? =
 
-Yes, the plugin allows for all settings to be controlled via constants in `wp-config.php`. If set, the constant will override the value that exists in the WordPress options table. The available constants are explained (with their available options) below:
+Yes, the plugin allows for all settings to be controlled via constants in `wp-config.php`. If set, the constant will override the value that exists in the WordPress options table. The available constants are detailed (with their available options) below:
 
-Coming soon...
+ - `SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD`
+   - Format: string
+   - Available options: `'standard'` for the default "Environment Variables" option, `'redirect'` for the "Redirected Environment Variables" option, and `'http'` for the "HTTP Headers" option.
+   - Example: `define('SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD', 'standard');`
+ - `SHIBBOLETH_LOGIN_URL`
+   - Format: string
+   - Avaliable Options: none
+   - Example: `define('SHIBBOLETH_LOGIN_URL', 'https://example.com/Shibboleth.sso/Login');`
+ - `SHIBBOLETH_LOGOUT_URL`
+   - Format: string
+   - Avaliable Options: none
+   - Example: `define('SHIBBOLETH_LOGOUT_URL', 'https://example.com/Shibboleth.sso/Logout');`
+ - `SHIBBOLETH_PASSWORD_CHANGE_URL`
+   - Format: string
+   - Available options: none
+   - Example: `define('SHIBBOLETH_PASSWORD_CHANGE_URL', 'https://sso.example.com/account/update');`
+ - `SHIBBOLETH_PASSWORD_RESET_URL`
+   - Format: string
+   - Available options: none
+   - Example: `define('SHIBBOLETH_PASSWORD_RESET_URL', 'https://sso.example.com/account/reset');`
+ - `SHIBBOLETH_SPOOF_KEY`
+   - Format: string
+   - Available options: none
+   - Example: `define('SHIBBOLETH_SPOOF_KEY', 'abcdefghijklmnopqrstuvwxyz');`
+ - `SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN`
+   - Format: boolean
+   - Available options: `true` to automatically default to Shibboleth login or `false` to not default to Shibboleth login.
+   - Example: `define('SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN', true);`
+ - `SHIBBOLETH_AUTO_LOGIN`
+   - Format: boolean
+   - Available options: `true` to automatically login users with an existing Shibboleth session or `false` to not check for an existing Shibboleth session.
+   - Example: `define('SHIBBOLETH_AUTO_LOGIN', true);`
+ - `SHIBBOLETH_BUTTON_TEXT`
+   - Format: string
+   - Available options: none
+   - Example: `define('SHIBBOLETH_BUTTON_TEXT', 'Login with Shibboleth');`
+ - `SHIBBOLETH_DISABLE_LOCAL_AUTH`
+   - Format: boolean
+   - Available options: `true` to prevent users logging in using WordPress local authentication or `false` allow WordPress local authentication AND Shibboleth authentication.
+   - Example: `define('SHIBBOLETH_DISABLE_LOCAL_AUTH', true);`
+ - `SHIBBOLETH_HEADERS`
+   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Available options: none
+   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_HEADERS', serialize( array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) ) ) );`
+   - PHP 5.6 (and above) example: `const SHIBBOLETH_HEADERS = array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) );`
+   - PHP 7.0 (and above) example: `define('SHIBBOLETH_HEADERS', array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) ) );`
+ - `SHIBBOLETH_CREATE_ACCOUNTS`
+   - Format: boolean
+   - Available options: `true` to automatically create new users if they do not exist in the WordPress database or `false` to only allow existing users to authenticate.
+   - Example: `define('SHIBBOLETH_CREATE_ACCOUNTS', true);`
+ - `SHIBBOLETH_AUTO_COMBINE_ACCOUNTS`
+   - Format: string
+   - Available options: `'disallow'` for the default "Prevent Automatic Account Merging" option, `'allow'` for the "Allow Automatic Account Merging" option, and `'bypass'` for the "Allow Automatic Account Merging (Bypass Username Management)" option.
+   - Example: `define('SHIBBOLETH_AUTO_COMBINE_ACCOUNTS', 'disallow');`
+ - `SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS`
+   - Format: string
+   - Available options: `'disallow'` for the default "Prevent Manual Account Merging" option, `'allow'` for the "Allow Manual Account Merging" option, and `'bypass'` for the "Allow Manual Account Merging (Bypass Username Management)" option.
+   - Example: `define('SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS', 'disallow');`
+ - `SHIBBOLETH_ROLES`
+   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Available options: none
+   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_ROLES', serialize( array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) ) );`
+   - PHP 5.6 (and above) example: `const SHIBBOLETH_ROLES = array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) );`
+   - PHP 7.0 (and above) example: `define('SHIBBOLETH_ROLES', array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) );`
+ - `SHIBBOLETH_DEFAULT_ROLE`
+   - Format: string
+   - Available options: All available WordPress roles. The defaults are `'administrator'`, `'subscriber'`, `'author'`, `'editor'`, and `'contributor'`.
+   - Example: `define('SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS', 'subscriber');`
+ - `SHIBBOLETH_UPDATE_ROLES`
+   - Format: boolean
+   - Available options: `true` to automatically use Shibboleth data to update user role mappings each time the user logs in or `false` to only update role mappings when a user is initally created.
+   - Example: `define('SHIBBOLETH_UPDATE_ROLES', true);`
+ - `SHIBBOLETH_DISALLOW_FILE_MODS`
+   - Format: boolean
+   - Available options: `true` to disable the Shibboleth plugin from attempting to add `.htaccess` directives or `false` to allow the Shibboleth plugin to add the necessary `.htaccess` directives.
+   - Example: `define('SHIBBOLETH_DISALLOW_FILE_MODS', true);`
 
 == Screenshots ==
 
