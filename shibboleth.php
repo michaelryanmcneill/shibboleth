@@ -726,6 +726,9 @@ function shibboleth_update_user_data( $user_id, $force_update = false ) {
 		}
 	}
 
+	// Shibboleth users do not use their email address for authentication.
+	add_filter( 'send_email_change_email', '__return_false' );
+	
 	wp_update_user( $user_data );
 }
 
