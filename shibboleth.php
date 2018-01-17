@@ -124,7 +124,7 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_auto_login', false );
 	add_site_option( 'shibboleth_logout_url', get_site_option( 'home' ) . '/Shibboleth.sso/Logout' );
 	add_site_option( 'shibboleth_attribute_access', 'standard' );
-	add_site_option( 'shibboleth_default_role', 'subscriber' );
+	add_site_option( 'shibboleth_default_role', '' );
 	add_site_option( 'shibboleth_update_roles', false );
 	add_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
 	add_site_option( 'shibboleth_auto_combine_accounts', 'disallow' );
