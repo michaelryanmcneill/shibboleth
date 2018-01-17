@@ -621,6 +621,7 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 					<th scope="row"><?php _e('Default Role', 'shibboleth') ?></th>
 					<td>
 						<select id="default_role" name="default_role" <?php if ( defined( 'SHIBBOLETH_DEFAULT_ROLE' ) ) { disabled( $default_role, SHIBBOLETH_DEFAULT_ROLE ); } ?>>
+							<option value=""><?php _e('(none)') ?></option>
 <?php
 			foreach ($wp_roles->role_names as $key => $name) {
 				echo '

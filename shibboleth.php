@@ -4,12 +4,12 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- Version: 2.0
+ Version: 2.0.1
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '3.3' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.0' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.0.1' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -124,7 +124,7 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_auto_login', false );
 	add_site_option( 'shibboleth_logout_url', get_site_option( 'home' ) . '/Shibboleth.sso/Logout' );
 	add_site_option( 'shibboleth_attribute_access', 'standard' );
-	add_site_option( 'shibboleth_default_role', 'subscriber' );
+	add_site_option( 'shibboleth_default_role', '' );
 	add_site_option( 'shibboleth_update_roles', false );
 	add_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
 	add_site_option( 'shibboleth_auto_combine_accounts', 'disallow' );
