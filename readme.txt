@@ -2,8 +2,8 @@
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
-Tested up to: 4.9.1
-Stable tag: 2.0
+Tested up to: 4.9.2
+Stable tag: 2.0.1-alpha
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -170,10 +170,17 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Upgrade Notice ==
+= 2.0.1 =
+This update brings with it a major change to the way Shibboleth attributes are accessed from versions less than 2.0. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+
 = 2.0 =
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
+= version 2.0.1 (2018-01-17) =
+ - Resolved a regression that prevented accounts from being created if they matched a group; [thanks to @Androclese for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/22).
+ - Resolved an issue where assets were not being properly included in the WordPress.org packaged plugin. 
+
 = version 2.0 (2018-01-16) =
  - Changed the way we check for Shibboleth attributes. Now, by default, we only check standard environment variables for Shibboleth attributes. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should instead select the option specific to your server configuration. Selecting the "Redirected Environment Variables" option will look for attributes in environment variables prefixed with `REDIRECT_` while selecting the "HTTP Headers" option will look for attributes in environment variables (populated by HTTP Headers) prefixed with `HTTP_`. Most users should be fine leaving the default option selected; [thanks to @jrchamp for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/8).
  - Changed the default behavior to not automatically update user roles.
