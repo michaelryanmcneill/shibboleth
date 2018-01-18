@@ -227,7 +227,7 @@ function shibboleth_link_accounts() {
 							exit;
 						}
 					} else {
-						$initator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
+						$initiator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
 						wp_redirect( $initiator_url );
 						exit;
 					}
