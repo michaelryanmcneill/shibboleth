@@ -3,7 +3,7 @@ Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcra
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
 Tested up to: 4.9.2
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
