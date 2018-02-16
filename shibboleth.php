@@ -517,8 +517,8 @@ function shibboleth_authenticate_user() {
 		}
 	} else {
 		$user = get_user_by( 'email', $email );
-		if ( is_object( $user ) && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
-			if ( $user->ID && $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'bypass' ) {
+		if ( is_object( $user ) && $user->ID && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
+			if ( $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'bypass' ) {
 				update_user_meta( $user->ID, 'shibboleth_account', true );
 			} else {
 				return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
@@ -538,7 +538,6 @@ function shibboleth_authenticate_user() {
 	}
 
 	// update user data
-	update_user_meta( $user->ID, 'shibboleth_account', true );
 	shibboleth_update_user_data( $user->ID );
 
 	if ( defined( 'SHIBBOLETH_UPDATE_ROLES' ) ) {
