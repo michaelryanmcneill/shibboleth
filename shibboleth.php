@@ -617,7 +617,11 @@ function shibboleth_get_user_role() {
 		$shib_roles = apply_filters( 'shibboleth_roles', get_site_option( 'shibboleth_roles' ) );
 	}
 
-	$user_role = get_site_option( 'shibboleth_default_role' );
+	if ( defined( 'SHIBBOLETH_DEFAULT_ROLE' ) ) {
+		$user_role = SHIBBOLETH_DEFAULT_ROLE;
+	} else {
+		$user_role = get_site_option( 'shibboleth_default_role' );
+	}
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
 		if ( isset( $shib_roles[$key]['header'] ) ) {
