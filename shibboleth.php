@@ -506,23 +506,29 @@ function shibboleth_authenticate_user() {
 		return $authenticate;
 	}
 
+	// look up existing account by username, with email as a fallback
+	$user_by = 'username';
 	$user = get_user_by( 'login', $username );
-	if ( is_object( $user ) && $user->ID ) {
-		if ( ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
-			if ( $auto_combine_accounts === 'allow' || $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'allow' || $manually_combine_accounts === 'bypass' ) {
-				update_user_meta( $user->ID, 'shibboleth_account', true );
-			} else {
-				return new WP_Error( 'invalid_username', __( 'An account already exists with this username.', 'shibboleth' ) );
-			}
-		}
-	} else {
+	if ( ! $user ) {
+		$user_by = 'email';
 		$user = get_user_by( 'email', $email );
-		if ( is_object( $user ) && $user->ID && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
-			if ( $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'bypass' ) {
-				update_user_meta( $user->ID, 'shibboleth_account', true );
-			} else {
-				return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
-			}
+	}
+
+	// if this account is not a Shibboleth account, then do account combine (if allowed)
+	if ( is_object( $user ) && $user->ID && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
+		$do_account_combine = false;
+		if ( $user_by === 'username' && ( $auto_combine_accounts === 'allow' || $manually_combine_accounts === 'allow' ) ) {
+			$do_account_combine = true;
+		} elseif ( $auto_combine_accounts === 'bypass' || $manually_combine_accounts === 'bypass' ) {
+			$do_account_combine = true;
+		}
+
+		if ( $do_account_combine ) {
+			update_user_meta( $user->ID, 'shibboleth_account', true );
+		} elseif ( $user_by === 'username' ) {
+			return new WP_Error( 'invalid_username', __( 'An account already exists with this username.', 'shibboleth' ) );
+		} else {
+			return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
 		}
 	}
 
