@@ -6,6 +6,7 @@
  Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
  Version: 2.0.2
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
+ Text Domain: shibboleth
  */
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '3.3' );
