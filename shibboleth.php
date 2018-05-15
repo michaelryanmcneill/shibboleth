@@ -481,13 +481,6 @@ function shibboleth_authenticate_user() {
 		$manually_combine_accounts = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 	}
 
-	// ensure user is authorized to login
-	$user_role = shibboleth_get_user_role();
-
-	if ( empty( $user_role ) ) {
-		return new WP_Error( 'no_access', __( 'You do not have sufficient access.' ) );
-	}
-
 	$username = shibboleth_getenv( $shib_headers['username']['name'] );
 	$email = shibboleth_getenv( $shib_headers['email']['name'] );
 
@@ -548,6 +541,7 @@ function shibboleth_authenticate_user() {
 	}
 
 	if ( $update ) {
+		$user_role = shibboleth_get_user_role();
 		$user->set_role( $user_role );
 		do_action( 'shibboleth_set_user_roles', $user );
 	}
@@ -623,18 +617,10 @@ function shibboleth_get_user_role() {
 		$shib_roles = apply_filters( 'shibboleth_roles', get_site_option( 'shibboleth_roles' ) );
 	}
 
-
-
-	if ( defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) ) {
-		$create_accounts = SHIBBOLETH_CREATE_ACCOUNTS;
+	if ( defined( 'SHIBBOLETH_DEFAULT_ROLE' ) ) {
+		$user_role = SHIBBOLETH_DEFAULT_ROLE;
 	} else {
-		$create_accounts = get_site_option( 'shibboleth_create_accounts' );
-	}
-
-	if ( $create_accounts != false ) {
 		$user_role = get_site_option( 'shibboleth_default_role' );
-	} else {
-		$user_role = 'none';
 	}
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
