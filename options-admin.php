@@ -10,7 +10,7 @@
  * @since 1.9-alpha
  */
 function shibboleth_admin_tabs( $current = 'general' ) {
-	$tabs = array( 'general' => 'General', 'user' => 'User', 'authorization' => 'Authorization' );
+	$tabs = array( 'general' => 'General', 'user' => 'User', 'authorization' => 'Authorization', 'logging' => 'Logging' );
 	echo '<h2 class="nav-tab-wrapper">';
 	foreach( $tabs as $tab => $name ){
 		$class = ( $tab == $current ) ? ' nav-tab-active' : '';
@@ -140,6 +140,8 @@ function shibboleth_options_page() {
 				if ( ! defined( 'SHIBBOLETH_UPDATE_ROLES' ) ) {
 					update_site_option( 'shibboleth_update_roles', ! empty( $_POST['update_roles'] ) );
 				}
+				break;
+			case 'logging' :
 				break;
 		}
 		$type = 'updated';
@@ -548,9 +550,12 @@ function shibboleth_options_page() {
 				<div class="notice notice-warning">
 					<p><?php _e( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ); ?></p>
 				</div>
-			<?php } ?>
+			<?php }
+		break;
+	case 'logging' :
+		echo "Adding additional logic here for logging...";
+		break;
 
-<?php
 /**
  * filter shibboleth_role_mapping_override
  * Return true to override the default user role mapping form
