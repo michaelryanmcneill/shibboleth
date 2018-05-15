@@ -3,7 +3,7 @@ Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcra
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
 Tested up to: 4.9.2
-Stable tag: 2.0.2
+Stable tag: 2.1-alpha
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -180,6 +180,13 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
+= version 2.1 (2018-05-xx) =
+ - Resolved an issue where in multisite users could inadvertently be sent to an unrelated subsite after logging in; [thanks to @themantimeforgot for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/33) and [props to @jrchamp for the fix](https://github.com/michaelryanmcneill/shibboleth/pull/35).
+ - Resolved an regression that prevented users from authenticating if shibboleth_default_role is blank and shibboleth_create_accounts is enabled; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/37).
+ - Cleaned up the shibboleth_authenticate_user function; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/38).
+ - Allowed translate.wordpress.org compatibility; [thanks to @eric-gagnon for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/41) and [props to @jrchamp for the fix](https://github.com/michaelryanmcneill/shibboleth/pull/42).
+ - Resolved a conflict that caused the lost password and reset password forms to break; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/44).
+
 = version 2.0.2 (2018-01-17) =
  - Resolved an issue that caused manual linking of accounts to fail if user's didn't have an existing Shibboleth session. 
 
