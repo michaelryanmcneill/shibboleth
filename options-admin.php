@@ -142,6 +142,24 @@ function shibboleth_options_page() {
 				}
 				break;
 			case 'logging' :
+				if ( ! defined( 'SHIBBOLETH_LOG_UNSUCCESSFUL_AUTH' ) ) {
+					update_site_option( 'shibboleth_log_unsuccessful_auth', ! empty( $_POST['log_unsuccessful_auth'] ) );
+				}
+				if ( ! defined( 'SHIBBOLETH_LOG_SUCCESSFUL_AUTH' ) ) {
+					update_site_option( 'shibboleth_log_successful_auth', ! empty( $_POST['log_successful_auth'] ) );
+				}
+				if ( ! defined( 'SHIBBOLETH_LOG_USER_CREATION' ) ) {
+					update_site_option( 'shibboleth_log_user_creation', ! empty( $_POST['log_user_creation'] ) );
+				}
+				if ( ! defined( 'SHIBBOLETH_LOG_ROLE_UPDATE' ) ) {
+					update_site_option( 'shibboleth_log_role_update', ! empty( $_POST['log_role_update'] ) );
+				}
+				if ( ! defined( 'SHIBBOLETH_LOG_UNSUCCESSFUL_ACCOUNT_MERGES' ) ) {
+					update_site_option( 'log_unsuccessful_account_merges', ! empty( $_POST['log_unsuccessful_account_merges'] ) );
+				}
+				if ( ! defined( 'SHIBBOLETH_LOG_SUCCESSFUL_ACCOUNT_MERGES' ) ) {
+					update_site_option( 'log_successful_account_merges', ! empty( $_POST['log_successful_account_merges'] ) );
+				}
 				break;
 		}
 		$type = 'updated';
