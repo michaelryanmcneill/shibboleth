@@ -743,8 +743,13 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
  * @since 2.0
  */
 function shibboleth_login_enqueue_scripts() {
-	wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
-	wp_enqueue_script( 'shibboleth-login', plugins_url( 'assets/js/shibboleth_login_form.js', __FILE__ ), array( 'jquery' ), SHIBBOLETH_PLUGIN_VERSION );
+	global $action;
+	
+	// Only add scripts for the login action to avoid breaking other forms.
+	if ( $action === 'login' ) {
+		wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
+		wp_enqueue_script( 'shibboleth-login', plugins_url( 'assets/js/shibboleth_login_form.js', __FILE__ ), array( 'jquery' ), SHIBBOLETH_PLUGIN_VERSION );
+	}
 }
 add_action( 'login_enqueue_scripts', 'shibboleth_login_enqueue_scripts' );
 
