@@ -553,6 +553,9 @@ function shibboleth_options_page() {
 			<?php }
 		break;
 	case 'logging' :
+		?>
+		<h3><?php _e('Logging Configuration', 'shibboleth') ?></h3>
+		<?php
 		echo "Adding additional logic here for logging...";
 		break;
 
