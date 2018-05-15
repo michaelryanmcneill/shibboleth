@@ -752,7 +752,7 @@ function shibboleth_login_enqueue_scripts() {
 	global $action;
 	
 	// Only add scripts for the login action to avoid breaking other forms.
-	if ( $action === 'login' ) {
+	if ( $action === 'login' ) || ( $action === 'shibboleth' ) {
 		wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
 		wp_enqueue_script( 'shibboleth-login', plugins_url( 'assets/js/shibboleth_login_form.js', __FILE__ ), array( 'jquery' ), SHIBBOLETH_PLUGIN_VERSION );
 	}
