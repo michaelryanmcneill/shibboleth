@@ -557,6 +557,64 @@ function shibboleth_options_page() {
 		<h3><?php _e('Logging Configuration', 'shibboleth') ?></h3>
 		<?php
 		echo "Adding additional logic here for logging...";
+		?>
+		<table class="form-table">
+			<tr>
+				<th scope="row"><label for="log_unsuccessful_auth"><?php _e('Log Unsuccessful Authentication Attempts', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="log_unsuccessful_auth" name="log_unsuccessful_auth" <?php echo $log_unsuccessful_auth ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_LOG_UNSUCCESSFUL_AUTH' ) ) { disabled( $log_unsuccessful_auth, SHIBBOLETH_LOG_UNSUCCESSFUL_AUTH ); } ?> />
+						<label for="log_unsuccessful_auth"><?php _e('Coming soon.', 'shibboleth'); ?></label>
+
+						<p><?php _e('More details coming soon...'); ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="log_successful_auth"><?php _e('Log Successful Authentication Attempts', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="log_successful_auth" name="log_successful_auth" <?php echo $log_successful_auth ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_LOG_SUCCESSFUL_AUTH' ) ) { disabled( $log_successful_auth, SHIBBOLETH_LOG_SUCCESSFUL_AUTH ); } ?> />
+						<label for="log_unsuccessful_auth"><?php _e('Coming soon.', 'shibboleth'); ?></label>
+
+						<p><?php _e('More details coming soon...'); ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="log_user_creation"><?php _e('Log User Creation', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="log_user_creation" name="log_user_creation" <?php echo $log_user_creation ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_LOG_USER_CREATION' ) ) { disabled( $log_user_creation, SHIBBOLETH_LOG_USER_CREATION ); } ?> />
+						<label for="log_user_creation"><?php _e('Coming soon.', 'shibboleth'); ?></label>
+
+						<p><?php _e('More details coming soon...'); ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="log_role_update"><?php _e('Log Role Update', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="log_role_update" name="log_role_update" <?php echo $log_role_update ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_LOG_ROLE_UPDATE' ) ) { disabled( $log_role_update, SHIBBOLETH_LOG_ROLE_UPDATE ); } ?> />
+						<label for="log_role_update"><?php _e('Coming soon.', 'shibboleth'); ?></label>
+
+						<p><?php _e('More details coming soon...'); ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="log_unsuccessful_account_merges"><?php _e('Log Unsuccessful Account Merges', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="log_unsuccessful_account_merges" name="log_unsuccessful_account_merges" <?php echo $log_unsuccessful_account_merges ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_LOG_UNSUCCESSFUL_ACCOUNT_MERGES' ) ) { disabled( $log_unsuccessful_account_merges, SHIBBOLETH_LOG_UNSUCCESSFUL_ACCOUNT_MERGES ); } ?> />
+						<label for="log_unsuccessful_account_merges"><?php _e('Coming soon.', 'shibboleth'); ?></label>
+
+						<p><?php _e('More details coming soon...'); ?></p>
+					</td>
+				</tr>
+				<tr>
+				<th scope="row"><label for="log_successful_account_merges"><?php _e('Log Successful Account Merges', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="log_successful_account_merges" name="log_successful_account_merges" <?php echo $log_successful_account_merges ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_LOG_SUCCESSFUL_ACCOUNT_MERGES' ) ) { disabled( $log_successful_account_merges, SHIBBOLETH_LOG_SUCCESSFUL_ACCOUNT_MERGES ); } ?> />
+						<label for="log_successful_account_merges"><?php _e('Coming soon.', 'shibboleth'); ?></label>
+
+						<p><?php _e('More details coming soon...'); ?></p>
+					</td>
+				</tr>
+			</table>
+				<?php 
 		break;
 
 /**
