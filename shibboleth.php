@@ -597,7 +597,7 @@ function shibboleth_authenticate_user() {
 	}
 
 	if ( in_array( 'auth', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . '(ID: ' . $user->id . ') successfully authenticated.' );
+		error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') successfully authenticated.' );
 	}
 	return $user;
 }
@@ -638,7 +638,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 			$user->set_role( $user_role );
 			do_action( 'shibboleth_set_user_roles', $user );
 			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') was created with role ' . $user_role . '.' );
+				error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') was created with role ' . ( $user_role :? 'none' ) . '.' );
 			}
 			return $user;
 		}
