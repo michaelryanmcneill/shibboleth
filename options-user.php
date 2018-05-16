@@ -205,10 +205,6 @@ function shibboleth_link_accounts() {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
 
 						$username = shibboleth_getenv( $shib_headers['username']['name'] );
-						if (function_exists( 'mb_strtolower' ) mb_strtolower()
-
-						
-						
 						$user = get_user_by( 'id', $user_id );
 						
 						// If username and email match, safe to merge
