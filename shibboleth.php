@@ -510,8 +510,8 @@ function shibboleth_session_initiator_url( $redirect = null ) {
  * @since 1.0
  */
 function shibboleth_authenticate_user() {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
-	$shib_logging = shibboleth_getoption( 'shibboleth_logging', false, true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
 	$auto_combine_accounts = shibboleth_getoption( 'shibboleth_auto_combine_accounts' );
 	$manually_combine_accounts = shibboleth_getoption( 'shibboleth_manually_combine_accounts' );
 
@@ -613,7 +613,7 @@ function shibboleth_authenticate_user() {
  */
 function shibboleth_create_new_user( $user_login, $user_email ) {
 	$create_accounts = shibboleth_getoption( 'shibboleth_create_accounts' );
-	$shib_logging = shibboleth_getoption( 'shibboleth_logging', false, true );
+	$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
 
 	if ( $create_accounts != false ) {
 		if ( empty( $user_login ) || empty( $user_email ) ) {
@@ -666,7 +666,7 @@ function shibboleth_get_user_role() {
 		$wp_roles = new WP_Roles();
 	}
 
-	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', false, true ) );
+	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', array(), true ) );
 	$user_role = shibboleth_getoption( 'shibboleth_default_role' );
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
@@ -699,7 +699,7 @@ function shibboleth_get_user_role() {
  * @since 1.3
  */
 function shibboleth_get_managed_user_fields() {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
 
 	$managed = array();
 
@@ -728,7 +728,7 @@ function shibboleth_get_managed_user_fields() {
  * @since 1.0
  */
 function shibboleth_update_user_data( $user_id, $force_update = false ) {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
 
 	$user_fields = array(
 		'user_login' => 'username',

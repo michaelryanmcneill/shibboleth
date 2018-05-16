@@ -377,7 +377,7 @@ function shibboleth_options_page() {
 			break;
 				case 'user' :
 					$constant = false;
-					list( $shib_headers, $shib_headers_constant ) = shibboleth_getoption( 'shibboleth_headers', false, true, true );
+					list( $shib_headers, $shib_headers_constant ) = shibboleth_getoption( 'shibboleth_headers', array(), true, true );
 					$constant = $constant || $shib_headers_constant;
 					list( $create_accounts, $from_constant ) = shibboleth_getoption( 'shibboleth_create_accounts', false, false, true );
 					$constant = $constant || $from_constant;
@@ -502,7 +502,7 @@ function shibboleth_options_page() {
 <?php 	break;
 	case 'authorization' :
 					$constant = false;
-					list( $shib_roles, $shib_roles_constant ) = shibboleth_getoption( 'shibboleth_roles', true, false, true );
+					list( $shib_roles, $shib_roles_constant ) = shibboleth_getoption( 'shibboleth_roles', array(), true, true );
 					$constant = $constant || $shib_roles_constant;
 					list( $default_role, $from_constant ) = shibboleth_getoption( 'shibboleth_default_role', false, false, true );
 					$constant = $constant || $from_constant;
@@ -634,7 +634,7 @@ endif; // if ( form override )
 <?php       break;
 	case 'logging' :
 		$constant = false;
-		list( $shib_logging, $shib_logging_constant ) = shibboleth_getoption( 'shibboleth_logging', true, false, true );
+		list( $shib_logging, $shib_logging_constant ) = shibboleth_getoption( 'shibboleth_logging', array(), false, true );
 		$constant = $constant || $shib_logging_constant;
 		?>
 		<h3><?php _e('Logging Configuration', 'shibboleth') ?></h3>
