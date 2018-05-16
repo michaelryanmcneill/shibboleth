@@ -205,6 +205,7 @@ function shibboleth_link_accounts() {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
 
 						$username = shibboleth_getenv( $shib_headers['username']['name'] );
+						$email = shibboleth_getenv( $shib_headers['email']['name'] );
 
 						$user = get_user_by( 'id', $user_id );
 
