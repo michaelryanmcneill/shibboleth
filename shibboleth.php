@@ -28,10 +28,9 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
  * If it isn't, return the value from get_site_option(). If you'd like to pass a default
  * for get_site_option(), set $default to the requested default. If you'd like to check
  * for arrays in constants, set $array to true. If you'd like to return that the object
- * was obtained as a constant, set $compact to true and extract the result. To get the
+ * was obtained as a constant, set $compact to true and the result is an array. To get the
  * value of the constant or option, look at the value key. To check if the value was
- * retreived from a constant, look at the constant key. Note, the constant key will only
- * return true, so you should set a default of false before using extract.
+ * retreived from a constant, look at the constant key.
  *
  * @since 2.1
  * @param string $option
@@ -41,46 +40,28 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
  * @return mixed
  */
 function shibboleth_getoption( $option, $default = false, $array = false, $compact = false ) {
-	// We have to do special work for arrays thanks to PHP 5.5 and below
-	if ( $array ) {
-		// In PHP 5.6 and above, we can use arrays in constants, so we just get the value of the
-		// constant
-		if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( strtoupper( $option ) ) ) {
-			$value = constant( strtoupper( $option ) );
-			$constant = true;
+	// If a constant is defined with the provided option name, get the value of the constant
+	if ( defined( strtoupper( $option ) ) ) {
+		$value = constant( strtoupper( $option ) );
+		$constant = true;
+
 		// In PHP 5.5 and below, we can't use arrays in constants, so we have to use
 		// serialize and unserialize
-		} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( strtoupper( $option ) ) ) {
-			$value = unserialize( constant( strtoupper( $option ) ) );
-			$constant = true;
-		// If no constant is set, just get the value from get_site_option()
-		} else {
-			$value = get_site_option( $option, $default );
+		if ( $array && version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
+			$value = unserialize( $value );
 		}
-		// If compact is set to true, we compact $value and $constant together for easy extraction
-		if ( $compact ) {
-			return compact( 'value', 'constant' );
-		// Otherwise, just return the $value
-		} else {
-			return $value;
-		}
-	// If this isn't an array, proceed
+	// If no constant is set, just get the value from get_site_option()
 	} else {
-		// If a constant is defined with the provided option name, get the value of the constant
-		if ( defined( strtoupper( $option ) ) ) {
-			$value = constant( strtoupper( $option ) );
-			$constant = true;
-		// If no constant is set, just get the value from get_site_option()
-		} else {
-			$value = get_site_option( $option, $default );
-		}
-		// If compact is set to true, we compact $value and $constant together for easy extraction
-		if ( $compact ) {
-			return compact( 'value', 'constant' );
-		// Otherwise, just return the $value
-		} else {
-			return $value;
-		}
+		$value = get_site_option( $option, $default );
+		$constant = false;
+	}
+
+	// If compact is set to true, we compact $value and $constant together for easy use
+	if ( $compact ) {
+		return array( 'value' => $value, 'constant' => $constant );
+	// Otherwise, just return the $value
+	} else {
+		return $value;
 	}
 }
 
