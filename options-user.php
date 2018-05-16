@@ -205,12 +205,14 @@ function shibboleth_link_accounts() {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
 
 						$username = shibboleth_getenv( $shib_headers['username']['name'] );
-						$email = shibboleth_getenv( $shib_headers['email']['name'] );
+						if (function_exists( 'mb_strtolower' ) mb_strtolower()
+
+						
 						
 						$user = get_user_by( 'id', $user_id );
 						
 						// If username and email match, safe to merge
-						if ( $user->user_login === $username && $user->user_email === $email) {
+						if ( $user->user_login === $username && ( function_exists( 'mb_strtolower' ) ? mb_strtolower( $user->user_email ) : strtolower( $user->user_email ) ) === ( function_exists( 'mb_strtolower' ) ? mb_strtolower( $email ) : strtolower( $email ) ) ) {
 							update_user_meta( $user->ID, 'shibboleth_account', true );
 							// @todo: Add logging for successful manual merging
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
@@ -231,7 +233,7 @@ function shibboleth_link_accounts() {
 									exit;
 								}
 						// If email matches and username bypass is enabled, check if there is a conflict with the username
-						} elseif ( $user->user_email == $email && $allowed === 'bypass' ) {
+						} elseif ( ( function_exists( 'mb_strtolower' ) ? mb_strtolower( $user->user_email ) : strtolower( $user->user_email ) ) === ( function_exists( 'mb_strtolower' ) ? mb_strtolower( $email ) : strtolower( $email ) ) && $allowed === 'bypass' ) {
 							$prevent_conflict = get_user_by( 'user_login', $username );
 							// If email matches and there is no existing account with the username, safe to merge
 							if ( ! $prevent_conflict->ID ) {
