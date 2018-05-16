@@ -191,28 +191,28 @@ function shibboleth_options_page() {
 			switch ( $tab ) {
 				case 'general' :
 					$constant = false;
-					extract( shibboleth_getoption( 'shibboleth_login_url', false, false, true ), EXTR_OVERWRITE );
-					$login_url = $value;
-					extract( shibboleth_getoption( 'shibboleth_logout_url', false, false, true ), EXTR_OVERWRITE );
-					$logout_url = $value;
-					extract( shibboleth_getoption( 'shibboleth_password_change_url', false, false, true ), EXTR_OVERWRITE );
-					$password_change_url = $value;
-					extract( shibboleth_getoption( 'shibboleth_password_reset_url', false, false, true ), EXTR_OVERWRITE );
-					$password_reset_url = $value;
-					extract( shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true ), EXTR_OVERWRITE );
-					$attribute_access = $value;
-					extract( shibboleth_getoption( 'shibboleth_attribute_custom_access_method', false, false, true ), EXTR_OVERWRITE );
-					$attribute_custom_access = $value;
-					extract( shibboleth_getoption( 'shibboleth_spoof_key', false, false, true ), EXTR_OVERWRITE );
-					$spoofkey = $value;
-					extract( shibboleth_getoption( 'shibboleth_default_login', false, false, true ), EXTR_OVERWRITE );
-					$default_login = $value;
-					extract( shibboleth_getoption( 'shibboleth_auto_login', false, false, true ), EXTR_OVERWRITE );
-					$auto_login = $value;
-					extract( shibboleth_getoption( 'shibboleth_disable_local_auth', false, false, true ), EXTR_OVERWRITE );
-					$disable_local_auth = $value;
-					extract( shibboleth_getoption( 'shibboleth_button_text', false, false, true ), EXTR_OVERWRITE );
-					$button_text = $value;
+					list( $login_url, $from_constant ) = shibboleth_getoption( 'shibboleth_login_url', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $logout_url, $from_constant ) = shibboleth_getoption( 'shibboleth_logout_url', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $password_change_url, $from_constant ) = shibboleth_getoption( 'shibboleth_password_change_url', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $password_reset_url, $from_constant ) = shibboleth_getoption( 'shibboleth_password_reset_url', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $attribute_access, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $attribute_custom_access, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $spoofkey, $from_constant ) = shibboleth_getoption( 'shibboleth_spoof_key', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $default_login, $from_constant ) = shibboleth_getoption( 'shibboleth_default_login', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $auto_login, $from_constant ) = shibboleth_getoption( 'shibboleth_auto_login', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $disable_local_auth, $from_constant ) = shibboleth_getoption( 'shibboleth_disable_local_auth', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $button_text, $from_constant ) = shibboleth_getoption( 'shibboleth_button_text', false, false, true );
+					$constant = $constant || $from_constant;
 					?>
 
 			<h3><?php _e( 'General Configuration', 'shibboleth' ); ?></h3>
@@ -377,15 +377,14 @@ function shibboleth_options_page() {
 			break;
 				case 'user' :
 					$constant = false;
-					extract( shibboleth_getoption( 'shibboleth_headers', false, true, true ), EXTR_OVERWRITE );
-					$shib_headers = $value;
-					$shib_headers_constant = $constant;
-					extract( shibboleth_getoption( 'shibboleth_create_accounts', false, false, true ), EXTR_OVERWRITE );
-					$create_accounts = $value;
-					extract( shibboleth_getoption( 'shibboleth_auto_combine_accounts', false, false, true ), EXTR_OVERWRITE );
-					$auto_combine_accounts = $value;
-					extract( shibboleth_getoption( 'shibboleth_manually_combine_accounts', false, false, true ), EXTR_OVERWRITE );
-					$manually_combine_accounts = $value;
+					list( $shib_headers, $shib_headers_constant ) = shibboleth_getoption( 'shibboleth_headers', false, true, true );
+					$constant = $constant || $shib_headers_constant;
+					list( $create_accounts, $from_constant ) = shibboleth_getoption( 'shibboleth_create_accounts', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $auto_combine_accounts, $from_constant ) = shibboleth_getoption( 'shibboleth_auto_combine_accounts', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $manually_combine_accounts, $from_constant ) = shibboleth_getoption( 'shibboleth_manually_combine_accounts', false, false, true );
+					$constant = $constant || $from_constant;
 					?>
 
 
@@ -503,13 +502,12 @@ function shibboleth_options_page() {
 <?php 	break;
 	case 'authorization' :
 					$constant = false;
-					extract( shibboleth_getoption( 'shibboleth_roles', true, false, true ), EXTR_OVERWRITE );
-					$shib_roles = $value;
-					$shib_roles_constant = $constant;
-					extract( shibboleth_getoption( 'shibboleth_default_role', false, false, true ), EXTR_OVERWRITE );
-					$default_role = $value;
-					extract( shibboleth_getoption( 'shibboleth_update_roles', false, false, true ), EXTR_OVERWRITE );
-					$update_roles = $value;
+					list( $shib_roles, $shib_roles_constant ) = shibboleth_getoption( 'shibboleth_roles', true, false, true );
+					$constant = $constant || $shib_roles_constant;
+					list( $default_role, $from_constant ) = shibboleth_getoption( 'shibboleth_default_role', false, false, true );
+					$constant = $constant || $from_constant;
+					list( $update_roles, $from_constant ) = shibboleth_getoption( 'shibboleth_update_roles', false, false, true );
+					$constant = $constant || $from_constant;
 					?>
 
 			<h3><?php _e('User Role Mappings', 'shibboleth') ?></h3>
@@ -636,9 +634,8 @@ endif; // if ( form override )
 <?php       break;
 	case 'logging' :
 		$constant = false;
-		extract( shibboleth_getoption( 'shibboleth_logging', true, false, true ), EXTR_OVERWRITE );
-		$shib_logging = $value;
-		$shib_logging_constant = $constant;
+		list( $shib_logging, $shib_logging_constant ) = shibboleth_getoption( 'shibboleth_logging', true, false, true );
+		$constant = $constant || $shib_logging_constant;
 		?>
 		<h3><?php _e('Logging Configuration', 'shibboleth') ?></h3>
 		<?php if ( $constant ) { ?>
