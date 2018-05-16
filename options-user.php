@@ -64,11 +64,7 @@ function shibboleth_admin_footer_edit_user() {
 
 		$shibboleth_fields = array_merge( $shibboleth_fields, shibboleth_get_managed_user_fields() );
 
-		if ( defined( 'SHIBBOLETH_UPDATE_ROLES' ) && SHIBBOLETH_UPDATE_ROLES ) {
-			$update = SHIBBOLETH_UPDATE_ROLES;
-		} else {
-			$update = get_site_option( 'shibboleth_update_roles' );
-		}
+		$update = shibboleth_getoption( 'shibboleth_update_roles' );
 
 		if ( $update ) {
 			$shibboleth_fields = array_merge( $shibboleth_fields, array('role') );
@@ -102,11 +98,8 @@ function shibboleth_admin_footer_edit_user() {
  */
 function shibboleth_show_user_profile() {
 	$user = wp_get_current_user();
-	if ( defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) && SHIBBOLETH_PASSWORD_CHANGE_URL ) {
-		$password_change_url = SHIBBOLETH_PASSWORD_CHANGE_URL;
-	} else {
-		$password_change_url = get_site_option( 'shibboleth_password_change_url' );
-	}
+	$password_change_url = shibboleth_getoption( 'shibboleth_password_change_url' );
+	
 	if ( get_user_meta( $user->ID, 'shibboleth_account' ) && ! empty( $password_change_url ) ) {
 ?>
 	<table class="form-table">
@@ -163,7 +156,8 @@ function shibboleth_personal_options_update() {
  * @since 1.9
  */
 function shibboleth_link_accounts_button( $user ) {
-	$allowed = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
+	$allowed = shibboleth_getoption( 'shibboleth_manually_combine_accounts', 'disallow' );
+
 	if ( $allowed === 'allow' || $allowed === 'bypass' ) {
 		$linked = get_user_meta( $user->ID, 'shibboleth_account', true ); ?>
 		<table class="form-table">
@@ -196,46 +190,59 @@ function shibboleth_link_accounts() {
 	if ( is_admin() && $screen->id == 'profile' ) {
 		$user_id = get_current_user_id();
 		if ( isset( $_GET['shibboleth'] ) && $_GET['shibboleth'] === 'link' && current_user_can( 'edit_user', $user_id ) ) {
-			$allowed = get_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
+			
+			$allowed = shibboleth_getoption( 'shibboleth_manually_combine_accounts', 'disallow' );
+
 			if ( ! get_user_meta( $user_id, 'shibboleth_account' ) ) {
 				if ( $allowed === 'allow' || $allowed === 'bypass' ) {
 					if ( shibboleth_session_active() ) {
-						$shib_headers = get_site_option( 'shibboleth_headers' );
+						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
+
 						$username = shibboleth_getenv( $shib_headers['username']['name'] );
 						$email = shibboleth_getenv( $shib_headers['email']['name'] );
+						
 						$user = get_user_by( 'id', $user_id );
+						
 						if ( $user->user_login == $username && $user->user_email == $email) {
+							# Insert Logging
 							update_user_meta( $user->ID, 'shibboleth_account', true );
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 							exit;
 						} elseif ( $user->user_login == $username ) {
 								$prevent_conflict = get_user_by( 'email', $email );
 								if ( ! $user->ID ) {
+									# Insert Logging
 									update_user_meta( $user->ID, 'shibboleth_account', true );
 									wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 									exit;
 								} else {
+									# Insert Logging
 									wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 									exit;
 								}
 						} elseif ( $user->user_email == $email && $allowed === 'bypass' ) {
+							# Insert Logging
 							update_user_meta( $user->ID, 'shibboleth_account', true );
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 							exit;
 						} else {
+							# Insert Logging
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 							exit;
 						}
 					} else {
+						# Insert Logging
 						$initiator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
 						wp_redirect( $initiator_url );
 						exit;
 					}
 				} else {
+					# Insert Logging
 					wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 					exit;
 				}
 			} else {
+				# Insert Logging
 				wp_safe_redirect( get_edit_user_link() . '?shibboleth=duplicate' );
 				exit;
 			}

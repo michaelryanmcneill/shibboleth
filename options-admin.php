@@ -99,16 +99,16 @@ function shibboleth_options_page() {
 				}
 				break;
 			case 'user' :
-				$shib_headers = (array) get_site_option( 'shibboleth_headers' );
-				$shib_headers = array_merge( $shib_headers, $_POST['headers'] );
-				/**
-				 * filter shibboleth_form_submit_headers
-				 * @param $shib_headers array
-				 * @since 1.4
-				 * Hint: access $_POST within the filter.
-				 */
-				$shib_headers = apply_filters( 'shibboleth_form_submit_headers', $shib_headers );
 				if ( ! defined( 'SHIBBOLETH_HEADERS' ) ) {
+					$shib_headers = (array) get_site_option( 'shibboleth_headers' );
+					$shib_headers = array_merge( $shib_headers, $_POST['headers'] );
+					/**
+					 * filter shibboleth_form_submit_headers
+					 * @param $shib_headers array
+					 * @since 1.4
+					 * Hint: access $_POST within the filter.
+					 */
+					$shib_headers = apply_filters( 'shibboleth_form_submit_headers', $shib_headers );
 					update_site_option( 'shibboleth_headers', $shib_headers );
 				}
 				if ( ! defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) ) {
@@ -122,16 +122,16 @@ function shibboleth_options_page() {
 				}
 				break;
 			case 'authorization' :
-				$shib_roles = (array) get_site_option( 'shibboleth_roles' );
-				$shib_roles = array_merge( $shib_roles, $_POST['shibboleth_roles'] );
-				/**
-				 * filter shibboleth_form_submit_roles
-				 * @param $shib_roles array
-				 * @since 1.4
-				 * Hint: access $_POST within the filter.
-				 */
-				$shib_roles = apply_filters( 'shibboleth_form_submit_roles', $shib_roles );
 				if ( ! defined( 'SHIBBOLETH_ROLES' ) ) {
+					$shib_roles = (array) get_site_option( 'shibboleth_roles' );
+					$shib_roles = array_merge( $shib_roles, $_POST['shibboleth_roles'] );
+					/**
+					 * filter shibboleth_form_submit_roles
+					 * @param $shib_roles array
+					 * @since 1.4
+					 * Hint: access $_POST within the filter.
+					 */
+					$shib_roles = apply_filters( 'shibboleth_form_submit_roles', $shib_roles );
 					update_site_option( 'shibboleth_roles', $shib_roles );
 				}
 				if ( ! defined( 'SHIBBOLETH_DEFAULT_ROLE' ) ) {
@@ -191,66 +191,26 @@ function shibboleth_options_page() {
 			switch ( $tab ) {
 				case 'general' :
 					$constant = false;
-					if ( defined( 'SHIBBOLETH_LOGIN_URL' ) ) {
-						$login_url = SHIBBOLETH_LOGIN_URL;
-						$constant = true;
-					} else {
-						$login_url = get_site_option( 'shibboleth_login_url' );
-					}
-					if ( defined( 'SHIBBOLETH_LOGOUT_URL' ) ) {
-						$logout_url = SHIBBOLETH_LOGOUT_URL;
-						$constant = true;
-					} else {
-						$logout_url = get_site_option( 'shibboleth_logout_url' );
-					}
-					if ( defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) ) {
-						$password_change_url = SHIBBOLETH_PASSWORD_CHANGE_URL;
-						$constant = true;
-					} else {
-						$password_change_url = get_site_option( 'shibboleth_password_change_url' );
-					}
-					if ( defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) ) {
-						$password_reset_url = SHIBBOLETH_PASSWORD_RESET_URL;
-						$constant = true;
-					} else {
-						$password_reset_url = get_site_option( 'shibboleth_password_reset_url' );
-					}
-					if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) {
-						$attribute_access = SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD;
-						$constant = true;
-					} else {
-						$attribute_access = get_site_option( 'shibboleth_attribute_access' );
-					}
-					if ( defined( 'SHIBBOLETH_SPOOF_KEY' ) ) {
-						$spoofkey = SHIBBOLETH_SPOOF_KEY;
-						$constant = true;
-					} else {
-						$spoofkey = get_site_option( 'shibboleth_spoofkey' );
-					}
-					if ( defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
-						$default_login = SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN;
-						$constant = true;
-					} else {
-						$default_login = get_site_option( 'shibboleth_default_login' );
-					}
-					if ( defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
-						$auto_login = SHIBBOLETH_AUTO_LOGIN;
-						$constant = true;
-					} else {
-						$auto_login = get_site_option( 'shibboleth_auto_login' );
-					}
-					if ( defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) ) {
-						$disable_local_auth = SHIBBOLETH_DISABLE_LOCAL_AUTH;
-						$constant = true;
-					} else {
-						$disable_local_auth = get_site_option( 'shibboleth_disable_local_auth' );
-					}
-					if ( defined( 'SHIBBOLETH_BUTTON_TEXT' ) ) {
-						$button_text = SHIBBOLETH_BUTTON_TEXT;
-						$constant = true;
-					} else {
-						$button_text = get_site_option( 'shibboleth_button_text' );
-					}
+					extract( shibboleth_getoption( 'shibboleth_login_url', false, false, true ), EXTR_OVERWRITE );
+					$login_url = $value;
+					extract( shibboleth_getoption( 'shibboleth_logout_url', false, false, true ), EXTR_OVERWRITE );
+					$logout_url = $value;
+					extract( shibboleth_getoption( 'shibboleth_password_change_url', false, false, true ), EXTR_OVERWRITE );
+					$password_change_url = $value;
+					extract( shibboleth_getoption( 'shibboleth_password_reset_url', false, false, true ), EXTR_OVERWRITE );
+					$password_reset_url = $value;
+					extract( shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true ), EXTR_OVERWRITE );
+					$attribute_access = $value;
+					extract( shibboleth_getoption( 'shibboleth_spoof_key', false, false, true ), EXTR_OVERWRITE );
+					$spoofkey = $value;
+					extract( shibboleth_getoption( 'shibboleth_default_login', false, false, true ), EXTR_OVERWRITE );
+					$default_login = $value;
+					extract( shibboleth_getoption( 'shibboleth_auto_login', false, false, true ), EXTR_OVERWRITE );
+					$auto_login = $value;
+					extract( shibboleth_getoption( 'shibboleth_disable_local_auth', false, false, true ), EXTR_OVERWRITE );
+					$disable_local_auth = $value;
+					extract( shibboleth_getoption( 'shibboleth_button_text', false, false, true ), EXTR_OVERWRITE );
+					$button_text = $value;
 					?>
 
 			<h3><?php _e( 'General Configuration', 'shibboleth' ); ?></h3>
@@ -379,36 +339,15 @@ function shibboleth_options_page() {
 			break;
 				case 'user' :
 					$constant = false;
-					if ( defined( 'SHIBBOLETH_HEADERS' ) ) {
-						if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) ) {
-							$shib_headers = SHIBBOLETH_HEADERS;
-						} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
-							$shib_headers = unserialize( SHIBBOLETH_HEADERS );
-						}
-						$shib_headers_constant = true;
-						$constant = true;
-					} else {
-						$shib_headers = get_site_option( 'shibboleth_headers' );
-						$shib_headers_constant = false;
-					}
-					if ( defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) ) {
-						$create_accounts = SHIBBOLETH_CREATE_ACCOUNTS;
-						$constant = true;
-					} else {
-						$create_accounts = get_site_option( 'shibboleth_create_accounts' );
-					}
-					if ( defined( 'SHIBBOLETH_AUTO_COMBINE_ACCOUNTS' ) ) {
-						$auto_combine_accounts = SHIBBOLETH_AUTO_COMBINE_ACCOUNTS;
-						$constant = true;
-					} else {
-						$auto_combine_accounts = get_site_option( 'shibboleth_auto_combine_accounts' );
-					}
-					if ( defined( 'SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS' ) ) {
-						$manually_combine_accounts = SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS;
-						$constant = true;
-					} else {
-						$manually_combine_accounts = get_site_option( 'shibboleth_manually_combine_accounts' );
-					}
+					extract( shibboleth_getoption( 'shibboleth_headers', true, false, true ), EXTR_OVERWRITE );
+					$shib_headers = $value;
+					$shib_headers_constant = $consant;
+					extract( shibboleth_getoption( 'shibboleth_create_accounts', true, false, false ), EXTR_OVERWRITE );
+					$create_accounts = $value;
+					extract( shibboleth_getoption( 'shibboleth_auto_combine_accounts', true, false, false ), EXTR_OVERWRITE );
+					$auto_combine_accounts = $value;
+					extract( shibboleth_getoption( 'shibboleth_manually_combine_accounts', true, false, false ), EXTR_OVERWRITE );
+					$manually_combine_accounts = $value;
 					?>
 
 
@@ -526,30 +465,13 @@ function shibboleth_options_page() {
 <?php 	break;
 	case 'authorization' :
 					$constant = false;
-					if ( defined( 'SHIBBOLETH_ROLES' ) ) {
-						if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) ) {
-							$shib_roles = SHIBBOLETH_ROLES;
-						} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
-							$shib_roles = unserialize( SHIBBOLETH_ROLES );
-						}
-						$shib_roles_constant = true;
-						$constant = true;
-					} else {
-						$shib_roles = get_site_option( 'shibboleth_roles' );
-						$shib_roles_constant = false;
-					}
-					if ( defined( 'SHIBBOLETH_DEFAULT_ROLE' ) ) {
-						$default_role = SHIBBOLETH_DEFAULT_ROLE;
-						$constant = true;
-					} else {
-						$default_role = get_site_option( 'shibboleth_default_role' );
-					}
-					if ( defined( 'SHIBBOLETH_UPDATE_ROLES' ) ) {
-						$update_roles = SHIBBOLETH_UPDATE_ROLES;
-						$constant = true;
-					} else {
-						$update_roles = get_site_option( 'shibboleth_update_roles' );
-					}
+					extract( shibboleth_getoption( 'shibboleth_roles', true, false, true ), EXTR_OVERWRITE );
+					$shib_roles = $value;
+					$shib_roles_constant = $consant;
+					extract( shibboleth_getoption( 'shibboleth_default_role', true, false, false ), EXTR_OVERWRITE );
+					$default_role = $value;
+					extract( shibboleth_getoption( 'shibboleth_update_roles', true, false, false ), EXTR_OVERWRITE );
+					$update_roles = $value;
 					?>
 
 			<h3><?php _e('User Role Mappings', 'shibboleth') ?></h3>
@@ -676,19 +598,10 @@ endif; // if ( form override )
 <?php       break;
 	case 'logging' :
 		$constant = false;
-
-		if ( defined( 'SHIBBOLETH_LOGGING' ) ) {
-			if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) ) {
-				$shib_logging = SHIBBOLETH_LOGGING;
-			} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
-				$shib_logging = unserialize( SHIBBOLETH_LOGGING );
-			}
-			$shib_logging_constant = true;
-			$constant = true;
-		} else {
-			$shib_logging = get_site_option( 'shibboleth_logging' );
-			$shib_logging_constant = false;
-		} ?>
+		extract( shibboleth_getoption( 'shibboleth_logging', true, false, true ), EXTR_OVERWRITE );
+		$shib_logging = $value;
+		$shib_logging_constant = $consant;
+		?>
 		<h3><?php _e('Logging Configuration', 'shibboleth') ?></h3>
 		<?php if ( $constant ) { ?>
 			<div class="notice notice-warning">
