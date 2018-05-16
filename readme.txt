@@ -186,6 +186,10 @@ This update brings with it a major change to the way Shibboleth attributes are a
  - Cleaned up the shibboleth_authenticate_user function; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/38).
  - Allowed translate.wordpress.org compatibility; [thanks to @eric-gagnon for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/41) and [props to @jrchamp for the fix](https://github.com/michaelryanmcneill/shibboleth/pull/42).
  - Resolved a conflict that caused the lost password and reset password forms to break; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/44).
+ - Resolves an issue where the password reset URL wasn't being properly displayed on wp-login.php; [thanks to @earnjam for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/28).
+ - Prevents local password resets if local authentication is disabled; [thanks to @earnjam for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/28).
+ - Prevents local password changes if local authentication is disabled; [thanks to @earnjam for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/28).
+ - Standardized the way we check if options are set as constants to prevent duplicate code.
 
 = version 2.0.2 (2018-01-17) =
  - Resolved an issue that caused manual linking of accounts to fail if user's didn't have an existing Shibboleth session. 
