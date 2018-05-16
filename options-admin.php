@@ -678,7 +678,7 @@ endif; // if ( form override )
 				<th scope="row"><label for="log_role_update"><?php _e('Log Role Update', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php echo in_array( 'role_update', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
-						<label for="log_role_update"><?php _e('Log when the plugin updates a users role.', 'shibboleth'); ?></label>
+						<label for="log_role_update"><?php _e('Log when the plugin updates a user\'s role.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
 					</td>
