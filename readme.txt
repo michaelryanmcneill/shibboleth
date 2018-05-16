@@ -190,6 +190,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
  - Prevents local password resets if local authentication is disabled; [thanks to @earnjam for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/28).
  - Prevents local password changes if local authentication is disabled; [thanks to @earnjam for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/28).
  - Standardized the way we check if options are set as constants to prevent duplicate code.
+ - For manual account merges, ensure that email comparisons are case insensitive; [thanks to @mrbrown8 for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/39).
 
 = version 2.0.2 (2018-01-17) =
  - Resolved an issue that caused manual linking of accounts to fail if user's didn't have an existing Shibboleth session. 

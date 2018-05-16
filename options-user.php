@@ -209,13 +209,13 @@ function shibboleth_link_accounts() {
 						$user = get_user_by( 'id', $user_id );
 						
 						// If username and email match, safe to merge
-						if ( $user->user_login === $username && $user->user_email === $email) {
+						if ( $user->user_login === $username && strtolower( $user->user_email ) === strtolower( $email ) {
 							update_user_meta( $user->ID, 'shibboleth_account', true );
 							// @todo: Add logging for successful manual merging
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 							exit;
 						// If username matches, check if there is a conflict with the email
-						} elseif ( $user->user_login == $username ) {
+						} elseif ( $user->user_login === $username ) {
 								$prevent_conflict = get_user_by( 'email', $email );
 								// If username matches and there is no existing account with the email, safe to merge
 								if ( ! $prevent_conflict->ID ) {
@@ -230,7 +230,7 @@ function shibboleth_link_accounts() {
 									exit;
 								}
 						// If email matches and username bypass is enabled, check if there is a conflict with the username
-						} elseif ( $user->user_email == $email && $allowed === 'bypass' ) {
+						} elseif ( strtolower( $user->user_email) === strtolower( $email ) && $allowed === 'bypass' ) {
 							$prevent_conflict = get_user_by( 'user_login', $username );
 							// If email matches and there is no existing account with the username, safe to merge
 							if ( ! $prevent_conflict->ID ) {

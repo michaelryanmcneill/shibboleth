@@ -34,7 +34,7 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
  * return true, so you should set a default of false before using extract. 
  *
  * @since 2.1
- * @param string $var
+ * @param string $option
  * @param bool $default
  * @param bool $array
  * @param bool $compact
