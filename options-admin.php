@@ -648,7 +648,7 @@ endif; // if ( form override )
 				<th scope="row"><label for="log_auth"><?php _e('Log Authentication Attempts', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="checkbox" id="log_auth" name="logging[]" value="auth" <?php echo in_array( 'auth', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
-						<label for="log_auth"><?php _e('Log when a user attempts authenticates using Shibboleth.', 'shibboleth'); ?></label>
+						<label for="log_auth"><?php _e('Log when a user attempts to authenticate using Shibboleth.', 'shibboleth'); ?></label>
 					</td>
 				</tr>
 				<tr>
