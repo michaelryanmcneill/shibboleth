@@ -258,7 +258,7 @@ function shibboleth_options_page() {
 					<th scope="row"><label for="password_reset_url"><?php _e('Password Reset URL', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="text" id="password_reset_url" name="password_reset_url" value="<?php echo esc_url( $password_reset_url ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) ) { disabled( $password_reset_url, SHIBBOLETH_PASSWORD_RESET_URL ); } ?> /><br />
-						<?php _e('If this option is set, Shibboleth users who try to reset their forgotten password using WordPress will be redirected to this URL.', 'shibboleth'); ?>
+						<?php _e('If this option is set, wp-login.php will send <b><i>ALL</i></b> users here to reset their password.', 'shibboleth'); ?>
 					</td>
 				</tr>
 				<tr valign="top">
