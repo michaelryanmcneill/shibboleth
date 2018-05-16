@@ -347,7 +347,7 @@ function shibboleth_options_page() {
 
 			<br class="clear" />
 
-			<script type="application/javascript">
+			<script type="text/javascript">
 				var attribute_access = document.getElementById("attribute_access");
 				attribute_access.onchange=AttributeAccessMethod;
 				function AttributeAccessMethod()
