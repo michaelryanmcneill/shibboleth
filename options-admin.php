@@ -65,7 +65,7 @@ function shibboleth_options_page() {
 		switch ( $tab ) {
 			case 'general' :
 				if ( ! defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) {
-					update_site_option( 'shibboleth_attribute_access', $_POST['attribute_access'] );
+					update_site_option( 'shibboleth_attribute_access_method', $_POST['attribute_access'] );
 				}
 				if ( ! defined( 'SHIBBOLETH_LOGIN_URL' ) ) {
 					update_site_option( 'shibboleth_login_url', $_POST['login_url'] );
@@ -74,7 +74,7 @@ function shibboleth_options_page() {
 					update_site_option( 'shibboleth_logout_url', $_POST['logout_url'] );
 				}
 				if ( ! defined( 'SHIBBOLETH_SPOOF_KEY' ) ) {
-					update_site_option( 'shibboleth_spoofkey', $_POST['spoofkey'] );
+					update_site_option( 'shibboleth_spoof_key', $_POST['spoofkey'] );
 				}
 				if ( ! defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) ) {
 					update_site_option( 'shibboleth_password_change_url', $_POST['password_change_url'] );
@@ -86,7 +86,7 @@ function shibboleth_options_page() {
 					update_site_option( 'shibboleth_password_reset_url', $_POST['password_reset_url'] );
 				}
 				if ( ! defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
-					update_site_option( 'shibboleth_default_login', ! empty( $_POST['default_login'] ) );
+					update_site_option( 'shibboleth_default_to_shib_login', ! empty( $_POST['default_login'] ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
 					update_site_option( 'shibboleth_auto_login', ! empty( $_POST['auto_login'] ) );
