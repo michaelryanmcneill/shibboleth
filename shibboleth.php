@@ -803,20 +803,40 @@ add_action( 'login_init', 'shibboleth_disable_login' );
  */
 function shibboleth_disable_login_form() {
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
+	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
 	
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 	
 	if ( $disable && ! $bypass ) {
 	?>
 		<style type="text/css">
-			#loginform p {
-			  display: none;
+			.login #loginform p {
+				display: none;
 			}
+			<?php if ( ! $password_reset_url ) { ?>
+			.login #nav {
+				display: none;
+			}
+			<?php } ?>
 		</style>
 	<?php
 	}
 }
 add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
+
+/**
+ * Updates the lost password URL, if specified.
+ *
+ * @since 2.1
+ */
+function shibboleth_custom_password_reset_url() {
+	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
+	
+	if ( $password_reset_url ) {
+		return $password_reset_url;
+	}
+}
+add_filter( 'lostpassword_url', 'shibboleth_custom_password_reset_url' );
 
 /**
  * Add a "Log in with Shibboleth" link to the WordPress login form.  This link
