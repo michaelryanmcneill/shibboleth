@@ -339,14 +339,14 @@ function shibboleth_options_page() {
 			break;
 				case 'user' :
 					$constant = false;
-					extract( shibboleth_getoption( 'shibboleth_headers', true, false, true ), EXTR_OVERWRITE );
+					extract( shibboleth_getoption( 'shibboleth_headers', false, true, true ), EXTR_OVERWRITE );
 					$shib_headers = $value;
 					$shib_headers_constant = $constant;
-					extract( shibboleth_getoption( 'shibboleth_create_accounts', true, false, false ), EXTR_OVERWRITE );
+					extract( shibboleth_getoption( 'shibboleth_create_accounts', false, false, true ), EXTR_OVERWRITE );
 					$create_accounts = $value;
-					extract( shibboleth_getoption( 'shibboleth_auto_combine_accounts', true, false, false ), EXTR_OVERWRITE );
+					extract( shibboleth_getoption( 'shibboleth_auto_combine_accounts', false, false, true ), EXTR_OVERWRITE );
 					$auto_combine_accounts = $value;
-					extract( shibboleth_getoption( 'shibboleth_manually_combine_accounts', true, false, false ), EXTR_OVERWRITE );
+					extract( shibboleth_getoption( 'shibboleth_manually_combine_accounts', false, false, true ), EXTR_OVERWRITE );
 					$manually_combine_accounts = $value;
 					?>
 
@@ -468,9 +468,9 @@ function shibboleth_options_page() {
 					extract( shibboleth_getoption( 'shibboleth_roles', true, false, true ), EXTR_OVERWRITE );
 					$shib_roles = $value;
 					$shib_roles_constant = $constant;
-					extract( shibboleth_getoption( 'shibboleth_default_role', true, false, false ), EXTR_OVERWRITE );
+					extract( shibboleth_getoption( 'shibboleth_default_role', false, false, true ), EXTR_OVERWRITE );
 					$default_role = $value;
-					extract( shibboleth_getoption( 'shibboleth_update_roles', true, false, false ), EXTR_OVERWRITE );
+					extract( shibboleth_getoption( 'shibboleth_update_roles', false, false, true ), EXTR_OVERWRITE );
 					$update_roles = $value;
 					?>
 
