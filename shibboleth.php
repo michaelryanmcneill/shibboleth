@@ -114,7 +114,7 @@ function shibboleth_getenv( $var ) {
 			break;
 		// If specified, use the custom specified method
 		case 'custom':
-			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' )
+			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
 			$var_method = $custom;
 			break;
 		// Otherwise, fall back to standard for security
