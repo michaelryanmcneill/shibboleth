@@ -227,17 +227,16 @@ function shibboleth_options_page() {
 				var select = document.getElementById("attribute_access");
 				select.onchange=customAttributeAccessMethod;
 				function customAttributeAccessMethod()
-				{
-					var select = document.getElementById("attribute_access");
-					var selectedValue = select.options[select.selectedIndex].value;
+				{   
+				    var select = document.getElementById("attribute_access");
+				    var selectedValue = select.options[select.selectedIndex].value;				 
 
-					if (selectedValue == "custom")
-					{
-						document.getElementById("attribute_access_custom_row").style.display = "block";
-					}
-					else
-					{
-						document.getElementById("attribute_access_custom_row").style.display = "none";
+				    if (selectedValue == "custom")
+				    {   document.getElementById("attribute_access_custom_row").style.display = "block";
+				    }
+				    else
+				    {
+				       document.getElementById("attribute_access_custom_row").style.display = "none";
 				    }
 				}
 			</script>
@@ -296,7 +295,7 @@ function shibboleth_options_page() {
 						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
-				<tr id="attribute_access_custom_row">
+				<tr id="attribute_access_custom_row" <?php ( $attribute_access_custom === true ?: echo 'style="display:none;"' ) ?>>
 					<th scope="row"><label for="attribute_access_custom"><?php _e('Custom Attribute Access Prefix', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="text" id="attribute_access_custom" name="attribute_access_custom" value="<?php echo $attribute_access; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) { disabled( $attribute_access, SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD ); } ?> /><br />
