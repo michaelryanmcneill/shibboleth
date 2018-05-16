@@ -286,7 +286,6 @@ function shibboleth_options_page() {
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
-				<tr>
 				<tr valign="top">
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth'); ?></label></th>
 					<td>
