@@ -787,11 +787,12 @@ function shibboleth_disable_login() {
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 
 	if ( $disable && ! $bypass ) {
+		// Disable the ability to reset passwords from wp-login.php
+		add_filter( 'allow_password_reset', '__return_false' );
+		
 		if ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
 			 wp_die( __( 'Shibboleth authentication is required.', 'shibboleth' ) );
 		}
-		// Disable the ability to reset passwords from wp-login.php
-		add_filter( 'allow_password_reset', '__return_false' );
 	}
 }
 add_action( 'login_init', 'shibboleth_disable_login' );
