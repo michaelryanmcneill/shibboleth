@@ -362,7 +362,7 @@ function shibboleth_options_page() {
 				    	document.getElementById("attribute_custom_access_row").style.display = "table-row";
 				    	document.getElementById("spoofkey_row").style.display = "none";
 				    }
-				    else if (selectedValue == "custom")
+				    else if (selectedValue == "http")
 				    {
 				    	document.getElementById("attribute_custom_access_row").style.display = "none";
 				    	document.getElementById("spoofkey_row").style.display = "table-row";
