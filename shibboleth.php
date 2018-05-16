@@ -342,7 +342,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
  */
  function shibboleth_session_active( $auto_login = false ) {
  	$active = false;
-	$method = shibboleth_getoption( 'shibboleth_attribute_access' );
+	$method = shibboleth_getoption( 'shibboleth_attribute_access_method' );
  	$session = shibboleth_getenv( 'Shib-Session-ID' );
 
  	if ( $session && $method !== 'http' ) {
