@@ -201,6 +201,9 @@ function shibboleth_options_page() {
 					$password_reset_url = $value;
 					extract( shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true ), EXTR_OVERWRITE );
 					$attribute_access = $value;
+					if ( $attribute_access != '' && $attribute_access != 'http' && $attribute_access != 'standard' && $attribute_access != 'redirect' ) {
+						$attribute_access_custom = true;
+					}
 					extract( shibboleth_getoption( 'shibboleth_spoof_key', false, false, true ), EXTR_OVERWRITE );
 					$spoofkey = $value;
 					extract( shibboleth_getoption( 'shibboleth_default_login', false, false, true ), EXTR_OVERWRITE );
@@ -219,6 +222,24 @@ function shibboleth_options_page() {
 					<p><?php _e( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ); ?></p>
 				</div>
 			<?php } ?>
+			<script type="application/javascript">
+				var select = document.getElementById("attribute_access");
+				select.onchange=customAttributeAccessMethod;
+				function customAttributeAccessMethod()
+				{
+					var select = document.getElementById("attribute_access");
+					var selectedValue = select.options[select.selectedIndex].value;
+
+					if (selectedValue == "custom")
+					{
+						document.getElementById("attribute_access_custom_row").style.display = "block";
+					}
+					else
+					{
+						document.getElementById("attribute_access_custom_row").style.display = "none";
+				    }
+				}
+			</script>
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><label for="login_url"><?php _e( 'Login URL', 'shibboleth' ); ?></label></th>
@@ -266,6 +287,7 @@ function shibboleth_options_page() {
 							<option value="standard" <?php selected( $attribute_access, 'standard' ); ?>>Environment Variables</option>
 							<option value="redirect" <?php selected( $attribute_access, 'redirect' ); ?>>Redirected Environment Variables</option>
 							<option value="http" <?php selected( $attribute_access, 'http' ); ?>>HTTP Headers</option>
+							<option value="custom" <?php selected( $attribute_access_custom, true ); ?>>Custom Prefix</option>
 						</select>
 						<p><?php _e('By default, attributes passed from your Shibboleth Service Provider will be accessed using standard environment variables. '
 						. 'For most users, leaving these defaults is perfectly fine. If you are running a special server configuration that results in environment variables '
@@ -273,6 +295,15 @@ function shibboleth_options_page() {
 						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
+				<tr id="attribute_access_custom_row">
+					<th scope="row"><label for="attribute_access_custom"><?php _e('Custom Attribute Access Prefix', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="text" id="attribute_access_custom" name="attribute_access_custom" value="<?php echo $attribute_access; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) { disabled( $attribute_access, SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD ); } ?> /><br />
+						<p><?php _e('This option only applies when using the "Custom" attribute access method.'
+						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
+					</td>
+				</tr>
+				<tr>
 				<tr valign="top">
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth'); ?></label></th>
 					<td>
