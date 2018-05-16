@@ -287,9 +287,7 @@ function shibboleth_disable_password_changes() {
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 
 	if ( $disable && ! $bypass ) {
-		if ( is_admin() ) {
 			add_filter( 'show_password_fields', '__return_false' );
-		}
 	}
 }
 
