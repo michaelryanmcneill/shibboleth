@@ -85,9 +85,6 @@ function shibboleth_options_page() {
 				if ( ! defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) ) {
 					update_site_option( 'shibboleth_password_reset_url', $_POST['password_reset_url'] );
 				}
-				if ( ! defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) ) {
-					update_site_option( 'shibboleth_password_reset_url', $_POST['password_reset_url'] );
-				}
 				if ( ! defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
 					update_site_option( 'shibboleth_default_to_shib_login', ! empty( $_POST['default_login'] ) );
 				}
