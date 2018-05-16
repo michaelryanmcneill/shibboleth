@@ -25,7 +25,13 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
 
 /**
  * Determine if a constant is defined. If it is, return the value of the constant.
- * If it isn't, return the value from get_site_option().
+ * If it isn't, return the value from get_site_option(). If you'd like to pass a default
+ * for get_site_option(), set $default to the requested default. If you'd like to check 
+ * for arrays in constants, set $array to true. If you'd like to return that the object 
+ * was obtained as a constant, set $compact to true and extract the result. To get the
+ * value of the constant or option, look at the value key. To check if the value was
+ * retreived from a constant, look at the constant key. Note, the constant key will only
+ * return true, so you should set a default of false before using extract. 
  *
  * @since 2.1
  * @param string $var
@@ -35,30 +41,43 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
  * @return mixed
  */
 function shibboleth_getoption( $option, $default = false, $array = false, $compact = false ) {
+	// We have to do special work for arrays thanks to PHP 5.5 and below
 	if ( $array ) {
+		// In PHP 5.6 and above, we can use arrays in constants, so we just get the value of the
+		// constant
 		if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( strtoupper( $option ) ) ) {
 			$value = constant( strtoupper( $option ) );
 			$constant = true;
+		// In PHP 5.5 and below, we can't use arrays in constants, so we have to use 
+		// serialize and unserialize
 		} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( strtoupper( $option ) ) ) {
 			$value = unserialize( constant( strtoupper( $option ) ) );
 			$constant = true;
+		// If no constant is set, just get the value from get_site_option()
 		} else {
 			$value = get_site_option( $option, $default );
 		}
+		// If compact is set to true, we compact $value and $constant together for easy extraction
 		if ( $compact ) {
 			return compact( 'value', 'constant' );
+		// Otherwise, just return the $value
 		} else {
 			return $value;
 		}
+	// If this isn't an array, proceed
 	} else {
+		// If a constant is defined with the provided option name, get the value of the constant
 		if ( defined( strtoupper( $option ) ) ) {
 			$value = constant( strtoupper( $option ) );
 			$constant = true;
+		// If no constant is set, just get the value from get_site_option()
 		} else {
 			$value = get_site_option( $option, $default );
 		}
+		// If compact is set to true, we compact $value and $constant together for easy extraction
 		if ( $compact ) {
 			return compact( 'value', 'constant' );
+		// Otherwise, just return the $value
 		} else {
 			return $value;
 		}
@@ -76,22 +95,29 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
  * @return string|bool
  */
 function shibboleth_getenv( $var ) {
+	// Get the specified shibboleth attribute access method; if one isn't specified
+	// simply use standard environment variables since they're the safest
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
 
 	switch ( $method ) {
+		// Use standard by default for security
 		case 'standard' :
 			$var_method = '';
 			break;
+		// If specified, use redirect
 		case 'redirect' :
 			$var_method = 'REDIRECT_';
 			break;
+		// If specified, use http
 		case 'http':
 			$var_method = 'HTTP_';
 			break;
+		// If specified, use the custom specified method
 		default :
-			$var_method = '';
+			$var_method = $method;
 	}
 
+	// Using the selected attribute access method, check all possible cases
 	$var_under = str_replace( '-', '_', $var );
 	$var_upper = strtoupper( $var );
 	$var_under_upper = strtoupper( $var_under );
@@ -240,6 +266,12 @@ function shibboleth_migrate_old_data() {
 		update_site_option( 'shibboleth_headers', $headers );
 	}
 	delete_site_option( 'shibboleth_update_users' );
+
+	/**
+	 * Changes to use plugin version instead of SVN revision.
+	 *
+	 * @since 1.8
+	 */
 	delete_site_option( 'shibboleth_plugin_revision' );
 
 	/**
@@ -262,6 +294,13 @@ function shibboleth_migrate_old_data() {
 		unset( $roles['default'] );
 		update_site_option( 'shibboleth_roles', $roles );
 	}
+
+	/**
+	 * Changes to support the shibboleth_getoption() function to match
+	 * naming conventions of constants.
+	 *
+	 * @since 2.1-alpha
+	 */
 	$attribute_access = get_site_option( 'shibboleth_attribute_access' );
 	if ( $attribute_access ) {
 		update_site_option( 'shibboleth_attribute_access_method', $attribute_access );
@@ -746,11 +785,13 @@ function shibboleth_disable_login() {
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
 
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
-	
+
 	if ( $disable && ! $bypass ) {
 		if ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
 			 wp_die( __( 'Shibboleth authentication is required.', 'shibboleth' ) );
 		}
+		// Disable the ability to reset passwords from wp-login.php
+		add_filter( 'allow_password_reset', '__return_false' );
 	}
 }
 add_action( 'login_init', 'shibboleth_disable_login' );

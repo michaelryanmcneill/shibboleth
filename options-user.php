@@ -275,6 +275,25 @@ function shibboleth_link_accounts() {
 }
 add_action( 'current_screen', 'shibboleth_link_accounts' );
 
+
+/**
+ * Prevents local password changes when local authentication is disabled
+ *
+ * @since 1.9
+ */
+function shibboleth_disable_password_changes() {
+	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
+
+	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
+
+	if ( $disable && ! $bypass ) {
+		if ( is_admin() ) {
+			add_filter( 'show_password_fields', '__return_false' );
+		}
+	}
+
+add_action( 'current_screen', 'shibboleth_disable_password_changes' );
+
 /**
  * Displays admin notices based off query string.
  *
