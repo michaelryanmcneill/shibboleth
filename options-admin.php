@@ -634,7 +634,7 @@ endif; // if ( form override )
 <?php       break;
 	case 'logging' :
 		$constant = false;
-		list( $shib_logging, $shib_logging_constant ) = shibboleth_getoption( 'shibboleth_logging', array(), false, true );
+		list( $shib_logging, $shib_logging_constant ) = shibboleth_getoption( 'shibboleth_logging', array(), true, true );
 		$constant = $constant || $shib_logging_constant;
 		?>
 		<h3><?php _e('Logging Configuration', 'shibboleth') ?></h3>

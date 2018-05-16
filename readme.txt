@@ -188,6 +188,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
 == Changelog ==
 = version 2.1.1 (XXX-XX-XX) =
  - Minor code cleanup for disabling authentication and passsword resets; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/commit/06c28bec6d42e92a9338961e2f7ed4a7ae8a0f71#commitcomment-29005081).
+ - Resolved a minor problem where setting the SHIBBOLETH_LOGGING constant on PHP 5.5 or below would not work in the administrative interface; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/47#discussion_r188758184).
 
 = version 2.1 (2018-05-16) =
  - Resolved an issue where in multisite users could inadvertently be sent to an unrelated subsite after logging in; [thanks to @themantimeforgot for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/33) and [props to @jrchamp for the fix](https://github.com/michaelryanmcneill/shibboleth/pull/35).
