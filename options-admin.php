@@ -223,23 +223,6 @@ function shibboleth_options_page() {
 					<p><?php _e( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ); ?></p>
 				</div>
 			<?php } ?>
-			<script type="application/javascript">
-				var select = document.getElementById("attribute_access");
-				select.onchange=customAttributeAccessMethod;
-				function customAttributeAccessMethod()
-				{   
-				    var select = document.getElementById("attribute_access");
-				    var selectedValue = select.options[select.selectedIndex].value;				 
-
-				    if (selectedValue == "custom")
-				    {   document.getElementById("attribute_access_custom_row").style.display = "block";
-				    }
-				    else
-				    {
-				       document.getElementById("attribute_access_custom_row").style.display = "none";
-				    }
-				}
-			</script>
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><label for="login_url"><?php _e( 'Login URL', 'shibboleth' ); ?></label></th>
@@ -365,6 +348,24 @@ function shibboleth_options_page() {
 			</table>
 
 			<br class="clear" />
+
+			<script type="application/javascript">
+				var select = document.getElementById("attribute_access");
+				select.onchange=customAttributeAccessMethod;
+				function customAttributeAccessMethod()
+				{   
+				    var select = document.getElementById("attribute_access");
+				    var selectedValue = select.options[select.selectedIndex].value;				 
+
+				    if (selectedValue == "custom")
+				    {   document.getElementById("attribute_access_custom_row").style.display = "block";
+				    }
+				    else
+				    {
+				       document.getElementById("attribute_access_custom_row").style.display = "none";
+				    }
+				}
+			</script>
 
 <?php
 			break;
