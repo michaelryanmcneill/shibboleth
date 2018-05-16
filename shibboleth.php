@@ -832,13 +832,16 @@ add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
 /**
  * Updates the lost password URL, if specified.
  *
+ * @param string $url original password reset URL
  * @since 2.1
  */
-function shibboleth_custom_password_reset_url() {
+function shibboleth_custom_password_reset_url( $url ) {
 	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
 
-	if ( empty( $password_reset_url) ) {
+	if ( $password_reset_url ) {
 		return $password_reset_url;
+	} else {
+		return $url;
 	}
 }
 add_filter( 'lostpassword_url', 'shibboleth_custom_password_reset_url' );
