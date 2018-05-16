@@ -205,7 +205,7 @@ function shibboleth_options_page() {
 					$constant = $constant || $from_constant;
 					list( $spoofkey, $from_constant ) = shibboleth_getoption( 'shibboleth_spoof_key', false, false, true );
 					$constant = $constant || $from_constant;
-					list( $default_login, $from_constant ) = shibboleth_getoption( 'shibboleth_default_login', false, false, true );
+					list( $default_login, $from_constant ) = shibboleth_getoption( 'shibboleth_default_to_shib_login', false, false, true );
 					$constant = $constant || $from_constant;
 					list( $auto_login, $from_constant ) = shibboleth_getoption( 'shibboleth_auto_login', false, false, true );
 					$constant = $constant || $from_constant;
