@@ -113,8 +113,13 @@ function shibboleth_getenv( $var ) {
 			$var_method = 'HTTP_';
 			break;
 		// If specified, use the custom specified method
+		case 'custom':
+			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' )
+			$var_method = $custom;
+			break;
+		// Otherwise, fall back to standard for security
 		default :
-			$var_method = $method;
+			$var_method = '';
 	}
 
 	// Using the selected attribute access method, check all possible cases
