@@ -67,6 +67,9 @@ function shibboleth_options_page() {
 				if ( ! defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) {
 					update_site_option( 'shibboleth_attribute_access_method', $_POST['attribute_access'] );
 				}
+				if ( ! defined( 'SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD' ) ) {
+					update_site_option( 'shibboleth_attribute_custom_access_method', $_POST['attribute_custom_access'] );
+				}
 				if ( ! defined( 'SHIBBOLETH_LOGIN_URL' ) ) {
 					update_site_option( 'shibboleth_login_url', $_POST['login_url'] );
 				}
@@ -201,10 +204,8 @@ function shibboleth_options_page() {
 					$password_reset_url = $value;
 					extract( shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true ), EXTR_OVERWRITE );
 					$attribute_access = $value;
-					$attribute_access_custom = false;
-					if ( $attribute_access != '' && $attribute_access != 'http' && $attribute_access != 'standard' && $attribute_access != 'redirect' ) {
-						$attribute_access_custom = true;
-					}
+					extract( shibboleth_getoption( 'shibboleth_attribute_custom_access_method', false, false, true ), EXTR_OVERWRITE );
+					$attribute_custom_access = $value;
 					extract( shibboleth_getoption( 'shibboleth_spoof_key', false, false, true ), EXTR_OVERWRITE );
 					$spoofkey = $value;
 					extract( shibboleth_getoption( 'shibboleth_default_login', false, false, true ), EXTR_OVERWRITE );
@@ -270,7 +271,7 @@ function shibboleth_options_page() {
 							<option value="standard" <?php selected( $attribute_access, 'standard' ); ?>>Environment Variables</option>
 							<option value="redirect" <?php selected( $attribute_access, 'redirect' ); ?>>Redirected Environment Variables</option>
 							<option value="http" <?php selected( $attribute_access, 'http' ); ?>>HTTP Headers</option>
-							<option value="custom" <?php selected( $attribute_access_custom, true ); ?>>Custom Prefix</option>
+							<option value="custom" <?php selected( $attribute_access, 'custom' ); ?>>Custom Prefix</option>
 						</select>
 						<p><?php _e('By default, attributes passed from your Shibboleth Service Provider will be accessed using standard environment variables. '
 						. 'For most users, leaving these defaults is perfectly fine. If you are running a special server configuration that results in environment variables '
@@ -278,19 +279,19 @@ function shibboleth_options_page() {
 						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
-				<tr id="attribute_access_custom_row" <?php echo ( $attribute_access_custom ?: 'style="display:none;"' ); ?>>
-					<th scope="row"><label for="attribute_access_custom"><?php _e('Custom Attribute Access Prefix', 'shibboleth'); ?></label></th>
+				<tr id="attribute_custom_access_row" <?php echo ( $attribute_access_custom ?: 'style="display:none;"' ); ?>>
+					<th scope="row"><label for="attribute_custom_access"><?php _e('Custom Attribute Access Prefix', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="text" id="attribute_access_custom" name="attribute_access_custom" value="<?php echo $attribute_access; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) { disabled( $attribute_access, SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD ); } ?> /><br />
-						<p><?php _e('This option only applies when using the "Custom" attribute access method.'
+						<input type="text" id="attribute_custom_access" name="attribute_custom_access" value="<?php echo $attribute_custom_access; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD' ) ) { disabled( $attribute_custom_access, SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD ); } ?> /><br />
+						<p><?php _e('If you wish to use a custom attribute access prefix, enter it here. This field is case-insensitive.'
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
-				<tr valign="top">
+				<tr id="spoofkey_row" <?php echo ( $spoofkey ?: 'style="display:none;"' ); ?>>
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo $spoofkey; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_SPOOF_KEY' ) ) { disabled( $spoofkey, SHIBBOLETH_SPOOF_KEY ); } ?> /><br />
-						<p><?php _e('This option only applies when using the "HTTP Headers" attribute access method. For more details on setting a spoof key on the Shibboleth Service Provider, see <a href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking">this wiki document</a>. '
+						<p><?php _e('For more details on setting a spoof key on the Shibboleth Service Provider, see <a href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking">this wiki document</a>. '
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
@@ -349,19 +350,27 @@ function shibboleth_options_page() {
 			<br class="clear" />
 
 			<script type="application/javascript">
-				var select = document.getElementById("attribute_access");
-				select.onchange=customAttributeAccessMethod;
-				function customAttributeAccessMethod()
+				var attribute_access = document.getElementById("attribute_access");
+				attribute_access.onchange=AttributeAccessMethod;
+				function AttributeAccessMethod()
 				{   
-				    var select = document.getElementById("attribute_access");
-				    var selectedValue = select.options[select.selectedIndex].value;				 
+				    var attribute_access = document.getElementById("attribute_access");
+				    var selectedValue = attribute_access.options[attribute_access.selectedIndex].value;				 
 
 				    if (selectedValue == "custom")
-				    {   document.getElementById("attribute_access_custom_row").style.display = "block";
+				    {
+				    	document.getElementById("attribute_custom_access_row").style.display = "table-row";
+				    	document.getElementById("spoofkey_row").style.display = "none";
+				    }
+				    else if (selectedValue == "custom")
+				    {
+				    	document.getElementById("attribute_custom_access_row").style.display = "none";
+				    	document.getElementById("spoofkey_row").style.display = "table-row";
 				    }
 				    else
 				    {
-				       document.getElementById("attribute_access_custom_row").style.display = "none";
+				       document.getElementById("attribute_custom_access_row").style.display = "none";
+				       document.getElementById("spoofkey_row").style.display = "none";
 				    }
 				}
 			</script>
