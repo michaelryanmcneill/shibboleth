@@ -2,8 +2,8 @@
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
-Tested up to: 4.9.2
-Stable tag: 2.1
+Tested up to: 4.9.6
+Stable tag: 2.1.1
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -186,6 +186,11 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
+= version 2.1.1 (2018-05-16) =
+ - Minor code cleanup for disabling authentication and passsword resets; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/commit/06c28bec6d42e92a9338961e2f7ed4a7ae8a0f71#commitcomment-29005081).
+ - Resolved a minor problem where setting the SHIBBOLETH_LOGGING constant on PHP 5.5 or below would not work in the administrative interface; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/47#discussion_r188758184).
+ - Resolved an issue with the default to shibboleth login option in the admin; [thanks to @trandrew for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/48).
+
 = version 2.1 (2018-05-16) =
  - Resolved an issue where in multisite users could inadvertently be sent to an unrelated subsite after logging in; [thanks to @themantimeforgot for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/33) and [props to @jrchamp for the fix](https://github.com/michaelryanmcneill/shibboleth/pull/35).
  - Resolved an regression that prevented users from authenticating if shibboleth_default_role is blank and shibboleth_create_accounts is enabled; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/37).
