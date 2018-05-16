@@ -142,8 +142,12 @@ function shibboleth_options_page() {
 				}
 				break;
 			case 'logging' :
-				if ( ! defined( 'SHIBBOLETH_LOGGING' ) && isset( $_POST['logging'] ) ) {
-					update_site_option( 'shibboleth_logging', $_POST['logging'] );
+				if ( ! defined( 'SHIBBOLETH_LOGGING' ) ) {
+					if ( isset( $_POST['logging'] ) ) {	
+						update_site_option( 'shibboleth_logging', $_POST['logging'] );
+					} else {
+						update_site_option( 'shibboleth_logging', array() );
+					}
 				}
 				break;
 		}
@@ -672,6 +676,7 @@ endif; // if ( form override )
 <?php       break;
 	case 'logging' :
 		$constant = false;
+
 		if ( defined( 'SHIBBOLETH_LOGGING' ) ) {
 			if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) ) {
 				$shib_logging = SHIBBOLETH_LOGGING;
