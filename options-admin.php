@@ -273,7 +273,8 @@ function shibboleth_options_page() {
 						<p><?php _e('By default, attributes passed from your Shibboleth Service Provider will be accessed using standard environment variables. '
 						. 'For most users, leaving these defaults is perfectly fine. If you are running a special server configuration that results in environment variables '
 						. 'being sent with the prefix <code>REDIRECT_</code>, you should select the "Redirected Environment Variables" option. If you are running '
-						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.', 'shibboleth'); ?></p>
+						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below. '
+						. ' If you are running Shibboleth with a custom prefix, you should select the "Custom Prefix" option and complete the "Custom Attribute Access Prefix" field that appears below.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
 				<tr id="attribute_custom_access_row" <?php echo ( $attribute_access === 'custom' ?: 'style="display:none;"' ); ?>>
