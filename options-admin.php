@@ -143,7 +143,7 @@ function shibboleth_options_page() {
 				break;
 			case 'logging' :
 				if ( ! defined( 'SHIBBOLETH_LOGGING' ) ) {
-					if ( isset( $_POST['logging'] ) ) {	
+					if ( isset( $_POST['logging'] ) ) {
 						update_site_option( 'shibboleth_logging', $_POST['logging'] );
 					} else {
 						update_site_option( 'shibboleth_logging', array() );
@@ -350,9 +350,9 @@ function shibboleth_options_page() {
 				var attribute_access = document.getElementById("attribute_access");
 				attribute_access.onchange=AttributeAccessMethod;
 				function AttributeAccessMethod()
-				{   
+				{
 				    var attribute_access = document.getElementById("attribute_access");
-				    var selectedValue = attribute_access.options[attribute_access.selectedIndex].value;				 
+				    var selectedValue = attribute_access.options[attribute_access.selectedIndex].value;
 
 				    if (selectedValue == "custom")
 				    {

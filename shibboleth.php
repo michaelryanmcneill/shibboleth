@@ -26,12 +26,12 @@ if ( SHIBBOLETH_PLUGIN_VERSION != $plugin_version ) {
 /**
  * Determine if a constant is defined. If it is, return the value of the constant.
  * If it isn't, return the value from get_site_option(). If you'd like to pass a default
- * for get_site_option(), set $default to the requested default. If you'd like to check 
- * for arrays in constants, set $array to true. If you'd like to return that the object 
+ * for get_site_option(), set $default to the requested default. If you'd like to check
+ * for arrays in constants, set $array to true. If you'd like to return that the object
  * was obtained as a constant, set $compact to true and extract the result. To get the
  * value of the constant or option, look at the value key. To check if the value was
  * retreived from a constant, look at the constant key. Note, the constant key will only
- * return true, so you should set a default of false before using extract. 
+ * return true, so you should set a default of false before using extract.
  *
  * @since 2.1
  * @param string $option
@@ -48,7 +48,7 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
 		if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) && defined( strtoupper( $option ) ) ) {
 			$value = constant( strtoupper( $option ) );
 			$constant = true;
-		// In PHP 5.5 and below, we can't use arrays in constants, so we have to use 
+		// In PHP 5.5 and below, we can't use arrays in constants, so we have to use
 		// serialize and unserialize
 		} elseif ( version_compare( PHP_VERSION, '5.6.0', '<' ) && defined( strtoupper( $option ) ) ) {
 			$value = unserialize( constant( strtoupper( $option ) ) );
@@ -504,7 +504,7 @@ function shibboleth_session_initiator_url( $redirect = null ) {
 
 	// now build the Shibboleth session initiator URL
 	$initiator_url = shibboleth_getoption( 'shibboleth_login_url' );
-	
+
 	$initiator_url = add_query_arg( 'target', urlencode($target), $initiator_url );
 
 	$initiator_url = apply_filters( 'shibboleth_session_initiator_url', $initiator_url );
@@ -752,7 +752,7 @@ function shibboleth_update_user_data( $user_id, $force_update = false ) {
 
 	// Shibboleth users do not use their email address for authentication.
 	add_filter( 'send_email_change_email', '__return_false' );
-	
+
 	wp_update_user( $user_data );
 }
 
@@ -772,7 +772,7 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
  */
 function shibboleth_login_enqueue_scripts() {
 	global $action;
-	
+
 	// Only add scripts for the login action to avoid breaking other forms.
 	if ( $action === 'login' || $action === 'shibboleth' ) {
 		wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
@@ -809,9 +809,9 @@ add_action( 'login_init', 'shibboleth_disable_login' );
 function shibboleth_disable_login_form() {
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
 	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
-	
+
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
-	
+
 	if ( $disable && ! $bypass ) {
 	?>
 		<style type="text/css">
@@ -836,7 +836,7 @@ add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
  */
 function shibboleth_custom_password_reset_url() {
 	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
-	
+
 	if ( $password_reset_url ) {
 		return $password_reset_url;
 	}
@@ -883,7 +883,7 @@ add_action( 'login_form', 'shibboleth_login_form' );
  */
 function shibboleth_insert_htaccess() {
 	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
-	
+
 	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
 		$rules = array( 'AuthType shibboleth', 'Require shibboleth' );
@@ -899,7 +899,7 @@ function shibboleth_insert_htaccess() {
  */
 function shibboleth_remove_htaccess() {
 	$disabled = defined( 'SHIBBOLETH_DISALLOW_FILE_MODS' ) && SHIBBOLETH_DISALLOW_FILE_MODS;
-	
+
 	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
 		insert_with_markers( $htaccess, 'Shibboleth', array() );

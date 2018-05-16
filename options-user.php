@@ -99,7 +99,7 @@ function shibboleth_admin_footer_edit_user() {
 function shibboleth_show_user_profile() {
 	$user = wp_get_current_user();
 	$password_change_url = shibboleth_getoption( 'shibboleth_password_change_url' );
-	
+
 	if ( get_user_meta( $user->ID, 'shibboleth_account' ) && ! empty( $password_change_url ) ) {
 ?>
 	<table class="form-table">
@@ -205,9 +205,9 @@ function shibboleth_link_accounts() {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
 
 						$username = shibboleth_getenv( $shib_headers['username']['name'] );
-						
+
 						$user = get_user_by( 'id', $user_id );
-						
+
 						// If username and email match, safe to merge
 						if ( $user->user_login === $username && strtolower( $user->user_email ) === strtolower( $email ) ) {
 							update_user_meta( $user->ID, 'shibboleth_account', true );
@@ -250,14 +250,14 @@ function shibboleth_link_accounts() {
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 							exit;
 						}
-					// If there is no existing shibboleth session, kick to the shibboleth_session_initiator_url 
+					// If there is no existing shibboleth session, kick to the shibboleth_session_initiator_url
 					// and redirect to this page with the ?shibboleth=link action
 					} else {
 						$initiator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
 						wp_redirect( $initiator_url );
 						exit;
 					}
-				// If manual merging is disabled, fail 
+				// If manual merging is disabled, fail
 				} else {
 					// @todo: Add logging for failed manual merging
 					wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
