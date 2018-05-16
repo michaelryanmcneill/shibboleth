@@ -291,6 +291,7 @@ function shibboleth_disable_password_changes() {
 			add_filter( 'show_password_fields', '__return_false' );
 		}
 	}
+}
 
 add_action( 'current_screen', 'shibboleth_disable_password_changes' );
 
