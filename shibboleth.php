@@ -837,7 +837,7 @@ add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
 function shibboleth_custom_password_reset_url() {
 	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
 
-	if ( $password_reset_url ) {
+	if ( empty( $password_reset_url) ) {
 		return $password_reset_url;
 	}
 }
