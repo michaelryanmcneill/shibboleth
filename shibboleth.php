@@ -621,8 +621,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 		}
 
 		// create account and flag as a shibboleth acount
-		require_once( ABSPATH . WPINC . '/registration.php' );
-		$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email ) );
+		$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email, 'user_pass' => NULL ) );
 		if ( is_wp_error( $user_id ) ) {
 			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( '[Shibboleth WordPress Plugin Logging] ERROR: Unable to create account based on data provided. Reason: ' . $user_id->get_error_message() . '.' );
