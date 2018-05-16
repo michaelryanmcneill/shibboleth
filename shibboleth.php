@@ -660,8 +660,8 @@ function shibboleth_get_user_role() {
 		$wp_roles = new WP_Roles();
 	}
 
-	$shib_roles = shibboleth_getoption( 'shibboleth_roles', false, true );
-	$shib_logging = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_logging', false, true ) );
+	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', false, true ) );
+	$shib_logging = shibboleth_getoption( 'shib_logging', false, true );
 	$user_role = shibboleth_getoption( 'shibboleth_default_role' );
 
 	foreach ( $wp_roles->role_names as $key => $name ) {
