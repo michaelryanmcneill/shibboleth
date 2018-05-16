@@ -209,7 +209,7 @@ function shibboleth_link_accounts() {
 						$user = get_user_by( 'id', $user_id );
 						
 						// If username and email match, safe to merge
-						if ( $user->user_login === $username && strtolower( $user->user_email ) === strtolower( $email ) {
+						if ( $user->user_login === $username && strtolower( $user->user_email ) === strtolower( $email ) ) {
 							update_user_meta( $user->ID, 'shibboleth_account', true );
 							// @todo: Add logging for successful manual merging
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
