@@ -7,7 +7,7 @@
  * Setup admin tabs for the Shibboleth option page.
  *
  * @param string $current the current tab
- * @since 1.9-alpha
+ * @since 1.9
  */
 function shibboleth_admin_tabs( $current = 'general' ) {
 	$tabs = array( 'general' => 'General', 'user' => 'User', 'authorization' => 'Authorization', 'logging' => 'Logging' );
