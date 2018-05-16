@@ -158,6 +158,12 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Format: boolean
    - Available options: `true` to automatically use Shibboleth data to update user role mappings each time the user logs in or `false` to only update role mappings when a user is initally created.
    - Example: `define('SHIBBOLETH_UPDATE_ROLES', true);`
+ - `SHIBBOLETH_LOGGING`
+   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Available options: account_merge, account_create, auth, role_update
+   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_LOGGING', serialize( array( 'account_merge', 'account_create', 'auth', 'role_update' ) ) );`
+   - PHP 5.6 (and above) example: `const SHIBBOLETH_LOGGING = array( 'account_merge', 'account_create', 'auth', 'role_update' );`
+   - PHP 7.0 (and above) example: `define('SHIBBOLETH_LOGGING', array( 'account_merge', 'account_create', 'auth', 'role_update' ) );`
  - `SHIBBOLETH_DISALLOW_FILE_MODS`
    - Format: boolean
    - Available options: `true` to disable the Shibboleth plugin from attempting to add `.htaccess` directives or `false` to allow the Shibboleth plugin to add the necessary `.htaccess` directives.
@@ -180,7 +186,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
-= version 2.1 (2018-05-xx) =
+= version 2.1 (2018-05-16) =
  - Resolved an issue where in multisite users could inadvertently be sent to an unrelated subsite after logging in; [thanks to @themantimeforgot for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/33) and [props to @jrchamp for the fix](https://github.com/michaelryanmcneill/shibboleth/pull/35).
  - Resolved an regression that prevented users from authenticating if shibboleth_default_role is blank and shibboleth_create_accounts is enabled; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/37).
  - Cleaned up the shibboleth_authenticate_user function; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/pull/38).
@@ -191,6 +197,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
  - Prevents local password changes if local authentication is disabled; [thanks to @earnjam for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/28).
  - Standardized the way we check if options are set as constants to prevent duplicate code.
  - For manual account merges, ensure that email comparisons are case insensitive; [thanks to @mrbrown8 for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/39).
+ - Introduces available logging for various actions the plugin takes.
 
 = version 2.0.2 (2018-01-17) =
  - Resolved an issue that caused manual linking of accounts to fail if user's didn't have an existing Shibboleth session. 
