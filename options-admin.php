@@ -280,7 +280,7 @@ function shibboleth_options_page() {
 				<tr id="attribute_custom_access_row" <?php echo ( $attribute_access === 'custom' ?: 'style="display:none;"' ); ?>>
 					<th scope="row"><label for="attribute_custom_access"><?php _e('Custom Attribute Access Prefix', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="text" id="attribute_custom_access" name="attribute_custom_access" value="<?php echo esc_html( $attribute_custom_access ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD' ) ) { disabled( $attribute_custom_access, SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD ); } ?> /><br />
+						<input type="text" id="attribute_custom_access" name="attribute_custom_access" value="<?php echo esc_attr( $attribute_custom_access ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD' ) ) { disabled( $attribute_custom_access, SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD ); } ?> /><br />
 						<p><?php _e('If you wish to use a custom attribute access prefix, enter it here. This field is case-insensitive.'
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
@@ -288,7 +288,7 @@ function shibboleth_options_page() {
 				<tr id="spoofkey_row" <?php echo ( $attribute_access === 'http' ?: 'style="display:none;"' ); ?>>
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo esc_html( $spoofkey ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_SPOOF_KEY' ) ) { disabled( $spoofkey, SHIBBOLETH_SPOOF_KEY ); } ?> /><br />
+						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo esc_attr( $spoofkey ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_SPOOF_KEY' ) ) { disabled( $spoofkey, SHIBBOLETH_SPOOF_KEY ); } ?> /><br />
 						<p><?php _e('For more details on setting a spoof key on the Shibboleth Service Provider, see <a href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking">this wiki document</a>. '
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
@@ -326,7 +326,7 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="button_text"><?php _e('Button Text', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="text" id="button_text" name="button_text" value="<?php echo esc_html( $button_text ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_BUTTON_TEXT' ) ) { disabled( $button_text, SHIBBOLETH_BUTTON_TEXT ); } ?> /><br />
+						<input type="text" id="button_text" name="button_text" value="<?php echo esc_attr( $button_text ); ?>" size="50" <?php if ( defined( 'SHIBBOLETH_BUTTON_TEXT' ) ) { disabled( $button_text, SHIBBOLETH_BUTTON_TEXT ); } ?> /><br />
 						<p><?php _e('Set the text of the button that appears on the <code>wp-login.php</code> page.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
@@ -410,41 +410,41 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="username"><?php _e('Username') ?></label></th>
 					<td><input type="text" id="username" name="headers[username][name]" value="<?php echo
-						esc_html( $shib_headers['username']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
+						esc_attr( $shib_headers['username']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
 						<td width="60%"><input type="checkbox" id="username_managed" name="headers[username][managed]" checked="checked" disabled="true" <?php disabled( $shib_headers_constant ); ?>/> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="first_name"><?php _e('First name') ?></label></th>
 					<td><input type="text" id="first_name" name="headers[first_name][name]" value="<?php echo
-						esc_html( $shib_headers['first_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
+						esc_attr( $shib_headers['first_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
 					<td><input type="checkbox" id="first_name_managed" name="headers[first_name][managed]" <?php
 						if (isset($shib_headers['first_name']['managed'])) checked($shib_headers['first_name']['managed'], 'on') ?> <?php disabled( $shib_headers_constant ); ?>/> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="last_name"><?php _e('Last name') ?></label></th>
 					<td><input type="text" id="last_name" name="headers[last_name][name]" value="<?php echo
-						esc_html( $shib_headers['last_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
+						esc_attr( $shib_headers['last_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
 					<td><input type="checkbox" id="last_name_managed" name="headers[last_name][managed]" <?php
 						if (isset($shib_headers['last_name']['managed'])) checked($shib_headers['last_name']['managed'], 'on') ?> <?php disabled( $shib_headers_constant ); ?> /> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="nickname"><?php _e('Nickname') ?></label></th>
 					<td><input type="text" id="nickname" name="headers[nickname][name]" value="<?php echo
-						esc_html( $shib_headers['nickname']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
+						esc_attr( $shib_headers['nickname']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
 					<td><input type="checkbox" id="nickname_managed" name="headers[nickname][managed]" <?php
 						if (isset($shib_headers['nickname']['managed'])) checked($shib_headers['nickname']['managed'], 'on') ?> <?php disabled( $shib_headers_constant ); ?>/> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="_display_name"><?php _e('Display name', 'shibboleth') ?></label></th>
 					<td><input type="text" id="_display_name" name="headers[display_name][name]" value="<?php echo
-						esc_html( $shib_headers['display_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
+						esc_attr( $shib_headers['display_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
 					<td><input type="checkbox" id="display_name_managed" name="headers[display_name][managed]" <?php
 						if (isset($shib_headers['display_name']['managed'])) checked($shib_headers['display_name']['managed'], 'on') ?> <?php disabled( $shib_headers_constant ); ?>/> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="email"><?php _e('Email Address', 'shibboleth') ?></label></th>
 					<td><input type="text" id="email" name="headers[email][name]" value="<?php echo
-						esc_html( $shib_headers['email']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
+						esc_attr( $shib_headers['email']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/></td>
 					<td><input type="checkbox" id="email_managed" name="headers[email][managed]" <?php
 						if (isset($shib_headers['email']['managed'])) checked($shib_headers['email']['managed'], 'on') ?> <?php disabled( $shib_headers_constant ); ?>/> <?php _e('Managed', 'shibboleth') ?></td>
 				</tr>
