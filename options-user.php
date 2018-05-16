@@ -187,14 +187,20 @@ add_action( 'edit_user_profile', 'shibboleth_link_accounts_button' );
  */
 function shibboleth_link_accounts() {
 	$screen = get_current_screen();
+
 	if ( is_admin() && $screen->id == 'profile' ) {
 		$user_id = get_current_user_id();
+
+		// If profile page has ?shibboleth=link action and current user can edit their profile, proceed
 		if ( isset( $_GET['shibboleth'] ) && $_GET['shibboleth'] === 'link' && current_user_can( 'edit_user', $user_id ) ) {
-			
+			$shib_logging = shibboleth_getoption( 'shibboleth_logging', false, true );
 			$allowed = shibboleth_getoption( 'shibboleth_manually_combine_accounts', 'disallow' );
 
+			// If user's account is not already linked with shibboleth, proceed
 			if ( ! get_user_meta( $user_id, 'shibboleth_account' ) ) {
+				// If manual account merging is enabled, proceed
 				if ( $allowed === 'allow' || $allowed === 'bypass' ) {
+					// If there is an existing shibboleth session, proceed 
 					if ( shibboleth_session_active() ) {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
 
@@ -203,46 +209,64 @@ function shibboleth_link_accounts() {
 						
 						$user = get_user_by( 'id', $user_id );
 						
-						if ( $user->user_login == $username && $user->user_email == $email) {
-							# Insert Logging
+						// If username and email match, safe to merge
+						if ( $user->user_login === $username && $user->user_email === $email) {
 							update_user_meta( $user->ID, 'shibboleth_account', true );
+							// @todo: Add logging for successful manual merging
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 							exit;
+						// If username matches, check if there is a conflict with the email
 						} elseif ( $user->user_login == $username ) {
 								$prevent_conflict = get_user_by( 'email', $email );
-								if ( ! $user->ID ) {
-									# Insert Logging
+								// If username matches and there is no existing account with the email, safe to merge
+								if ( ! $prevent_conflict->ID ) {
 									update_user_meta( $user->ID, 'shibboleth_account', true );
+									// @todo: Add logging for successful manual merging
 									wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 									exit;
+								// If username matches and there is an existing account with the email, fail
 								} else {
-									# Insert Logging
+									// @todo: Add logging for failed manual merging
 									wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 									exit;
 								}
+						// If email matches and username bypass is enabled, check if there is a conflict with the username
 						} elseif ( $user->user_email == $email && $allowed === 'bypass' ) {
-							# Insert Logging
-							update_user_meta( $user->ID, 'shibboleth_account', true );
-							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
-							exit;
+							$prevent_conflict = get_user_by( 'user_login', $username );
+							// If email matches and there is no existing account with the username, safe to merge
+							if ( ! $prevent_conflict->ID ) {
+								update_user_meta( $user->ID, 'shibboleth_account', true );
+								// @todo: Add logging for successful manual merging
+								wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
+								exit;
+							// If username matches and there is an existing account with the email, fail
+							} else {
+								// @todo: Add logging for failed manual merging
+								wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
+								exit;
+							}
+						// If no other conditions are met, fail
 						} else {
-							# Insert Logging
+							// @todo: Add logging for failed manual merging
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 							exit;
 						}
+					// If there is no existing shibboleth session, kick to the shibboleth_session_initiator_url 
+					// and redirect to this page with the ?shibboleth=link action
 					} else {
-						# Insert Logging
 						$initiator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
 						wp_redirect( $initiator_url );
 						exit;
 					}
+				// If manual merging is disabled, fail 
 				} else {
-					# Insert Logging
+					// @todo: Add logging for failed manual merging
 					wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 					exit;
 				}
+			// If account is already merged, warn
 			} else {
-				# Insert Logging
+				// @todo: Add logging for failed manual merging
 				wp_safe_redirect( get_edit_user_link() . '?shibboleth=duplicate' );
 				exit;
 			}
