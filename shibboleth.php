@@ -552,16 +552,16 @@ function shibboleth_authenticate_user() {
 
 		if ( $do_account_combine ) {
 			update_user_meta( $user->ID, 'shibboleth_account', true );
-			if ( in_array( 'account_merge', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+			if ( in_array( 'account_merge', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') merged accounts automatically.' );
 			}
 		} elseif ( $user_by === 'username' ) {
-			if ( in_array( 'account_merge', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+			if ( in_array( 'account_merge', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to automatically merge accounts. Reason: An account already exists with this username.' );
 			}
 			return new WP_Error( 'invalid_username', __( 'An account already exists with this username.', 'shibboleth' ) );
 		} else {
-			if ( in_array( 'account_merge', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+			if ( in_array( 'account_merge', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to automatically merge accounts. Reason: An account already exists with this email.' );
 			}
 			return new WP_Error( 'invalid_email', __( 'An account already exists with this email.', 'shibboleth' ) );
@@ -576,7 +576,7 @@ function shibboleth_authenticate_user() {
 
 	if ( ! $user ) {
 		$error_message = 'Unable to create account based on data provided.';
-		if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+		if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( '[Shibboleth WordPress Plugin Logging] ERROR: Unable to create account based on data provided.' );
 		}
 		return new WP_Error( 'missing_data', $error_message );
@@ -590,13 +590,13 @@ function shibboleth_authenticate_user() {
 	if ( $update ) {
 		$user_role = shibboleth_get_user_role();
 		$user->set_role( $user_role );
-		if ( in_array( 'role_update', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+		if ( in_array( 'role_update', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') role was updated to ' . $user_role . '.' );
 		}
 		do_action( 'shibboleth_set_user_roles', $user );
 	}
 
-	if ( in_array( 'auth', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+	if ( in_array( 'auth', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . '(ID: ' . $user->id . ') successfully authenticated.' );
 	}
 	return $user;
@@ -624,7 +624,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 		require_once( ABSPATH . WPINC . '/registration.php' );
 		$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email ) );
 		if ( is_wp_error( $user_id ) ) {
-			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( '[Shibboleth WordPress Plugin Logging] ERROR: Unable to create account based on data provided. Reason: ' . $user_id->get_error_message() . '.' );
 			}
 	    	return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
@@ -637,13 +637,13 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 			$user_role = shibboleth_get_user_role();
 			$user->set_role( $user_role );
 			do_action( 'shibboleth_set_user_roles', $user );
-			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( '[Shibboleth WordPress Plugin Logging] SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') was created with role ' . $user_role . '.' );
 			}
 			return $user;
 		}
 	} else {
-		if ( in_array( 'auth', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG; ) {
+		if ( in_array( 'auth', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User account does not exist and account creation is disabled.' );
 		}
 		return new WP_Error( 'no_access', __( 'You do not have sufficient access.' ) );
