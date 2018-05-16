@@ -142,8 +142,8 @@ function shibboleth_options_page() {
 				}
 				break;
 			case 'logging' :
-				if ( ! defined( 'SHIBBOLETH_LOGGING' ) ) {
-					update_site_option( 'shibboleth_logging', ! empty( $_POST['logging'] ) );
+				if ( ! defined( 'SHIBBOLETH_LOGGING' ) && isset( $_POST['logging'] ) ) {
+					update_site_option( 'shibboleth_logging', $_POST['logging'] );
 				}
 				break;
 		}
@@ -694,7 +694,7 @@ endif; // if ( form override )
 			<tr>
 				<th scope="row"><label for="log_unsuccessful_auth"><?php _e('Log Unsuccessful Authentication Attempts', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_unsuccessful_auth" name="logging[]" value="unsuccessful_auth" <?php echo $shib_logging['unsuccessful_auth'] ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
+						<input type="checkbox" id="log_unsuccessful_auth" name="logging[]" value="unsuccessful_auth" <?php echo in_array( 'unsuccessful_auth', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
 						<label for="log_unsuccessful_auth"><?php _e('Log when a user attempts to authenticate and gets denied by the plugin configuration.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
@@ -703,7 +703,7 @@ endif; // if ( form override )
 				<tr>
 				<th scope="row"><label for="log_successful_auth"><?php _e('Log Successful Authentication Attempts', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_successful_auth" name="logging[]" value="successful_auth" <?php echo $shib_logging['successful_auth'] ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
+						<input type="checkbox" id="log_successful_auth" name="logging[]" value="successful_auth" <?php echo in_array( 'successful_auth', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
 						<label for="log_unsuccessful_auth"><?php _e('Log when a user successfully authenticates with Shibboleth.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
@@ -712,7 +712,7 @@ endif; // if ( form override )
 				<tr>
 				<th scope="row"><label for="log_user_creation"><?php _e('Log User Creation', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_user_creation" name="logging[]" value="user_creation" <?php echo $shib_logging['user_creation'] ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
+						<input type="checkbox" id="log_user_creation" name="logging[]" value="user_creation" <?php echo in_array( 'user_creation', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
 						<label for="log_user_creation"><?php _e('Log when a new user is created.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
@@ -721,7 +721,7 @@ endif; // if ( form override )
 				<tr>
 				<th scope="row"><label for="log_role_update"><?php _e('Log Role Update', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php echo $shib_logging['role_update'] ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
+						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php echo in_array( 'role_update', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
 						<label for="log_role_update"><?php _e('Log when the plugin updates a users role.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
@@ -730,7 +730,7 @@ endif; // if ( form override )
 				<tr>
 				<th scope="row"><label for="log_unsuccessful_account_merges"><?php _e('Log Unsuccessful Account Merges', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_unsuccessful_account_merges" name="logging[]" value="unsuccessful_account_merges" <?php echo $shib_logging['unsuccessful_account_merges'] ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
+						<input type="checkbox" id="log_unsuccessful_account_merges" name="logging[]" value="unsuccessful_account_merges" <?php echo in_array( 'unsuccessful_account_merges', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $shib_logging_constant, true, false); } ?> />
 						<label for="log_unsuccessful_account_merges"><?php _e('Log when a user attempts to merge their account and is denied.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
@@ -739,7 +739,7 @@ endif; // if ( form override )
 				<tr>
 				<th scope="row"><label for="log_successful_account_merges"><?php _e('Log Successful Account Merges', 'shibboleth'); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_successful_account_merges" name="logging[]" value="successful_account_merges" <?php echo $shib_logging['successful_account_merges'] ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $log_successful_account_merges, SHIBBOLETH_LOG_SUCCESSFUL_ACCOUNT_MERGES ); } ?> />
+						<input type="checkbox" id="log_successful_account_merges" name="logging[]" value="successful_account_merges" <?php echo in_array( 'successful_account_merges', $shib_logging ) ? ' checked="checked"' : '' ?> <?php if ( defined( $shib_logging_constant ) ) { disabled( $log_successful_account_merges, SHIBBOLETH_LOG_SUCCESSFUL_ACCOUNT_MERGES ); } ?> />
 						<label for="log_successful_account_merges"><?php _e('Log when a user successfully merges their account.', 'shibboleth'); ?></label>
 
 						<p><?php _e('More details coming soon...'); ?></p>
