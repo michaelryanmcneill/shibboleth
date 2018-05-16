@@ -58,7 +58,7 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
 
 	// If compact is set to true, we compact $value and $constant together for easy use
 	if ( $compact ) {
-		return array( $value, $constant );
+		return array( $value, $constant, 'value' => $value, 'constant' => $constant );
 	// Otherwise, just return the $value
 	} else {
 		return $value;
