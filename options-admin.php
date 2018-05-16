@@ -279,7 +279,7 @@ function shibboleth_options_page() {
 						. 'your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
-				<tr id="attribute_custom_access_row" <?php echo ( $attribute_access_custom ?: 'style="display:none;"' ); ?>>
+				<tr id="attribute_custom_access_row" <?php echo ( $attribute_access === 'custom' ?: 'style="display:none;"' ); ?>>
 					<th scope="row"><label for="attribute_custom_access"><?php _e('Custom Attribute Access Prefix', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="text" id="attribute_custom_access" name="attribute_custom_access" value="<?php echo $attribute_custom_access; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD' ) ) { disabled( $attribute_custom_access, SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD ); } ?> /><br />
@@ -287,7 +287,7 @@ function shibboleth_options_page() {
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
-				<tr id="spoofkey_row" <?php echo ( $spoofkey ?: 'style="display:none;"' ); ?>>
+				<tr id="spoofkey_row" <?php echo ( $attribute_access === 'http' ?: 'style="display:none;"' ); ?>>
 					<th scope="row"><label for="spoofkey"><?php _e('Spoof Key', 'shibboleth'); ?></label></th>
 					<td>
 						<input type="text" id="spoofkey" name="spoofkey" value="<?php echo $spoofkey; ?>" size="50" <?php if ( defined( 'SHIBBOLETH_SPOOF_KEY' ) ) { disabled( $spoofkey, SHIBBOLETH_SPOOF_KEY ); } ?> /><br />
