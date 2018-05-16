@@ -201,6 +201,7 @@ function shibboleth_options_page() {
 					$password_reset_url = $value;
 					extract( shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true ), EXTR_OVERWRITE );
 					$attribute_access = $value;
+					$attribute_access_custom = false;
 					if ( $attribute_access != '' && $attribute_access != 'http' && $attribute_access != 'standard' && $attribute_access != 'redirect' ) {
 						$attribute_access_custom = true;
 					}
