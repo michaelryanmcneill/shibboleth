@@ -861,13 +861,13 @@ add_filter( 'lostpassword_url', 'shibboleth_custom_password_reset_url' );
  * @since 1.0
  */
 function shibboleth_login_form() {
-    global $wp;
-    $url = false;
-    if ( isset( $wp->request ) ) {
-        $url = wp_login_url( home_url( $wp->request ) );
-    }
-    $login_url = add_query_arg( 'action', 'shibboleth', $url );
-   	$login_url = remove_query_arg( 'reauth', $login_url );
+	global $wp;
+	$url = false;
+	if ( isset( $wp->request ) ) {
+		$url = wp_login_url( home_url( $wp->request ) );
+	}
+	$login_url = add_query_arg( 'action', 'shibboleth', $url );
+	$login_url = remove_query_arg( 'reauth', $login_url );
 	$button_text = shibboleth_getoption( 'shibboleth_button_text', 'Log in with Shibboleth' );
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
 	?>
