@@ -594,11 +594,14 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 						<option value="' . $key . '"' .  selected( $default_role, $key ) . '>' . __($name) . '</option>';
 			}
 ?>
+							<option value="noaccount" <?php selected( $default_role, "noaccount" )?> ><?php _e('Do NOT create an account', 'shibboleth') ?></option>
 						</select>
 
 						<p><?php _e('If a user does not map into any of the roles above, they will'
 							. ' be placed into the default role.  If there is no default role, the'
-							. ' user will not be able to log in with Shibboleth.', 'shibboleth'); ?></p>
+							. ' user will not be assigned a role when creating an account with'
+							. ' Shibboleth.  If "Do NOT create an account" is selected, the user'
+							. ' will not be able to create an account with Shibboleth.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
 

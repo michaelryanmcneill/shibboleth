@@ -614,9 +614,10 @@ function shibboleth_authenticate_user() {
 function shibboleth_create_new_user( $user_login, $user_email ) {
 	$create_accounts = shibboleth_getoption( 'shibboleth_create_accounts' );
 	$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
+	$user_role = shibboleth_get_user_role();
 
 	if ( $create_accounts != false ) {
-		if ( empty( $user_login ) || empty( $user_email ) ) {
+		if ( empty( $user_login ) || empty( $user_email ) || $user_role === "noaccount" ) {
 			return null;
 		}
 
@@ -633,7 +634,6 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 
 			// always update user data and role on account creation
 			shibboleth_update_user_data( $user->ID, true );
-			$user_role = shibboleth_get_user_role();
 			$user->set_role( $user_role );
 			do_action( 'shibboleth_set_user_roles', $user );
 			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
