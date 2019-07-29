@@ -617,7 +617,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 	$user_role = shibboleth_get_user_role();
 
 	if ( $create_accounts != false ) {
-		if ( empty( $user_login ) || empty( $user_email ) || $user_role === "noaccount" ) {
+		if ( empty( $user_login ) || empty( $user_email ) || $user_role === "_no_account" ) {
 			return null;
 		}
 
