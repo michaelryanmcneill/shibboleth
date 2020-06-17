@@ -901,7 +901,7 @@ function shibboleth_insert_htaccess() {
 
 	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
-		$rules = array( 'AuthType shibboleth', 'Require shibboleth' );
+		$rules = array( '<IfModule mod_shib>','AuthType shibboleth', 'Require shibboleth','</IfModule>' );
 		insert_with_markers( $htaccess, 'Shibboleth', $rules );
 	}
 }
