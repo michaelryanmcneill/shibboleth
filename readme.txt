@@ -189,6 +189,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
 = version 2.2 (2020-06-xx) =
  - Implementing <IfModule> conditional for .htaccess to protect against the Shibboleth Apache module not being installed; [thanks to @jrchamp for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/60).
  - Added an option to disable account creation if no mapped roles or default roles exist; props [@dandalpiaz](https://github.com/michaelryanmcneill/shibboleth/pull/59).
+ - Improve the Shibboleth login link so that when it shows up on a normal request it will correctly still be a login link and will redirect back to the page that showed the login link; props [@Alhrath](https://github.com/michaelryanmcneill/shibboleth/pull/53).
 
 = version 2.1.1 (2018-05-16) =
  - Minor code cleanup for disabling authentication and passsword resets; props [@jrchamp](https://github.com/michaelryanmcneill/shibboleth/commit/06c28bec6d42e92a9338961e2f7ed4a7ae8a0f71#commitcomment-29005081).
