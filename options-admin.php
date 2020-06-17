@@ -587,7 +587,8 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 					<th scope="row"><?php _e('Default Role', 'shibboleth') ?></th>
 					<td>
 						<select id="default_role" name="default_role" <?php if ( defined( 'SHIBBOLETH_DEFAULT_ROLE' ) ) { disabled( $default_role, SHIBBOLETH_DEFAULT_ROLE ); } ?>>
-							<option value=""><?php _e('(none)', 'shibboleth') ?></option>
+							<option value=""><?php _e('(no role)', 'shibboleth') ?></option>
+							<option value="_no_account" <?php selected( $default_role, "_no_account" ); ?>><?php _e('(skip \'no role\' account creation)', 'shibboleth') ?></option>
 <?php
 			foreach ($wp_roles->role_names as $key => $name) {
 				echo '
@@ -598,7 +599,9 @@ if ( apply_filters('shibboleth_role_mapping_override',false) === false ):
 
 						<p><?php _e('If a user does not map into any of the roles above, they will'
 							. ' be placed into the default role.  If there is no default role, the'
-							. ' user will not be able to log in with Shibboleth.', 'shibboleth'); ?></p>
+							. ' user will not be assigned a role when creating an account with'
+							. ' Shibboleth.  If "(skip \'no role\' account creation)" is selected, the user'
+							. ' will not be able to create an account with Shibboleth.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
 
