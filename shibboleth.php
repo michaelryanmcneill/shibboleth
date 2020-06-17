@@ -4,13 +4,13 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- Version: 2.1.1
+ Version: 2.2
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  Text Domain: shibboleth
  */
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '3.3' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.1.1' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.2' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -614,9 +614,10 @@ function shibboleth_authenticate_user() {
 function shibboleth_create_new_user( $user_login, $user_email ) {
 	$create_accounts = shibboleth_getoption( 'shibboleth_create_accounts' );
 	$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
+	$user_role = shibboleth_get_user_role();
 
 	if ( $create_accounts != false ) {
-		if ( empty( $user_login ) || empty( $user_email ) ) {
+		if ( empty( $user_login ) || empty( $user_email ) || $user_role === "_no_account" ) {
 			return null;
 		}
 
@@ -633,7 +634,6 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 
 			// always update user data and role on account creation
 			shibboleth_update_user_data( $user->ID, true );
-			$user_role = shibboleth_get_user_role();
 			$user->set_role( $user_role );
 			do_action( 'shibboleth_set_user_roles', $user );
 			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -901,7 +901,7 @@ function shibboleth_insert_htaccess() {
 
 	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
-		$rules = array( 'AuthType shibboleth', 'Require shibboleth' );
+		$rules = array( '<IfModule mod_shib>','AuthType shibboleth', 'Require shibboleth','</IfModule>' );
 		insert_with_markers( $htaccess, 'Shibboleth', $rules );
 	}
 }
