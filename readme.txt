@@ -1,5 +1,5 @@
 === Shibboleth ===
-Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229
+Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
 Tested up to: 5.4.2
@@ -186,7 +186,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
-= version 2.2 (2020-06-xx) =
+= version 2.2 (2020-06-17) =
  - Implementing <IfModule> conditional for .htaccess to protect against the Shibboleth Apache module not being installed; [thanks to @jrchamp for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/60).
  - Added an option to disable account creation if no mapped roles or default roles exist; props [@dandalpiaz](https://github.com/michaelryanmcneill/shibboleth/pull/59).
  - Improve the Shibboleth login link so that when it shows up on a normal request it will correctly still be a login link and will redirect back to the page that showed the login link; props [@Alhrath](https://github.com/michaelryanmcneill/shibboleth/pull/53).
