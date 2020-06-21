@@ -4,7 +4,7 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- Version: 2.2.1
+ Version: 2.2.2
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  Text Domain: shibboleth
  */
@@ -901,7 +901,7 @@ function shibboleth_insert_htaccess() {
 
 	if ( got_mod_rewrite() && ! $disabled ) {
 		$htaccess = get_home_path() . '.htaccess';
-		$rules = array( 'AuthType shibboleth', 'Require shibboleth' );
+		$rules = array( '<IfModule mod_shib>', 'AuthType shibboleth', 'Require shibboleth', '</IfModule>', '<IfModule mod_shib.c>', 'AuthType shibboleth', 'Require shibboleth', '</IfModule>', '<IfModule mod_shib.cpp>', 'AuthType shibboleth', 'Require shibboleth', '</IfModule>' );
 		insert_with_markers( $htaccess, 'Shibboleth', $rules );
 	}
 }
