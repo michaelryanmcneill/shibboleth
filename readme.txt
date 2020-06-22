@@ -189,7 +189,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
-= version 2.2.2 (2020-06-XX) =
+= version 2.2.2 (2020-06-22) =
  - Re-implementing <IfModule> conditional for .htaccess to protect against the Shibboleth Apache module not being installed; [thanks to @jrchamp for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/60). This change includes conditionals for `mod_shib`, `mod_shib.c`, and `mod_shib.cpp`. If you run into issues related to this change, please open an issue on [GitHub](https://github.com/michaelryanmcneill/shibboleth/issues).
 
 = version 2.2.1 (2020-06-18) =
