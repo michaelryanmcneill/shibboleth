@@ -197,7 +197,7 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
-= version 2.3 (2020-XX-XX) =
+= version 2.3 (2020-08-17) =
  - Implementing a fallback option for the "Shibboleth Attribute Access Method". For example, if your web server returns redirected environment variables, but occasionally returns standard environment variables, you would want to enable this option. 
  - Removing deprecated `create_function()` from use. 
  - Bumped minimum PHP and WordPress versions to 5.6 and 4.0 respectively. 
