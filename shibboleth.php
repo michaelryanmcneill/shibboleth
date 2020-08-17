@@ -132,7 +132,7 @@ function shibboleth_getenv( $var ) {
 			$var_under_upper => TRUE,
 		);
 
-		array_merge( $check_vars, $fallback_check_vars);
+		$check_vars = array_merge( $check_vars, $fallback_check_vars );
 	}
 
 	foreach ( $check_vars as $check_var => $true ) {
