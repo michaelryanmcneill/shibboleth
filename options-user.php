@@ -26,7 +26,7 @@ add_action( 'personal_options', 'shibboleth_edit_user_options' );
  * For WordPress accounts that were created by Shibboleth, disable certain fields
  * that users/administrators aren't allowed to modify.
  *
- * @since 1.3 (renamed in 2.3 from `shibboleth_admin_footer_edit_user`)
+ * @since 1.3 (renamed in 2.3 from `shibboleth_admin_footer_profile`)
  */
 function shibboleth_disable_managed_fields() {
 	$managed_fields = shibboleth_get_managed_user_fields();
