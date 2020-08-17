@@ -67,6 +67,9 @@ function shibboleth_options_page() {
 				if ( ! defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD' ) ) {
 					update_site_option( 'shibboleth_attribute_access_method', $_POST['attribute_access'] );
 				}
+				if ( ! defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK' ) ) {
+					update_site_option( 'shibboleth_attribute_access_method_fallback', $_POST['attribute_access_fallback'] );
+				}
 				if ( ! defined( 'SHIBBOLETH_ATTRIBUTE_CUSTOM_ACCESS_METHOD' ) ) {
 					update_site_option( 'shibboleth_attribute_custom_access_method', $_POST['attribute_custom_access'] );
 				}
@@ -201,6 +204,8 @@ function shibboleth_options_page() {
 					$constant = $constant || $from_constant;
 					list( $attribute_access, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true );
 					$constant = $constant || $from_constant;
+					list( $attribute_access_fallback, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_access_method_fallback', false, false, true );
+					$constant = $constant || $from_constant;
 					list( $attribute_custom_access, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', false, false, true );
 					$constant = $constant || $from_constant;
 					list( $spoofkey, $from_constant ) = shibboleth_getoption( 'shibboleth_spoof_key', false, false, true );
@@ -293,6 +298,16 @@ function shibboleth_options_page() {
 						. '<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.', 'shibboleth'); ?></p>
 					</td>
 				</tr>
+				<tr id="attribute_access_fallback_row" <?php if( $attribute_access === 'standard' ) echo 'style="display:none;"'; ?>>
+				<th scope="row"><label for="attribute_access_fallback"><?php _e('Enable Fallback Attribute Access', 'shibboleth'); ?></label></th>
+					<td>
+						<input type="checkbox" id="attribute_access_fallback" name="attribute_access_fallback" <?php echo $attribute_access_fallback ? ' checked="checked"' : '' ?> <?php if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK' ) ) { disabled( $attribute_access_fallback, SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK ); } ?> />
+						<label for="attribute_access_fallback"><?php _e('Allow the standard environment variables to be used as a fallback for attribute access.', 'shibboleth'); ?></label>
+
+						<p><?php _e('If set, this will fallback to standard environment variables when the selected'
+							. ' attribute access method fails.', 'shibboleth'); ?></p>
+					</td>
+				</tr>
 				<tr>
 				<th scope="row"><label for="default_login"><?php _e('Default Login Method', 'shibboleth'); ?></label></th>
 					<td>
@@ -357,17 +372,26 @@ function shibboleth_options_page() {
 
 				    if (selectedValue == "custom")
 				    {
-				    	document.getElementById("attribute_custom_access_row").style.display = "table-row";
+						document.getElementById("attribute_custom_access_row").style.display = "table-row";
+						document.getElementById("attribute_access_fallback_row").style.display = "table-row";
 				    	document.getElementById("spoofkey_row").style.display = "none";
 				    }
 				    else if (selectedValue == "http")
 				    {
-				    	document.getElementById("attribute_custom_access_row").style.display = "none";
+						document.getElementById("attribute_custom_access_row").style.display = "none";
+						document.getElementById("attribute_access_fallback_row").style.display = "table-row";
 				    	document.getElementById("spoofkey_row").style.display = "table-row";
+					}
+				    else if (selectedValue == "standard")
+				    {
+						document.getElementById("attribute_custom_access_row").style.display = "none";
+						document.getElementById("attribute_access_fallback_row").style.display = "none";
+						document.getElementById("spoofkey_row").style.display = "none";
 				    }
 				    else
 				    {
-				       document.getElementById("attribute_custom_access_row").style.display = "none";
+					   document.getElementById("attribute_custom_access_row").style.display = "none";
+					   document.getElementById("attribute_access_fallback_row").style.display = "table-row";
 				       document.getElementById("spoofkey_row").style.display = "none";
 				    }
 				}

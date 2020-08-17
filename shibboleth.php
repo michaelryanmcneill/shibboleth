@@ -4,13 +4,16 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- Version: 2.2.2
+ Version: 2.3
+ Requires PHP: 5.6
+ Requires at least: 4.0
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  Text Domain: shibboleth
  */
 
-define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '3.3' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.2' );
+define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
+define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6');
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.3' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -79,11 +82,14 @@ function shibboleth_getenv( $var ) {
 	// Get the specified shibboleth attribute access method; if one isn't specified
 	// simply use standard environment variables since they're the safest
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
+	$fallback = shibboleth_getoption( 'shibboleth_attribute_access_method_fallback' );
 
 	switch ( $method ) {
 		// Use standard by default for security
 		case 'standard' :
 			$var_method = '';
+			// Disable fallback to prevent the same variables from being checked twice.
+			$fallback = false;
 			break;
 		// If specified, use redirect
 		case 'redirect' :
@@ -101,6 +107,8 @@ function shibboleth_getenv( $var ) {
 		// Otherwise, fall back to standard for security
 		default :
 			$var_method = '';
+			// Disable fallback to prevent the same variables from being checked twice.
+			$fallback = false;
 	}
 
 	// Using the selected attribute access method, check all possible cases
@@ -114,6 +122,18 @@ function shibboleth_getenv( $var ) {
 		$var_method . $var_upper => TRUE,
 		$var_method . $var_under_upper => TRUE,
 	);
+
+	// If fallback is enabled, we will add the standard environment variables to the end of the array to allow for fallback
+	if ( $fallback ) {
+		$fallback_check_vars = array(
+			$var => TRUE,
+			$var_under => TRUE,
+			$var_upper => TRUE,
+			$var_under_upper => TRUE,
+		);
+
+		$check_vars = array_merge( $check_vars, $fallback_check_vars );
+	}
 
 	foreach ( $check_vars as $check_var => $true ) {
 		if ( isset( $_SERVER[$check_var] ) && ( $result = $_SERVER[$check_var] ) !== FALSE ) {
@@ -155,7 +175,10 @@ add_action( 'init', 'shibboleth_auto_login' );
 function shibboleth_activate_plugin() {
 	if ( version_compare( $GLOBALS['wp_version'], SHIBBOLETH_MINIMUM_WP_VERSION, '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
-		wp_die( __( 'Shibboleth requires WordPress '. SHIBBOLETH_MINIMUM_WP_VERSION . 'or higher!', 'shibboleth' ) );
+		wp_die( __( 'Shibboleth requires WordPress '. SHIBBOLETH_MINIMUM_WP_VERSION . ' or higher!', 'shibboleth' ) );
+	} elseif ( version_compare( PHP_VERSION, SHIBBOLETH_MINIMUM_PHP_VERSION, '<' ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		wp_die( __( 'Shibboleth requires PHP '. SHIBBOLETH_MINIMUM_PHP_VERSION . ' or higher!', 'shibboleth' ) );
 	}
 
 	if ( function_exists( 'switch_to_blog' ) ) {
