@@ -89,28 +89,28 @@ function shibboleth_prevent_managed_fields_update( $user_id ) {
 
 	if ( get_user_meta( $user_id, 'shibboleth_account' ) ) {
 
-		$user = get_user_by('id', $user_id );
+		$user = get_user_by( 'id', $user_id );
 
 		$managed = shibboleth_get_managed_user_fields();
 
 		if ( in_array( 'first_name', $managed ) ) {
-			$_POST['first_name']=$user->first_name;
+			$_POST['first_name'] = $user->first_name;
 		}
 
 		if ( in_array( 'last_name', $managed ) ) {
-			$_POST['last_name']=$user->last_name;
+			$_POST['last_name'] = $user->last_name;
 		}
 
 		if ( in_array( 'nickname', $managed ) ) {
-			$_POST['nickname']=$user->nickname;
+			$_POST['nickname'] = $user->nickname;
 		}
 
 		if ( in_array( 'display_name', $managed ) ) {
-			$_POST['display_name']=$user->display_name;
+			$_POST['display_name'] = $user->display_name;
 		}
 
 		if ( in_array( 'email', $managed ) ) {
-			$_POST['email']=$user->user_email;
+			$_POST['email'] = $user->user_email;
 		}
 	}
 }
