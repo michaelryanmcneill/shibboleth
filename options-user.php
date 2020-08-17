@@ -1,39 +1,41 @@
 <?php
-// functions for managing Shibboleth user options through the WordPress administration panel
-
-add_action('profile_personal_options', 'shibboleth_profile_personal_options');
-add_action('personal_options_update', 'shibboleth_personal_options_update');
-add_action('show_user_profile', 'shibboleth_show_user_profile');
-add_action('admin_footer-user-edit.php', 'shibboleth_admin_footer_edit_user');
-
 /**
- * For WordPress accounts that were created by Shibboleth, limit what profile
- * attributes they can modify.
+ * For WordPress accounts that were created by Shibboleth, limit what administrators and users 
+ * can edit via user-edit.php and profile.php.
  *
- * @since 1.3
+ * @since 2.3
  */
-function shibboleth_profile_personal_options() {
-	$user = wp_get_current_user();
+function shibboleth_edit_user_options() {
+	if ( IS_PROFILE_PAGE ) {
+		$user_id = wp_get_current_user()->ID;
+	} else {
+		global $user_id;
+	}
 
-	if (get_user_meta( $user->ID, 'shibboleth_account') ) {
+	if ( get_user_meta( $user_id, 'shibboleth_account' ) ) {
+		add_filter( 'show_password_fields', '__return_false' );
 
-		add_filter( 'show_password_fields', create_function( '$v', 'return false;' ) );
+		add_action( 'admin_footer-user-edit.php', 'shibboleth_disable_managed_fields' );
 
-		add_action( 'admin_footer-profile.php', 'shibboleth_admin_footer_profile' );
+		add_action( 'admin_footer-profile.php', 'shibboleth_disable_managed_fields' );
 	}
 }
+add_action( 'personal_options', 'shibboleth_edit_user_options' );
 
 /**
  * For WordPress accounts that were created by Shibboleth, disable certain fields
- * that they are allowed to modify.
+ * that users/administrators aren't allowed to modify.
  *
- * @since 1.3
+ * @since 1.3 (renamed in 2.3 from `shibboleth_admin_footer_edit_user`)
  */
-function shibboleth_admin_footer_profile() {
+function shibboleth_disable_managed_fields() {
 	$managed_fields = shibboleth_get_managed_user_fields();
 
+	if ( shibboleth_getoption( 'shibboleth_update_roles' ) ) {
+		$managed_fields = array_merge( $managed_fields, array('role') );
+	}
 	if ( ! empty( $managed_fields ) ) {
-		$selectors = join( ',', array_map( create_function( '$a', 'return "#$a";' ), $managed_fields ) );
+		$selectors = join( ',', array_map( function( $a ) { return "#$a"; }, $managed_fields ) );
 
 		echo '
 		<script type="text/javascript">
@@ -44,6 +46,9 @@ function shibboleth_admin_footer_profile() {
 				jQuery("form#your-profile").submit(function() {
 					jQuery("' . $selectors . '").attr("disabled", false);
 				});
+				if(jQuery("#email").is(":disabled")){
+					jQuery("#email-description").hide();
+			   }
 			});
 		</script>';
 	}
@@ -51,52 +56,11 @@ function shibboleth_admin_footer_profile() {
 
 
 /**
- * For WordPress accounts that were created by Shibboleth, warn the admin of
- * Shibboleth managed attributes.
- *
- * @since 1.3
- */
-function shibboleth_admin_footer_edit_user() {
-	global $user_id;
-
-	if ( get_user_meta( $user_id, 'shibboleth_account' ) ) {
-		$shibboleth_fields = array();
-
-		$shibboleth_fields = array_merge( $shibboleth_fields, shibboleth_get_managed_user_fields() );
-
-		$update = shibboleth_getoption( 'shibboleth_update_roles' );
-
-		if ( $update ) {
-			$shibboleth_fields = array_merge( $shibboleth_fields, array('role') );
-		}
-
-		if ( ! empty( $shibboleth_fields ) ) {
-			$selectors = array();
-
-			foreach( $shibboleth_fields as $field ) {
-				$selectors[] = 'label[for=\'' . $field . '\']';
-			}
-
-			echo '
-			<script type="text/javascript">
-				jQuery(function() {
-					jQuery("' . implode( ',', $selectors ) . '").before("<span style=\"color: #F00; font-weight: bold;\">*</span> ");
-					jQuery("#first_name").parents(".form-table")
-						.before("<div class=\"updated fade\"><p><span style=\"color: #F00; font-weight: bold;\">*</span> '
-						. __( 'Starred fields are managed by Shibboleth and should not be changed from WordPress.', 'shibboleth' ) . '</p></div>");
-				});
-			</script>';
-		}
-	}
-}
-
-
-/**
  * Add change password link to the user profile for Shibboleth users.
  *
- * @since 1.3
+ * @since 1.3 (renamed in 2.3 from `shibboleth_show_user_profile`)
  */
-function shibboleth_show_user_profile() {
+function shibboleth_change_password_profile_link() {
 	$user = wp_get_current_user();
 	$password_change_url = shibboleth_getoption( 'shibboleth_password_change_url' );
 
@@ -112,41 +76,46 @@ function shibboleth_show_user_profile() {
 <?php
 	}
 }
+add_action( 'show_user_profile', 'shibboleth_change_password_profile_link' );
 
 
 /**
- * Ensure profile data isn't updated by the user.  This only applies to accounts that were
- * provisioned through Shibboleth, and only for those user fields marked as 'managed'.
+ * Ensure profile data isn't updated when managed. 
  *
- * @since 1.3
+ * @since 2.3
+ * @param int $user_id
  */
-function shibboleth_personal_options_update() {
-	$user = wp_get_current_user();
+function shibboleth_prevent_managed_fields_update( $user_id ) {
 
-	if ( get_user_meta( $user->ID, 'shibboleth_account' ) ) {
+	if ( get_user_meta( $user_id, 'shibboleth_account' ) ) {
+
+		$user = get_user_by('id', $user_id );
+
 		$managed = shibboleth_get_managed_user_fields();
 
 		if ( in_array( 'first_name', $managed ) ) {
-			add_filter( 'pre_user_first_name', create_function( '$n', 'return $GLOBALS["current_user"]->first_name;' ) );
+			$_POST['first_name']=$user->first_name;
 		}
 
 		if ( in_array( 'last_name', $managed ) ) {
-			add_filter( 'pre_user_last_name', create_function( '$n', 'return $GLOBALS["current_user"]->last_name;' ) );
+			$_POST['last_name']=$user->last_name;
 		}
 
 		if ( in_array( 'nickname', $managed ) ) {
-			add_filter( 'pre_user_nickname', create_function( '$n', 'return $GLOBALS["current_user"]->nickname;' ) );
+			$_POST['nickname']=$user->nickname;
 		}
 
 		if ( in_array( 'display_name', $managed ) ) {
-			add_filter( 'pre_user_display_name', create_function( '$n', 'return $GLOBALS["current_user"]->display_name;' ) );
+			$_POST['display_name']=$user->display_name;
 		}
 
 		if ( in_array( 'email', $managed ) ) {
-			add_filter( 'pre_user_email', create_function( '$e', 'return $GLOBALS["current_user"]->user_email;' ) );
+			$_POST['email']=$user->user_email;
 		}
 	}
 }
+add_action( 'personal_options_update', 'shibboleth_prevent_managed_fields_update' );
+add_action( 'edit_user_profile_update', 'shibboleth_prevent_managed_fields_update' );
 
 /**
  * Adds a button to user profile pages if administrator has allowed

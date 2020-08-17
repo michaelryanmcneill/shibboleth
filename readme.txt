@@ -1,9 +1,10 @@
 === Shibboleth ===
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz
 Tags: shibboleth, authentication, login, saml
-Requires at least: 3.3
-Tested up to: 5.4.2
-Stable tag: 2.2.2
+Requires at least: 4.0
+Tested up to: 5.5
+Requires PHP: 5.6
+Stable tag: 2.3
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -90,6 +91,10 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Format: string
    - Available options: `'standard'` for the default "Environment Variables" option, `'redirect'` for the "Redirected Environment Variables" option, and `'http'` for the "HTTP Headers" option.
    - Example: `define('SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD', 'standard');`
+ - `SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK`
+   - Format: boolean
+   - Available options: `true` to fallback to the standard "Environment Variables" options when the selected attribute access method does not return results or `false` to not fallback.
+   - Example: `define('SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK', true);`
  - `SHIBBOLETH_LOGIN_URL`
    - Format: string
    - Avaliable Options: none
@@ -176,6 +181,9 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Upgrade Notice ==
+= 2.3 =
+This update increases the minimum PHP version to 5.6 and the minimum WordPress version to 4.0. The plugin will fail to activate if you are running below those minimum versions. 
+
 = 2.2.2 =
 This update re-implements a previously reverted <IfModule> conditional for three aliases of the Shibboleth Apache module: `mod_shib`, `mod_shib.c`, and `mod_shib.cpp`. If you run into issues related to this change, please open an issue on [GitHub](https://github.com/michaelryanmcneill/shibboleth/issues).
 
@@ -189,6 +197,12 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
+= version 2.3 (2020-XX-XX) =
+ - Implementing a fallback option for the "Shibboleth Attribute Access Method". For example, if your web server returns redirected environment variables, but occasionally returns standard environment variables, you would want to enable this option. 
+ - Removing deprecated `create_function()` from use. 
+ - Bumped minimum PHP and WordPress versions to 5.6 and 4.0 respectively. 
+ - Greatly improved the handling of managed fields and cleaned up `options-user.php`.  
+
 = version 2.2.2 (2020-06-22) =
  - Re-implementing <IfModule> conditional for .htaccess to protect against the Shibboleth Apache module not being installed; [thanks to @jrchamp for reporting](https://github.com/michaelryanmcneill/shibboleth/issues/60). This change includes conditionals for `mod_shib`, `mod_shib.c`, and `mod_shib.cpp`. If you run into issues related to this change, please open an issue on [GitHub](https://github.com/michaelryanmcneill/shibboleth/issues).
 
