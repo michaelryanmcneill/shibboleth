@@ -97,11 +97,11 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Example: `define('SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK', true);`
  - `SHIBBOLETH_LOGIN_URL`
    - Format: string
-   - Avaliable Options: none
+   - Available Options: none
    - Example: `define('SHIBBOLETH_LOGIN_URL', 'https://example.com/Shibboleth.sso/Login');`
  - `SHIBBOLETH_LOGOUT_URL`
    - Format: string
-   - Avaliable Options: none
+   - Available Options: none
    - Example: `define('SHIBBOLETH_LOGOUT_URL', 'https://example.com/Shibboleth.sso/Logout');`
  - `SHIBBOLETH_PASSWORD_CHANGE_URL`
    - Format: string
