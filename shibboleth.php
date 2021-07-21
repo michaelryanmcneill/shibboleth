@@ -545,6 +545,13 @@ function shibboleth_authenticate_user() {
 	$email = shibboleth_getenv( $shib_headers['email']['name'] );
 
 	/**
+	 * Be VERY careful with the below two filters! They can lead to unintended
+	 * consequences, such as multiple Shibboleth users mapping to the same
+	 * WordPress user, or introducing security risks by improperly escaping
+	 * and validating usernames and email addresses.
+	 */
+
+	/**
 	 * Override the username provided by Shibboleth.
 	 *
 	 * This can be used to escape or normalize the Shibboleth username.
