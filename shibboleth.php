@@ -342,7 +342,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 
 /**
  * Check if a Shibboleth session is active. If HTTP headers are being used
- * we do additional testing to see if a spoofkey needs to be vaildated.
+ * we do additional testing to see if a spoofkey needs to be validated.
  *
  * @uses apply_filters calls 'shibboleth_session_active' before returning final result
  * @param boolean $auto_login whether this is being triggered by an auto_login request or not
@@ -374,7 +374,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 			} elseif ( $auto_login ) {
 				$active = false;
 			} else {
-				wp_die( __( 'The Shibboleth request you submitted failed vaildation. Please contact your site administrator for further assistance.', 'shibboleth' ) );
+				wp_die( __( 'The Shibboleth request you submitted failed validation. Please contact your site administrator for further assistance.', 'shibboleth' ) );
 			}
 		} else {
 			$active = true;
@@ -486,7 +486,7 @@ add_action( 'wp_logout', 'shibboleth_logout', 20 );
 function shibboleth_session_initiator_url( $redirect = null ) {
 
 	// first build the target URL.  This is the WordPress URL the user will be returned to after Shibboleth
-	// is done, and will handle actually logging the user into WordPress using the data provdied by Shibboleth
+	// is done, and will handle actually logging the user into WordPress using the data provided by Shibboleth
 	if ( function_exists( 'switch_to_blog' ) ) {
 		if ( !empty( $GLOBALS['current_blog']->blog_id ) && $GLOBALS['current_blog']->blog_id !== $GLOBALS['current_site']->site_id ) {
 			switch_to_blog( $GLOBALS['current_blog']->blog_id );
@@ -665,7 +665,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 			return null;
 		}
 
-		// create account and flag as a shibboleth acount
+		// create account and flag as a shibboleth account
 		$user_id = wp_insert_user( array( 'user_login' => $user_login, 'user_email' => $user_email, 'user_pass' => NULL ) );
 		if ( is_wp_error( $user_id ) ) {
 			if ( in_array( 'account_create', $shib_logging ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
