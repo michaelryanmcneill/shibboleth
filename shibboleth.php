@@ -556,7 +556,7 @@ function shibboleth_authenticate_user() {
 	 *
 	 * This can be used to escape or normalize the Shibboleth username.
 	 *
-	 * @param  string $username
+	 * @param string $username
 	 */
 	$username = apply_filters( 'shibboleth_override_username', $username );
 
@@ -565,7 +565,7 @@ function shibboleth_authenticate_user() {
 	 *
 	 * This can be used to escape or normalize the Shibboleth email address.
 	 *
-	 * @param  string $email
+	 * @param string $email
 	 */
 	$email = apply_filters( 'shibboleth_override_email', $email );
 
