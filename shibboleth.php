@@ -845,7 +845,8 @@ function shibboleth_disable_login_form() {
 	if ( $disable && ! $bypass ) {
 	?>
 		<style type="text/css">
-			.login #loginform p {
+			.login #loginform p,
+			.login #loginform .user-pass-wrap {
 				display: none;
 			}
 			<?php if ( ! $password_reset_url ) { ?>
