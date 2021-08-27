@@ -4,7 +4,7 @@ Tags: shibboleth, authentication, login, saml
 Requires at least: 4.0
 Tested up to: 5.8
 Requires PHP: 5.6
-Stable tag: 2.3
+Stable tag: 2.4
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -197,6 +197,12 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
+= version 2.4 (2021-08-27) =
+ - Added hooks for hopefully rare cases where user overrides are necessary; thanks @dsXLII [#74](https://github.com/michaelryanmcneill/shibboleth/issues/74)
+ - Better login form support for WordPress 5.3; thanks @jakeparis [#76](https://github.com/michaelryanmcneill/shibboleth/issues/76)
+ - Spelling fixes; thanks @junaidkbr [#72](https://github.com/michaelryanmcneill/shibboleth/pull/72)
+ - General cleanup to better align with the WordPress Coding Standards [#80](https://github.com/michaelryanmcneill/shibboleth/pull/80)
+
 = version 2.3 (2020-08-17) =
  - Implementing a fallback option for the "Shibboleth Attribute Access Method". For example, if your web server returns redirected environment variables, but occasionally returns standard environment variables, you would want to enable this option. 
  - Removing deprecated `create_function()` from use. 
