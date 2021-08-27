@@ -529,6 +529,9 @@ function shibboleth_session_initiator_url( $redirect = null ) {
  * Known users will have their profile data updated based on the Shibboleth
  * data present if the plugin is configured to do so.
  *
+ * @uses apply_filters() Calls 'shibboleth_override_username' before authenticating
+ * @uses apply_filters() Calls 'shibboleth_override_email' before authenticating
+ *
  * @return WP_User|WP_Error authenticated user or error if unable to authenticate
  * @since 1.0
  */
@@ -540,6 +543,31 @@ function shibboleth_authenticate_user() {
 
 	$username = shibboleth_getenv( $shib_headers['username']['name'] );
 	$email = shibboleth_getenv( $shib_headers['email']['name'] );
+
+	/**
+	 * Be VERY careful with the below two filters! They can lead to unintended
+	 * consequences, such as multiple Shibboleth users mapping to the same
+	 * WordPress user, or introducing security risks by improperly escaping
+	 * and validating usernames and email addresses.
+	 */
+
+	/**
+	 * Override the username provided by Shibboleth.
+	 *
+	 * This can be used to escape or normalize the Shibboleth username.
+	 *
+	 * @param string $username
+	 */
+	$username = apply_filters( 'shibboleth_override_username', $username );
+
+	/**
+	 * Override the email address provided by Shibboleth.
+	 *
+	 * This can be used to escape or normalize the Shibboleth email address.
+	 *
+	 * @param string $email
+	 */
+	$email = apply_filters( 'shibboleth_override_email', $email );
 
 	/**
 	 * Allows a bypass mechanism for native Shibboleth authentication.
