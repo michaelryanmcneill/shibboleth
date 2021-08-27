@@ -382,7 +382,7 @@ function shibboleth_options_page() {
 				?>>
 					<th scope="row"><label for="attribute_access_fallback"><?php esc_html_e( 'Enable Fallback Attribute Access', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="attribute_access_fallback" name="attribute_access_fallback" <?php echo $attribute_access_fallback ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="attribute_access_fallback" name="attribute_access_fallback" <?php checked( (bool) $attribute_access_fallback ); ?> <?php
 						if ( defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK' ) ) {
 							disabled( $attribute_access_fallback, SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK );
 						}
@@ -403,7 +403,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="default_login"><?php esc_html_e( 'Default Login Method', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="default_login" name="default_login" <?php echo $default_login ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="default_login" name="default_login" <?php checked( (bool) $default_login ); ?> <?php
 						if ( defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
 							disabled( $default_login, SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN );
 						}
@@ -425,7 +425,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="auto_login"><?php esc_html_e( 'Automatic Login', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="auto_login" name="auto_login" <?php echo $auto_login ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="auto_login" name="auto_login" <?php checked( (bool) $auto_login ); ?> <?php
 						if ( defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
 							disabled( $auto_login, SHIBBOLETH_AUTO_LOGIN );
 						}
@@ -448,7 +448,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="disable_local_auth"><?php esc_html_e( 'Disable Local Authentication', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="disable_local_auth" name="disable_local_auth" <?php echo $disable_local_auth ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="disable_local_auth" name="disable_local_auth" <?php checked( (bool) $disable_local_auth ); ?> <?php
 						if ( defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) ) {
 							disabled( $disable_local_auth, SHIBBOLETH_DISABLE_LOCAL_AUTH );
 						}
@@ -573,7 +573,7 @@ function shibboleth_options_page() {
 						?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td width="60%">
-						<input type="checkbox" id="username_managed" name="headers[username][managed]" checked="checked" disabled="true" <?php disabled( $shib_headers_constant ); ?>/> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="username_managed" name="headers[username][managed]" <?php checked( true ); ?><?php disabled( true ); ?>/> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -671,7 +671,7 @@ function shibboleth_options_page() {
 				<tr valign="top">
 					<th scope="row"><label for="create_accounts"><?php esc_html_e( 'Automatically Create Accounts', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="create_accounts" name="create_accounts" <?php echo $create_accounts ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="create_accounts" name="create_accounts" <?php checked( (bool) $create_accounts ); ?> <?php
 						if ( defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) ) {
 							disabled( $create_accounts, SHIBBOLETH_CREATE_ACCOUNTS );
 						}
@@ -894,7 +894,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="update_roles"><?php esc_html_e( 'Update User Roles', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="update_roles" name="update_roles" <?php echo $update_roles ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="update_roles" name="update_roles" <?php checked( (bool) $update_roles ); ?> <?php
 						if ( defined( 'SHIBBOLETH_UPDATE_ROLES' ) ) {
 							disabled( $update_roles, SHIBBOLETH_UPDATE_ROLES );
 						}
@@ -948,7 +948,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_auth"><?php esc_html_e( 'Log Authentication Attempts', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_auth" name="logging[]" value="auth" <?php echo in_array( 'auth', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_auth" name="logging[]" value="auth" <?php checked( in_array( 'auth', $shib_logging, true ) ); ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
@@ -959,7 +959,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_account_merge"><?php esc_html_e( 'Log Account Merges', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_account_merge" name="logging[]" value="account_merge" <?php echo in_array( 'account_merge', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_account_merge" name="logging[]" value="account_merge" <?php checked( in_array( 'account_merge', $shib_logging, true ) ); ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
@@ -970,7 +970,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_account_create"><?php esc_html_e( 'Log Account Creation', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_account_create" name="logging[]" value="account_create" <?php echo in_array( 'account_create', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_account_create" name="logging[]" value="account_create" <?php checked( in_array( 'account_create', $shib_logging, true ) ); ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
@@ -981,7 +981,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_role_update"><?php esc_html_e( 'Log Role Update', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php echo in_array( 'role_update', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php checked( in_array( 'role_update', $shib_logging, true ) ); ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
