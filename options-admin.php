@@ -21,7 +21,7 @@ function shibboleth_admin_tabs( $current = 'general' ) {
 	);
 	echo '<h2 class="nav-tab-wrapper">';
 	foreach ( $tabs as $tab => $name ) {
-		$class = ( $tab == $current ) ? ' nav-tab-active' : '';
+		$class = ( $tab === $current ) ? ' nav-tab-active' : '';
 		echo '<a class="nav-tab' . esc_attr( $class ) . '" href="?page=shibboleth-options&tab=' . esc_attr( $tab ) . '">' . esc_html( $name ) . '</a>';
 	}
 	echo '</h2>';
@@ -948,7 +948,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_auth"><?php esc_html_e( 'Log Authentication Attempts', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_auth" name="logging[]" value="auth" <?php echo in_array( 'auth', $shib_logging ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_auth" name="logging[]" value="auth" <?php echo in_array( 'auth', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
@@ -959,7 +959,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_account_merge"><?php esc_html_e( 'Log Account Merges', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_account_merge" name="logging[]" value="account_merge" <?php echo in_array( 'account_merge', $shib_logging ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_account_merge" name="logging[]" value="account_merge" <?php echo in_array( 'account_merge', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
@@ -970,7 +970,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_account_create"><?php esc_html_e( 'Log Account Creation', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_account_create" name="logging[]" value="account_create" <?php echo in_array( 'account_create', $shib_logging ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_account_create" name="logging[]" value="account_create" <?php echo in_array( 'account_create', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
@@ -981,7 +981,7 @@ function shibboleth_options_page() {
 				<tr>
 					<th scope="row"><label for="log_role_update"><?php esc_html_e( 'Log Role Update', 'shibboleth' ); ?></label></th>
 					<td>
-						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php echo in_array( 'role_update', $shib_logging ) ? ' checked="checked"' : ''; ?> <?php
+						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php echo in_array( 'role_update', $shib_logging, true ) ? ' checked="checked"' : ''; ?> <?php
 						if ( defined( $shib_logging_constant ) ) {
 							disabled( $shib_logging_constant, true, false );
 						}
