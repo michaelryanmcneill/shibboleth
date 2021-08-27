@@ -52,14 +52,8 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
 	if ( defined( strtoupper( $option ) ) ) {
 		$value = constant( strtoupper( $option ) );
 		$constant = true;
-
-		// In PHP 5.5 and below, we can't use arrays in constants, so we have to use
-		// serialize and unserialize
-		if ( $array && version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
-			$value = unserialize( $value );
-		}
-		// If no constant is set, just get the value from get_site_option()
 	} else {
+		// If no constant is set, just get the value from get_site_option()
 		$value = get_site_option( $option, $default );
 		$constant = false;
 	}
