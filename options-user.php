@@ -1,5 +1,11 @@
 <?php
 /**
+ * Shibboleth Options - User
+ *
+ * @package shibboleth
+ */
+
+/**
  * For WordPress accounts that were created by Shibboleth, limit what administrators and users
  * can edit via user-edit.php and profile.php.
  *
@@ -48,11 +54,11 @@ function shibboleth_disable_managed_fields() {
 		echo '
 		<script type="text/javascript">
 			jQuery(function() {
-				jQuery("' . $selectors . '").attr("disabled", true);
+				jQuery("' . esc_attr( $selectors ) . '").attr("disabled", true);
 				jQuery("#first_name").parents(".form-table").before("<div class=\"updated fade\"><p>'
-					. __( 'Some profile fields cannot be changed from WordPress.', 'shibboleth' ) . '</p></div>");
+					. esc_attr( __( 'Some profile fields cannot be changed from WordPress.', 'shibboleth' ) ) . '</p></div>");
 				jQuery("form#your-profile").submit(function() {
-					jQuery("' . $selectors . '").attr("disabled", false);
+					jQuery("' . esc_attr( $selectors ) . '").attr("disabled", false);
 				});
 				if(jQuery("#email").is(":disabled")){
 					jQuery("#email-description").hide();
@@ -76,11 +82,11 @@ function shibboleth_change_password_profile_link() {
 		?>
 	<table class="form-table">
 		<tr>
-			<th><?php _e( 'Change Password', 'shibboleth' ); ?></th>
+			<th><?php esc_html_e( 'Change Password', 'shibboleth' ); ?></th>
 			<td>
 				<a href="<?php echo esc_url( $password_change_url ); ?>" rel="nofollow" target="_blank">
 					<?php
-					_e( 'Change your password', 'shibboleth' );
+					esc_html_e( 'Change your password', 'shibboleth' );
 					?>
 				</a>
 			</td>
@@ -96,7 +102,7 @@ add_action( 'show_user_profile', 'shibboleth_change_password_profile_link' );
  * Ensure profile data isn't updated when managed.
  *
  * @since 2.3
- * @param int $user_id
+ * @param int $user_id The ID of the user.
  */
 function shibboleth_prevent_managed_fields_update( $user_id ) {
 
@@ -134,25 +140,25 @@ add_action( 'edit_user_profile_update', 'shibboleth_prevent_managed_fields_updat
  * Adds a button to user profile pages if administrator has allowed
  * users to manually combine accounts.
  *
- * @param object $user WP_User object
+ * @param object $user WP_User object.
  * @since 1.9
  */
 function shibboleth_link_accounts_button( $user ) {
 	$allowed = shibboleth_getoption( 'shibboleth_manually_combine_accounts', 'disallow' );
 
-	if ( $allowed === 'allow' || $allowed === 'bypass' ) {
+	if ( 'allow' === $allowed || 'bypass' === $allowed ) {
 		$linked = get_user_meta( $user->ID, 'shibboleth_account', true );
 		?>
 		<table class="form-table">
 			<tr>
-				<th><label for="link_shibboleth"><?php _e( 'Link Shibboleth Account', 'shibboleth' ); ?></label></th>
+				<th><label for="link_shibboleth"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></label></th>
 				<td>
 					<?php if ( $linked ) { ?>
-						<button type="button" disabled class="button"><?php _e( 'Link Shibboleth Account', 'shibboleth' ); ?></button>
-						<p class="description"><?php _e( 'Your account is already linked to Shibboleth.', 'shibboleth' ); ?></p>
+						<button type="button" disabled class="button"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></button>
+						<p class="description"><?php esc_html_e( 'Your account is already linked to Shibboleth.', 'shibboleth' ); ?></p>
 					<?php } else { ?>
-						<a href="?shibboleth=link"><button type="button" class="button"><?php _e( 'Link Shibboleth Account', 'shibboleth' ); ?></button></a>
-						<p class="description"><?php _e( 'Your account has not been linked to Shibboleth. To link your account, click the button above.', 'shibboleth' ); ?></p>
+						<a href="?shibboleth=link"><button type="button" class="button"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></button></a>
+						<p class="description"><?php esc_html_e( 'Your account has not been linked to Shibboleth. To link your account, click the button above.', 'shibboleth' ); ?></p>
 					<?php } ?>
 				</td>
 			</tr>
@@ -172,18 +178,18 @@ add_action( 'edit_user_profile', 'shibboleth_link_accounts_button' );
 function shibboleth_link_accounts() {
 	$screen = get_current_screen();
 
-	if ( is_admin() && $screen->id == 'profile' ) {
+	if ( is_admin() && 'profile' === $screen->id ) {
 		$user_id = get_current_user_id();
 
 		// If profile page has ?shibboleth=link action and current user can edit their profile, proceed
-		if ( isset( $_GET['shibboleth'] ) && $_GET['shibboleth'] === 'link' && current_user_can( 'edit_user', $user_id ) ) {
+		if ( isset( $_GET['shibboleth'] ) && 'link' === $_GET['shibboleth'] && current_user_can( 'edit_user', $user_id ) ) {
 			$shib_logging = shibboleth_getoption( 'shibboleth_logging', false, true );
 			$allowed = shibboleth_getoption( 'shibboleth_manually_combine_accounts', 'disallow' );
 
 			// If user's account is not already linked with shibboleth, proceed
 			if ( ! get_user_meta( $user_id, 'shibboleth_account' ) ) {
 				// If manual account merging is enabled, proceed
-				if ( $allowed === 'allow' || $allowed === 'bypass' ) {
+				if ( 'allow' === $allowed || 'bypass' === $allowed ) {
 					// If there is an existing shibboleth session, proceed
 					if ( shibboleth_session_active() ) {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
@@ -221,7 +227,7 @@ function shibboleth_link_accounts() {
 								exit;
 							}
 							// If email matches and username bypass is enabled, check if there is a conflict with the username
-						} elseif ( strtolower( $user->user_email ) === strtolower( $email ) && $allowed === 'bypass' ) {
+						} elseif ( strtolower( $user->user_email ) === strtolower( $email ) && 'bypass' === $allowed ) {
 							$prevent_conflict = get_user_by( 'user_login', $username );
 							// If email matches and there is no existing account with the username, safe to merge
 							if ( ! $prevent_conflict->ID ) {
@@ -287,7 +293,7 @@ function shibboleth_disable_password_changes() {
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 
 	if ( $disable && ! $bypass ) {
-			add_filter( 'show_password_fields', '__return_false' );
+		add_filter( 'show_password_fields', '__return_false' );
 	}
 }
 
@@ -300,13 +306,13 @@ add_action( 'current_screen', 'shibboleth_disable_password_changes' );
  */
 function shibboleth_link_accounts_notice() {
 	if ( isset( $_GET['shibboleth'] ) ) {
-		if ( $_GET['shibboleth'] === 'failed' ) {
+		if ( 'failed' === $_GET['shibboleth'] ) {
 			$class = 'notice notice-error';
 			$message = __( 'Your account was unable to be linked with Shibboleth.', 'shibboleth' );
-		} elseif ( $_GET['shibboleth'] === 'linked' ) {
+		} elseif ( 'linked' === $_GET['shibboleth'] ) {
 			$class = 'notice notice-success is-dismissible';
 			$message = __( 'Your account has been linked with Shibboleth.', 'shibboleth' );
-		} elseif ( $_GET['shibboleth'] === 'duplicate' ) {
+		} elseif ( 'duplicate' === $_GET['shibboleth'] ) {
 			$class = 'notice notice-info is-dismissible';
 			$message = __( 'Your account is already linked with Shibboleth.', 'shibboleth' );
 		} else {
