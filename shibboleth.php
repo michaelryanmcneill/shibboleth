@@ -531,7 +531,7 @@ function shibboleth_session_initiator_url( $redirect = null ) {
 	}
 
 	$target = add_query_arg( 'action', 'shibboleth', $target );
-	if( ! empty( $wp->request ) ) {
+	if ( ! empty( $wp->request ) ) {
 		$target = add_query_arg( 'redirect_to', rawurlencode( $redirect ), $target );
 	}
 
