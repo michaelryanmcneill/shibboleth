@@ -1,0 +1,13 @@
+{
+	"name": "michaelryanmcneill/shibboleth",
+	"description": "Shibboleth plugin for WordPress",
+	"homepage": "https://github.com/michaelryanmcneill/shibboleth",
+	"license": "Apache-2.0",
+	"support": {
+		"issues": "https://github.com/michaelryanmcneill/shibboleth/issues"
+	},
+	"require": {},
+	"require-dev" : {
+		"wp-coding-standards/wpcs": "@stable"
+	}
+}
