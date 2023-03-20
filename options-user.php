@@ -154,8 +154,9 @@ function shibboleth_link_accounts_button( $user ) {
 				<th><label for="link_shibboleth"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></label></th>
 				<td>
 					<?php if ( $linked ) { ?>
-						<button type="button" disabled class="button"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></button>
 						<p class="description"><?php esc_html_e( 'Your account is already linked to Shibboleth.', 'shibboleth' ); ?></p>
+					<?php } elseif ( defined( 'IS_PROFILE_PAGE' ) && ! IS_PROFILE_PAGE ) { ?>
+						<p class="description"><?php esc_html_e( 'This user account has not been linked to Shibboleth.', 'shibboleth' ); ?></p>
 					<?php } else { ?>
 						<a href="?shibboleth=link"><button type="button" class="button"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></button></a>
 						<p class="description"><?php esc_html_e( 'Your account has not been linked to Shibboleth. To link your account, click the button above.', 'shibboleth' ); ?></p>
