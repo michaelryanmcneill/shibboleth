@@ -2,9 +2,9 @@
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz
 Tags: shibboleth, authentication, login, saml
 Requires at least: 4.0
-Tested up to: 5.8
+Tested up to: 6.1
 Requires PHP: 5.6
-Stable tag: 2.4
+Stable tag: 2.4.1
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -16,7 +16,7 @@ WordPress can be configured so that all standard login requests will be sent to 
 
 Finally, the user's role within WordPress can be automatically set (and continually updated) based on any attribute Shibboleth provides.  For example, you may decide to give users with an eduPersonAffiliation value of *faculty* the WordPress role of *editor*, while the eduPersonAffiliation value of *student* maps to the WordPress role *contributor*.  Or you may choose to limit access to WordPress altogether using a special eduPersonEntitlement value.
 
-[Shibboleth]: http://shibboleth.internet2.edu/
+[Shibboleth]: https://incommon.org/software/shibboleth/
 
 = Contribute on GitHub =
 
@@ -78,10 +78,10 @@ Yes, the plugin provides a number of new [actions][] and [filters][] that can be
 
 Before extending the plugin in this manner, please ensure that it is not actually more appropriate to add this logic to Shibboleth.  It may make more sense to add a new attribute to your Shibboleth Identity Provider's attribute store (e.g. LDAP directory), or a new attribute definition to the  Identity Provider's internal attribute resolver or the Shibboleth Service Provider's internal attribute extractor.  In the end, the Shibboleth administrator will have to make that call as to what is most appropriate.
 
-[actions]: http://codex.wordpress.org/Plugin_API#Actions
-[filters]: http://codex.wordpress.org/Plugin_API#Filters
-[write a new plugin]: http://codex.wordpress.org/Writing_a_Plugin
-[support forum]: http://wordpress.org/tags/shibboleth?forum_id=10#postform
+[actions]: https://developer.wordpress.org/plugins/hooks/actions/
+[filters]: https://developer.wordpress.org/plugins/hooks/filters/
+[write a new plugin]: https://developer.wordpress.org/plugins/
+[support forum]: https://wordpress.org/support/plugin/shibboleth/
 
 = Can I control the plugin settings with constants in wp-config.php? =
 
@@ -197,6 +197,12 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
+= version 2.4.1 (2023-03-20) =
+ - Compatibility: Fix redirect_to issues on WordPress 6; thanks @masteradhoc, @caosborne89, @jakeparis [#88](https://github.com/michaelryanmcneill/shibboleth/pull/88)
+ - Accessibility: Improve color contrast on login page [#89](https://github.com/michaelryanmcneill/shibboleth/pull/89)
+ - Fix user profile to only show account link button to the user themself; thanks @jakeparis [#90](https://github.com/michaelryanmcneill/shibboleth/pull/90)
+ - CI: Add GitHub Action workflows to check against WordPress-Core coding standard [#91](https://github.com/michaelryanmcneill/shibboleth/pull/91)
+
 = version 2.4 (2021-08-27) =
  - Added hooks for hopefully rare cases where user overrides are necessary; thanks @dsXLII [#74](https://github.com/michaelryanmcneill/shibboleth/issues/74)
  - Better login form support for WordPress 5.3; thanks @jakeparis [#76](https://github.com/michaelryanmcneill/shibboleth/issues/76)
