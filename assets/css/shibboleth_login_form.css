@@ -46,7 +46,6 @@
 }
 
 #loginform #shibboleth-wrap p {
-	color: #777777;
 	margin-bottom: 16px;
 }
 
@@ -87,7 +86,6 @@
 }
 .shibboleth-or span {
 	background: #fff;
-	color: #777;
 	position: relative;
 	padding: 0 8px;
 	text-transform: uppercase
