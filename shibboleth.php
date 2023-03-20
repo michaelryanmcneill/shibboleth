@@ -959,7 +959,7 @@ add_filter( 'lostpassword_url', 'shibboleth_custom_password_reset_url' );
 function shibboleth_login_form() {
 	global $wp;
 	$url = false;
-	if ( isset( $wp->request ) ) {
+	if ( ! empty( $wp->request ) ) {
 		$url = wp_login_url( home_url( $wp->request ) );
 	}
 	$login_url = add_query_arg( 'action', 'shibboleth', $url );
