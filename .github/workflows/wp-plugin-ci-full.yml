@@ -27,4 +27,4 @@ jobs:
 
     - name: Run PHPCS on all files
       run: |
-        vendor/bin/phpcs -q -n --ignore=vendor --runtime-set installed_paths vendor/wp-coding-standards/wpcs --standard=WordPress-Core --report=checkstyle $GITHUB_WORKSPACE | cs2pr
+        vendor/bin/phpcs -q -n --ignore=vendor --runtime-set installed_paths vendor/wp-coding-standards/wpcs --standard=WordPress --report=checkstyle $GITHUB_WORKSPACE | cs2pr

@@ -1,5 +1,9 @@
-// Originally from Automattic's Jetpack SSO module (v5.3)
-// @see https://github.com/Automattic/jetpack/blob/5.3/modules/sso/jetpack-sso-login.js
+/**
+ * Originally from Automattic's Jetpack SSO module (v5.3)
+ *
+ * @see https://github.com/Automattic/jetpack/blob/5.3/modules/sso/jetpack-sso-login.js.
+ * @package shibboleth
+ */
 
 jQuery( document ).ready(
 	function( $ ) {
@@ -15,7 +19,7 @@ jQuery( document ).ready(
 		// UI under the submit button.
 		//
 		// @TODO: Remove this approach once core ticket 28528 is in and we have more actions in wp-login.php.
-		// See - https://core.trac.wordpress.org/ticket/28528
+		// See - https://core.trac.wordpress.org/ticket/28528.
 		loginForm.append( overflow );
 		overflow.append( $( 'p.forgetmenot' ), $( 'p.submit' ) );
 

@@ -158,7 +158,7 @@ function shibboleth_link_accounts_button( $user ) {
 					<?php } elseif ( defined( 'IS_PROFILE_PAGE' ) && ! IS_PROFILE_PAGE ) { ?>
 						<p class="description"><?php esc_html_e( 'This user account has not been linked to Shibboleth.', 'shibboleth' ); ?></p>
 					<?php } else { ?>
-						<a href="?shibboleth=link"><button type="button" class="button"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></button></a>
+						<a href="<?php echo esc_url( wp_nonce_url( '?shibboleth=link', 'shibboleth-link' ) ); ?>"><button type="button" class="button"><?php esc_html_e( 'Link Shibboleth Account', 'shibboleth' ); ?></button></a>
 						<p class="description"><?php esc_html_e( 'Your account has not been linked to Shibboleth. To link your account, click the button above.', 'shibboleth' ); ?></p>
 					<?php } ?>
 				</td>
@@ -182,16 +182,18 @@ function shibboleth_link_accounts() {
 	if ( is_admin() && 'profile' === $screen->id ) {
 		$user_id = get_current_user_id();
 
-		// If profile page has ?shibboleth=link action and current user can edit their profile, proceed
+		// If profile page has ?shibboleth=link action and current user can edit their profile, proceed.
 		if ( isset( $_GET['shibboleth'] ) && 'link' === $_GET['shibboleth'] && current_user_can( 'edit_user', $user_id ) ) {
+			check_admin_referer( 'shibboleth-link' );
+
 			$shib_logging = shibboleth_getoption( 'shibboleth_logging', false, true );
 			$allowed = shibboleth_getoption( 'shibboleth_manually_combine_accounts', 'disallow' );
 
-			// If user's account is not already linked with shibboleth, proceed
+			// If user's account is not already linked with shibboleth, proceed.
 			if ( ! get_user_meta( $user_id, 'shibboleth_account' ) ) {
-				// If manual account merging is enabled, proceed
+				// If manual account merging is enabled, proceed.
 				if ( 'allow' === $allowed || 'bypass' === $allowed ) {
-					// If there is an existing shibboleth session, proceed
+					// If there is an existing shibboleth session, proceed.
 					if ( shibboleth_session_active() ) {
 						$shib_headers = shibboleth_getoption( 'shibboleth_headers', false, true );
 
@@ -200,7 +202,7 @@ function shibboleth_link_accounts() {
 
 						$user = get_user_by( 'id', $user_id );
 
-						// If username and email match, safe to merge
+						// If username and email match, safe to merge.
 						if ( $user->user_login === $username && strtolower( $user->user_email ) === strtolower( $email ) ) {
 							update_user_meta( $user->ID, 'shibboleth_account', true );
 							if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -208,10 +210,10 @@ function shibboleth_link_accounts() {
 							}
 							wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 							exit;
-							// If username matches, check if there is a conflict with the email
+							// If username matches, check if there is a conflict with the email.
 						} elseif ( $user->user_login === $username ) {
 								$prevent_conflict = get_user_by( 'email', $email );
-								// If username matches and there is no existing account with the email, safe to merge
+								// If username matches and there is no existing account with the email, safe to merge.
 							if ( ! $prevent_conflict->ID ) {
 								update_user_meta( $user->ID, 'shibboleth_account', true );
 								if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -219,7 +221,7 @@ function shibboleth_link_accounts() {
 								}
 								wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 								exit;
-								// If username matches and there is an existing account with the email, fail
+								// If username matches and there is an existing account with the email, fail.
 							} else {
 								if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 									error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to manually merge accounts. Reason: An account already exists with the email: ' . $email . ' .' );
@@ -227,10 +229,10 @@ function shibboleth_link_accounts() {
 								wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 								exit;
 							}
-							// If email matches and username bypass is enabled, check if there is a conflict with the username
+							// If email matches and username bypass is enabled, check if there is a conflict with the username.
 						} elseif ( strtolower( $user->user_email ) === strtolower( $email ) && 'bypass' === $allowed ) {
 							$prevent_conflict = get_user_by( 'user_login', $username );
-							// If email matches and there is no existing account with the username, safe to merge
+							// If email matches and there is no existing account with the username, safe to merge.
 							if ( ! $prevent_conflict->ID ) {
 								update_user_meta( $user->ID, 'shibboleth_account', true );
 								if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -238,7 +240,7 @@ function shibboleth_link_accounts() {
 								}
 								wp_safe_redirect( get_edit_user_link() . '?shibboleth=linked' );
 								exit;
-								// If there is an existing account with the email, fail
+								// If there is an existing account with the email, fail.
 							} else {
 								if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 									error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to manually merge accounts using username bypass. Reason: An account already exists with the email: ' . $email . ' .' );
@@ -246,7 +248,7 @@ function shibboleth_link_accounts() {
 								wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 								exit;
 							}
-							// If no other conditions are met, fail
+							// If no other conditions are met, fail.
 						} else {
 							if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 								error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to manually merge accounts. Reason: Username and email do not match what is provided by attributes. Username provided by attribute is: ' . $username . ' and email provided by attribute is ' . $email . '.' );
@@ -255,13 +257,13 @@ function shibboleth_link_accounts() {
 							exit;
 						}
 						// If there is no existing shibboleth session, kick to the shibboleth_session_initiator_url
-						// and redirect to this page with the ?shibboleth=link action
+						// and redirect to this page with the ?shibboleth=link action.
 					} else {
-						$initiator_url = shibboleth_session_initiator_url( get_edit_user_link() . '?shibboleth=link' );
+						$initiator_url = shibboleth_session_initiator_url( wp_nonce_url( get_edit_user_link() . '?shibboleth=link', 'shibboleth-link' ) );
 						wp_redirect( $initiator_url );
 						exit;
 					}
-					// If manual merging is disabled, fail
+					// If manual merging is disabled, fail.
 				} else {
 					if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 						error_log( '[Shibboleth WordPress Plugin Logging] ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to manually merge accounts. Reason: Manual account merging is disabled.' );
@@ -269,7 +271,7 @@ function shibboleth_link_accounts() {
 					wp_safe_redirect( get_edit_user_link() . '?shibboleth=failed' );
 					exit;
 				}
-				// If account is already merged, warn
+				// If account is already merged, warn.
 			} else {
 				if ( in_array( 'account_merge', $shib_logging, true ) || defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 					error_log( '[Shibboleth WordPress Plugin Logging] WARN: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to manually merge accounts. Reason: User\'s account is already merged.' );
