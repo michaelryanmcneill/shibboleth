@@ -19,12 +19,12 @@ function shibboleth_admin_tabs( $current = 'general' ) {
 		'authorization' => 'Authorization',
 		'logging' => 'Logging',
 	);
-	echo '<h2 class="nav-tab-wrapper">';
+	echo '<nav class="nav-tab-wrapper">';
 	foreach ( $tabs as $tab => $name ) {
 		$class = ( $tab === $current ) ? ' nav-tab-active' : '';
 		echo '<a class="nav-tab' . esc_attr( $class ) . '" href="?page=shibboleth-options&tab=' . esc_attr( $tab ) . '">' . esc_html( $name ) . '</a>';
 	}
-	echo '</h2>';
+	echo '</nav>';
 }
 
 /**
@@ -232,7 +232,7 @@ function shibboleth_options_page() {
 					$constant = $constant || $from_constant;
 					?>
 
-			<h3><?php esc_html_e( 'General Configuration', 'shibboleth' ); ?></h3>
+			<h2><?php esc_html_e( 'General Configuration', 'shibboleth' ); ?></h2>
 					<?php if ( $constant ) { ?>
 				<div class="notice notice-warning">
 					<p><?php echo wp_kses_post( __( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ) ); ?></p>
@@ -348,7 +348,7 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr id="attribute_access_fallback_row" <?php echo 'standard' === $attribute_access ? 'style="display:none;"' : ''; ?>>
-					<th scope="row"><label for="attribute_access_fallback"><?php esc_html_e( 'Enable Fallback Attribute Access', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Enable Fallback Attribute Access', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="attribute_access_fallback" name="attribute_access_fallback" <?php checked( (bool) $attribute_access_fallback ); ?> <?php defined( 'SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK' ) && disabled( $attribute_access_fallback, SHIBBOLETH_ATTRIBUTE_ACCESS_METHOD_FALLBACK ); ?> />
 						<label for="attribute_access_fallback"><?php esc_html_e( 'Allow the standard environment variables to be used as a fallback for attribute access.', 'shibboleth' ); ?></label>
@@ -365,7 +365,7 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="default_login"><?php esc_html_e( 'Default Login Method', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Default Login Method', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="default_login" name="default_login" <?php checked( (bool) $default_login ); ?> <?php defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) && disabled( $default_login, SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN ); ?> />
 						<label for="default_login"><?php esc_html_e( 'Use Shibboleth as the default login method for users.', 'shibboleth' ); ?></label>
@@ -383,7 +383,7 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="auto_login"><?php esc_html_e( 'Automatic Login', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Automatic Login', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="auto_login" name="auto_login" <?php checked( (bool) $auto_login ); ?> <?php defined( 'SHIBBOLETH_AUTO_LOGIN' ) && disabled( $auto_login, SHIBBOLETH_AUTO_LOGIN ); ?> />
 						<label for="auto_login"><?php esc_html_e( 'Use Shibboleth to auto-login users.', 'shibboleth' ); ?></label>
@@ -402,7 +402,7 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="disable_local_auth"><?php esc_html_e( 'Disable Local Authentication', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Disable Local Authentication', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="disable_local_auth" name="disable_local_auth" <?php checked( (bool) $disable_local_auth ); ?> <?php defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) && disabled( $disable_local_auth, SHIBBOLETH_DISABLE_LOCAL_AUTH ); ?> />
 						<label for="disable_local_auth"><?php esc_html_e( 'Disables local WordPress authentication.', 'shibboleth' ); ?></label>
@@ -491,7 +491,7 @@ function shibboleth_options_page() {
 					<p><?php echo wp_kses_post( __( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ) ); ?></p>
 				</div>
 			<?php } ?>
-			<h4><?php esc_html_e( 'User Profile Data', 'shibboleth' ); ?></h4>
+			<h3><?php esc_html_e( 'User Profile Data', 'shibboleth' ); ?></h3>
 
 			<p>
 					<?php
@@ -519,7 +519,7 @@ function shibboleth_options_page() {
 						<input type="text" id="username" name="headers[username][name]" value="<?php echo esc_attr( $shib_headers['username']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td width="60%">
-						<input type="checkbox" id="username_managed" name="headers[username][managed]" <?php checked( true ); ?><?php disabled( true ); ?>/> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="username_managed" name="headers[username][managed]" <?php checked( true ); ?><?php disabled( true ); ?>/> <label for="username_managed"><?php esc_html_e( 'Managed', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -528,7 +528,7 @@ function shibboleth_options_page() {
 						<input type="text" id="first_name" name="headers[first_name][name]" value="<?php echo esc_attr( $shib_headers['first_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td>
-						<input type="checkbox" id="first_name_managed" name="headers[first_name][managed]" <?php isset( $shib_headers['first_name']['managed'] ) && checked( $shib_headers['first_name']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?> /> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="first_name_managed" name="headers[first_name][managed]" <?php isset( $shib_headers['first_name']['managed'] ) && checked( $shib_headers['first_name']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?> /> <label for="first_name_managed"><?php esc_html_e( 'Managed', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -537,7 +537,7 @@ function shibboleth_options_page() {
 						<input type="text" id="last_name" name="headers[last_name][name]" value="<?php echo esc_attr( $shib_headers['last_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td>
-						<input type="checkbox" id="last_name_managed" name="headers[last_name][managed]" <?php isset( $shib_headers['last_name']['managed'] ) && checked( $shib_headers['last_name']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?> /> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="last_name_managed" name="headers[last_name][managed]" <?php isset( $shib_headers['last_name']['managed'] ) && checked( $shib_headers['last_name']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?> /> <label for="last_name_managed"><?php esc_html_e( 'Managed', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -546,7 +546,7 @@ function shibboleth_options_page() {
 						<input type="text" id="nickname" name="headers[nickname][name]" value="<?php echo esc_attr( $shib_headers['nickname']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td>
-						<input type="checkbox" id="nickname_managed" name="headers[nickname][managed]" <?php isset( $shib_headers['nickname']['managed'] ) && checked( $shib_headers['nickname']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?>/> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="nickname_managed" name="headers[nickname][managed]" <?php isset( $shib_headers['nickname']['managed'] ) && checked( $shib_headers['nickname']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?>/> <label for="nickname_managed"><?php esc_html_e( 'Managed', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -555,7 +555,7 @@ function shibboleth_options_page() {
 						<input type="text" id="_display_name" name="headers[display_name][name]" value="<?php echo esc_attr( $shib_headers['display_name']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td>
-						<input type="checkbox" id="display_name_managed" name="headers[display_name][managed]" <?php isset( $shib_headers['display_name']['managed'] ) && checked( $shib_headers['display_name']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?>/> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="display_name_managed" name="headers[display_name][managed]" <?php isset( $shib_headers['display_name']['managed'] ) && checked( $shib_headers['display_name']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?>/> <label for="display_name_managed"><?php esc_html_e( 'Managed', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -564,7 +564,7 @@ function shibboleth_options_page() {
 						<input type="text" id="email" name="headers[email][name]" value="<?php echo esc_attr( $shib_headers['email']['name'] ); ?>" <?php disabled( $shib_headers_constant ); ?>/>
 					</td>
 					<td>
-						<input type="checkbox" id="email_managed" name="headers[email][managed]" <?php isset( $shib_headers['email']['managed'] ) && checked( $shib_headers['email']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?> /> <?php esc_html_e( 'Managed', 'shibboleth' ); ?>
+						<input type="checkbox" id="email_managed" name="headers[email][managed]" <?php isset( $shib_headers['email']['managed'] ) && checked( $shib_headers['email']['managed'], 'on' ); ?><?php disabled( $shib_headers_constant ); ?> /> <label for="email_managed"><?php esc_html_e( 'Managed', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 			</table>
@@ -585,7 +585,7 @@ function shibboleth_options_page() {
 
 			<table class="form-table">
 				<tr valign="top">
-					<th scope="row"><label for="create_accounts"><?php esc_html_e( 'Automatically Create Accounts', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Automatically Create Accounts', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="create_accounts" name="create_accounts" <?php checked( (bool) $create_accounts ); ?> <?php defined( 'SHIBBOLETH_CREATE_ACCOUNTS' ) && disabled( $create_accounts, SHIBBOLETH_CREATE_ACCOUNTS ); ?> />
 						<label for="create_accounts"><?php esc_html_e( 'Automatically create new users if they do not exist in the WordPress database.', 'shibboleth' ); ?></label>
@@ -628,7 +628,7 @@ function shibboleth_options_page() {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="manually_combine_accounts"></label></th>
+					<th scope="row"><label for="manually_combine_accounts"><?php esc_html_e( 'Manual Account Merging', 'shibboleth' ); ?></label></th>
 					<td>
 						<select id="manually_combine_accounts" name="manually_combine_accounts" <?php defined( 'SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS' ) && disabled( $manually_combine_accounts, SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS ); ?>>
 							<option value="prevent" <?php selected( $manually_combine_accounts, 'disallow' ); ?>>Prevent Manual Account Merging</option>
@@ -666,7 +666,7 @@ function shibboleth_options_page() {
 					$constant = $constant || $from_constant;
 					?>
 
-			<h3><?php esc_html_e( 'User Role Mappings', 'shibboleth' ); ?></h3>
+			<h2><?php esc_html_e( 'User Role Mappings', 'shibboleth' ); ?></h2>
 						<?php if ( $constant ) { ?>
 				<div class="notice notice-warning">
 					<p><?php echo wp_kses_post( __( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ) ); ?></p>
@@ -722,22 +722,19 @@ function shibboleth_options_page() {
 				#role_mappings td, #role_mappings th { border-bottom: 0px; }
 			</style>
 
-			<table class="form-table optiontable editform" cellspacing="2" cellpadding="5" width="100%">
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Role Mappings', 'shibboleth' ); ?></th>
-					<td id="role_mappings">
-						<table id="">
-						<col width="10%"></col>
-						<col></col>
-						<col></col>
-						<thead>
-							<tr>
-								<th></th>
-								<th scope="column"><?php esc_html_e( 'Header Name', 'shibboleth' ); ?></th>
-								<th scope="column"><?php esc_html_e( 'Header Value', 'shibboleth' ); ?></th>
-							</tr>
-						</thead>
-						<tbody>
+			<h3><?php esc_html_e( 'Role Mappings', 'shibboleth' ); ?></h3>
+			<table id="role_mappings" class="form-table optiontable editform" cellspacing="2" cellpadding="5" width="100%">
+				<col width="10%"></col>
+				<col></col>
+				<col></col>
+				<thead>
+					<tr>
+						<th scope="col"><?php esc_html_e( 'Role' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'Header Name', 'shibboleth' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'Header Value', 'shibboleth' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
 							<?php
 
 							foreach ( $wp_roles->role_names as $key => $name ) {
@@ -750,21 +747,20 @@ function shibboleth_options_page() {
 									$value = $shib_roles[ $key ]['value'];
 								}
 								echo '
-						<tr valign="top">
-							<th scope="row">' . esc_html( $name ) . '</th>
-							<td><input type="text" id="role_' . esc_attr( $key ) . '_header" name="shibboleth_roles[' . esc_attr( $key ) . '][header]" value="' . esc_attr( $header ) . '" style="width: 100%" ' . disabled( $shib_roles_constant, true, false ) . '/></td>
-							<td><input type="text" id="role_' . esc_attr( $key ) . '_value" name="shibboleth_roles[' . esc_attr( $key ) . '][value]" value="' . esc_attr( $value ) . '" style="width: 100%" ' . disabled( $shib_roles_constant, true, false ) . '/></td>
-						</tr>';
+				<tr valign="top">
+					<th scope="row">' . esc_html( $name ) . '</th>
+					<td><input type="text" id="role_' . esc_attr( $key ) . '_header" name="shibboleth_roles[' . esc_attr( $key ) . '][header]" value="' . esc_attr( $header ) . '" style="width: 100%" ' . disabled( $shib_roles_constant, true, false ) . '/></td>
+					<td><input type="text" id="role_' . esc_attr( $key ) . '_value" name="shibboleth_roles[' . esc_attr( $key ) . '][value]" value="' . esc_attr( $value ) . '" style="width: 100%" ' . disabled( $shib_roles_constant, true, false ) . '/></td>
+				</tr>';
 							}
 							?>
 
-						</tbody>
-						</table>
-					</td>
-				</tr>
+				</tbody>
+			</table>
 
+			<table class="form-table optiontable editform" cellspacing="2" cellpadding="5" width="100%">
 				<tr>
-					<th scope="row"><?php esc_html_e( 'Default Role', 'shibboleth' ); ?></th>
+					<th scope="row"><label for="default_role"><?php esc_html_e( 'Default Role', 'shibboleth' ); ?></label></th>
 					<td>
 						<select id="default_role" name="default_role" <?php defined( 'SHIBBOLETH_DEFAULT_ROLE' ) && disabled( $default_role, SHIBBOLETH_DEFAULT_ROLE ); ?>>
 							<option value=""><?php esc_html_e( '(no role)', 'shibboleth' ); ?></option>
@@ -792,7 +788,7 @@ function shibboleth_options_page() {
 				</tr>
 
 				<tr>
-					<th scope="row"><label for="update_roles"><?php esc_html_e( 'Update User Roles', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Update User Roles', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="update_roles" name="update_roles" <?php checked( (bool) $update_roles ); ?> <?php defined( 'SHIBBOLETH_UPDATE_ROLES' ) && disabled( $update_roles, SHIBBOLETH_UPDATE_ROLES ); ?>
 							/>
@@ -834,7 +830,7 @@ function shibboleth_options_page() {
 					list( $shib_logging, $shib_logging_constant ) = shibboleth_getoption( 'shibboleth_logging', array(), true, true );
 					$constant = $constant || $shib_logging_constant;
 					?>
-		<h3><?php esc_html_e( 'Logging Configuration', 'shibboleth' ); ?></h3>
+		<h2><?php esc_html_e( 'Logging Configuration', 'shibboleth' ); ?></h2>
 					<?php if ( $constant ) { ?>
 			<div class="notice notice-warning">
 				<p><?php echo wp_kses_post( __( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ) ); ?></p>
@@ -842,28 +838,28 @@ function shibboleth_options_page() {
 		<?php } ?>
 			<table class="form-table">
 				<tr>
-					<th scope="row"><label for="log_auth"><?php esc_html_e( 'Log Authentication Attempts', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Log Authentication Attempts', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="log_auth" name="logging[]" value="auth" <?php checked( in_array( 'auth', $shib_logging, true ) ); ?> <?php defined( $shib_logging_constant ) && disabled( $shib_logging_constant, true, false ); ?> />
 						<label for="log_auth"><?php esc_html_e( 'Log when a user attempts to authenticate using Shibboleth.', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="log_account_merge"><?php esc_html_e( 'Log Account Merges', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Log Account Merges', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="log_account_merge" name="logging[]" value="account_merge" <?php checked( in_array( 'account_merge', $shib_logging, true ) ); ?> <?php defined( $shib_logging_constant ) && disabled( $shib_logging_constant, true, false ); ?> />
 						<label for="log_account_merge"><?php esc_html_e( 'Log when a user attempts to merge their account, either manually or automatically.', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="log_account_create"><?php esc_html_e( 'Log Account Creation', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Log Account Creation', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="log_account_create" name="logging[]" value="account_create" <?php checked( in_array( 'account_create', $shib_logging, true ) ); ?> <?php defined( $shib_logging_constant ) && disabled( $shib_logging_constant, true, false ); ?> />
 						<label for="log_account_create"><?php esc_html_e( 'Log when new accounts are created.', 'shibboleth' ); ?></label>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="log_role_update"><?php esc_html_e( 'Log Role Update', 'shibboleth' ); ?></label></th>
+					<th scope="row"><?php esc_html_e( 'Log Role Update', 'shibboleth' ); ?></th>
 					<td>
 						<input type="checkbox" id="log_role_update" name="logging[]" value="role_update" <?php checked( in_array( 'role_update', $shib_logging, true ) ); ?> <?php defined( $shib_logging_constant ) && disabled( $shib_logging_constant, true, false ); ?> />
 						<label for="log_role_update"><?php esc_html_e( 'Log when the plugin updates a user\'s role.', 'shibboleth' ); ?></label>
