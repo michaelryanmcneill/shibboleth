@@ -9,7 +9,7 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- * Version: 2.4.1
+ * Version: 2.4.2
  * Requires PHP: 5.6
  * Requires at least: 4.0
  * License: Apache 2 (https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -18,7 +18,7 @@
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.4.1' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.4.2' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -42,23 +42,23 @@ if ( SHIBBOLETH_PLUGIN_VERSION !== $plugin_version ) {
  *
  * @since 2.1
  * @param string $option Option identifier.
- * @param bool $default Default value.
- * @param bool $array If we expect the value to be an array.
- * @param bool $compact If you want the constant and value returned as an array.
+ * @param bool   $default Default value.
+ * @param bool   $array If we expect the value to be an array.
+ * @param bool   $compact If you want the constant and value returned as an array.
  * @return mixed
  */
 function shibboleth_getoption( $option, $default = false, $array = false, $compact = false ) {
-	// If a constant is defined with the provided option name, get the value of the constant
+	// If a constant is defined with the provided option name, get the value of the constant.
 	if ( defined( strtoupper( $option ) ) ) {
 		$value = constant( strtoupper( $option ) );
 		$constant = true;
 	} else {
-		// If no constant is set, just get the value from get_site_option()
+		// If no constant is set, just get the value from get_site_option().
 		$value = get_site_option( $option, $default );
 		$constant = false;
 	}
 
-	// If compact is set to true, we compact $value and $constant together for easy use
+	// If compact is set to true, we compact $value and $constant together for easy use.
 	if ( $compact ) {
 		return array(
 			$value,
@@ -66,7 +66,7 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
 			'value' => $value,
 			'constant' => $constant,
 		);
-		// Otherwise, just return the $value
+		// Otherwise, just return the $value.
 	} else {
 		return $value;
 	}
@@ -84,38 +84,38 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
  */
 function shibboleth_getenv( $var ) {
 	// Get the specified shibboleth attribute access method; if one isn't specified
-	// simply use standard environment variables since they're the safest
+	// simply use standard environment variables since they're the safest.
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
 	$fallback = shibboleth_getoption( 'shibboleth_attribute_access_method_fallback' );
 
 	switch ( $method ) {
-		// Use standard by default for security
+		// Use standard by default for security.
 		case 'standard':
 			$var_method = '';
 			// Disable fallback to prevent the same variables from being checked twice.
 			$fallback = false;
 			break;
-		// If specified, use redirect
+		// If specified, use redirect.
 		case 'redirect':
 			$var_method = 'REDIRECT_';
 			break;
-		// If specified, use http
+		// If specified, use http.
 		case 'http':
 			$var_method = 'HTTP_';
 			break;
-		// If specified, use the custom specified method
+		// If specified, use the custom specified method.
 		case 'custom':
 			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
 			$var_method = $custom;
 			break;
-		// Otherwise, fall back to standard for security
+		// Otherwise, fall back to standard for security.
 		default:
 			$var_method = '';
 			// Disable fallback to prevent the same variables from being checked twice.
 			$fallback = false;
 	}
 
-	// Using the selected attribute access method, check all possible cases
+	// Using the selected attribute access method, check all possible cases.
 	$var_under = str_replace( '-', '_', $var );
 	$var_upper = strtoupper( $var );
 	$var_under_upper = strtoupper( $var_under );
@@ -127,7 +127,7 @@ function shibboleth_getenv( $var ) {
 		$var_method . $var_under_upper => true,
 	);
 
-	// If fallback is enabled, we will add the standard environment variables to the end of the array to allow for fallback
+	// If fallback is enabled, we will add the standard environment variables to the end of the array to allow for fallback.
 	if ( $fallback ) {
 		$fallback_check_vars = array(
 			$var => true,
@@ -141,7 +141,7 @@ function shibboleth_getenv( $var ) {
 
 	foreach ( $check_vars as $check_var => $true ) {
 		if ( isset( $_SERVER[ $check_var ] ) && false !== $_SERVER[ $check_var ] ) {
-			return $_SERVER[ $check_var ];
+			return sanitize_text_field( wp_unslash( $_SERVER[ $check_var ] ) );
 		}
 	}
 
@@ -162,7 +162,7 @@ function shibboleth_auto_login() {
 
 		$userobj = wp_signon( '', true );
 		if ( ! is_wp_error( $userobj ) ) {
-			wp_safe_redirect( $_SERVER['REQUEST_URI'] );
+			wp_safe_redirect( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '' );
 			exit();
 		}
 	}
@@ -358,8 +358,8 @@ function shibboleth_migrate_old_data() {
  */
 function shibboleth_admin_hooks() {
 	if ( defined( 'WP_ADMIN' ) && WP_ADMIN === true ) {
-		require_once dirname( __FILE__ ) . '/options-admin.php';
-		require_once dirname( __FILE__ ) . '/options-user.php';
+		require_once __DIR__ . '/options-admin.php';
+		require_once __DIR__ . '/options-user.php';
 	}
 }
 add_action( 'init', 'shibboleth_admin_hooks' );
@@ -418,15 +418,16 @@ function shibboleth_session_active( $auto_login = false ) {
  *
  * @since 1.0
  * @param null|WP_User|WP_Error $user WP_User if the user is authenticated. WP_Error or null otherwise.
- * @param string $username Username or email address.
- * @param string $password User password.
+ * @param string                $username Username or email address.
+ * @param string                $password User password.
  */
 function shibboleth_authenticate( $user, $username, $password ) {
 	if ( shibboleth_session_active() ) {
 		return shibboleth_authenticate_user();
 	} else {
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
-			$initiator_url = shibboleth_session_initiator_url( $_REQUEST['redirect_to'] );
+			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+			$initiator_url = shibboleth_session_initiator_url( $redirect_to );
 		} else {
 			$initiator_url = shibboleth_session_initiator_url();
 		}
@@ -515,7 +516,7 @@ add_action( 'wp_logout', 'shibboleth_logout', 20 );
 function shibboleth_session_initiator_url( $redirect = null ) {
 
 	// first build the target URL.  This is the WordPress URL the user will be returned to after Shibboleth
-	// is done, and will handle actually logging the user into WordPress using the data provided by Shibboleth
+	// is done, and will handle actually logging the user into WordPress using the data provided by Shibboleth.
 	if ( function_exists( 'switch_to_blog' ) ) {
 		if ( ! empty( $GLOBALS['current_blog']->blog_id ) && $GLOBALS['current_blog']->blog_id !== $GLOBALS['current_site']->site_id ) {
 			switch_to_blog( $GLOBALS['current_blog']->blog_id );
@@ -535,7 +536,7 @@ function shibboleth_session_initiator_url( $redirect = null ) {
 		$target = add_query_arg( 'redirect_to', rawurlencode( $redirect ), $target );
 	}
 
-	// now build the Shibboleth session initiator URL
+	// now build the Shibboleth session initiator URL.
 	$initiator_url = shibboleth_getoption( 'shibboleth_login_url' );
 
 	$initiator_url = add_query_arg( 'target', rawurlencode( $target ), $initiator_url );
@@ -613,7 +614,7 @@ function shibboleth_authenticate_user() {
 		return $authenticate;
 	}
 
-	// look up existing account by username, with email as a fallback
+	// look up existing account by username, with email as a fallback.
 	$user_by = 'username';
 	$user = get_user_by( 'login', $username );
 	if ( ! $user ) {
@@ -621,7 +622,7 @@ function shibboleth_authenticate_user() {
 		$user = get_user_by( 'email', $email );
 	}
 
-	// if this account is not a Shibboleth account, then do account combine (if allowed)
+	// if this account is not a Shibboleth account, then do account combine (if allowed).
 	if ( is_object( $user ) && $user->ID && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
 		$do_account_combine = false;
 		if ( 'username' === $user_by && ( 'allow' === $auto_combine_accounts || 'allow' === $manually_combine_accounts ) ) {
@@ -648,7 +649,7 @@ function shibboleth_authenticate_user() {
 		}
 	}
 
-	// create account if new user
+	// create account if new user.
 	if ( ! $user ) {
 		$user = shibboleth_create_new_user( $username, $email );
 		if ( is_wp_error( $user ) ) {
@@ -664,7 +665,7 @@ function shibboleth_authenticate_user() {
 		return new WP_Error( 'missing_data', $error_message );
 	}
 
-	// update user data
+	// update user data.
 	shibboleth_update_user_data( $user->ID );
 
 	$update = shibboleth_getoption( 'shibboleth_update_roles' );
@@ -703,7 +704,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 			return null;
 		}
 
-		// create account and flag as a shibboleth account
+		// create account and flag as a shibboleth account.
 		$user_id = wp_insert_user(
 			array(
 				'user_login' => $user_login,
@@ -720,7 +721,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 			$user = new WP_User( $user_id );
 			update_user_meta( $user->ID, 'shibboleth_account', true );
 
-			// always update user data and role on account creation
+			// always update user data and role on account creation.
 			shibboleth_update_user_data( $user->ID, true );
 			$user->set_role( $user_role );
 			do_action( 'shibboleth_set_user_roles', $user );
@@ -815,7 +816,7 @@ function shibboleth_get_managed_user_fields() {
  * the 'force_update' parameter is true, only the user fields marked as 'managed' fields will be
  * updated.
  *
- * @param int $user_id ID of the user to update.
+ * @param int     $user_id ID of the user to update.
  * @param boolean $force_update force update of user data, regardless of 'managed' flag on fields.
  * @uses apply_filters() Calls 'shibboleth_user_*' before setting user attributes,
  *       where '*' is one of: login, nicename, first_name, last_name,
@@ -893,11 +894,13 @@ function shibboleth_disable_login() {
 
 	if ( $disable && ! $bypass ) {
 		if ( isset( $_GET['action'] ) && 'lostpassword' === $_GET['action'] ) {
-			// Disable the ability to reset passwords from wp-login.php
+			// Disable the ability to reset passwords from wp-login.php.
 			add_filter( 'allow_password_reset', '__return_false' );
-		} elseif ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Disable the ability to login using local authentication
+		} elseif ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
+			// Disable the ability to login using local authentication.
 			wp_die( esc_html( __( 'Shibboleth authentication is required.', 'shibboleth' ) ) );
+
+			check_admin_referer( 'log-in' );
 		}
 	}
 }
