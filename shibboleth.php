@@ -426,7 +426,7 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		return shibboleth_authenticate_user();
 	} else {
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
-			$redirect_to = sanitize_url( wp_unslash( $_REQUEST['redirect_to'] ) );
+			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 			$initiator_url = shibboleth_session_initiator_url( $redirect_to );
 		} else {
 			$initiator_url = shibboleth_session_initiator_url();

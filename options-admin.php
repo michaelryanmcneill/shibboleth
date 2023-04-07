@@ -89,19 +89,19 @@ function shibboleth_options_page() {
 					update_site_option( 'shibboleth_attribute_custom_access_method', sanitize_text_field( wp_unslash( $_POST['attribute_custom_access'] ) ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_LOGIN_URL' ) && isset( $_POST['login_url'] ) ) {
-					update_site_option( 'shibboleth_login_url', sanitize_url( wp_unslash( $_POST['login_url'] ) ) );
+					update_site_option( 'shibboleth_login_url', esc_url_raw( wp_unslash( $_POST['login_url'] ) ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_LOGOUT_URL' ) && isset( $_POST['logout_url'] ) ) {
-					update_site_option( 'shibboleth_logout_url', sanitize_url( wp_unslash( $_POST['logout_url'] ) ) );
+					update_site_option( 'shibboleth_logout_url', esc_url_raw( wp_unslash( $_POST['logout_url'] ) ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_SPOOF_KEY' ) && isset( $_POST['spoofkey'] ) ) {
 					update_site_option( 'shibboleth_spoof_key', sanitize_text_field( wp_unslash( $_POST['spoofkey'] ) ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) && isset( $_POST['password_change_url'] ) ) {
-					update_site_option( 'shibboleth_password_change_url', sanitize_url( wp_unslash( $_POST['password_change_url'] ) ) );
+					update_site_option( 'shibboleth_password_change_url', esc_url_raw( wp_unslash( $_POST['password_change_url'] ) ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) && isset( $_POST['password_reset_url'] ) ) {
-					update_site_option( 'shibboleth_password_reset_url', sanitize_url( wp_unslash( $_POST['password_reset_url'] ) ) );
+					update_site_option( 'shibboleth_password_reset_url', esc_url_raw( wp_unslash( $_POST['password_reset_url'] ) ) );
 				}
 				if ( ! defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
 					update_site_option( 'shibboleth_default_to_shib_login', ! empty( $_POST['default_login'] ) );
