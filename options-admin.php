@@ -265,8 +265,8 @@ function shibboleth_options_page() {
 						);
 						?>
 						<br /><?php esc_html_e( 'Wiki Documentation', 'shibboleth' ); ?>:
-						<a href="https://spaces.internet2.edu/display/SHIB/SessionInitiator" target="_blank">Shibboleth 1.3</a> |
-						<a href="https://spaces.internet2.edu/display/SHIB2/NativeSPSessionInitiator" target="_blank">Shibboleth 2</a>
+						<a href="https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065334685/SessionInitiator" target="_blank">Shibboleth SP v3</a> |
+						<a href="https://shibboleth.atlassian.net/wiki/spaces/SHIB2/pages/2577072500/NativeSPSessionInitiator" target="_blank">Shibboleth SP v2</a>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -283,8 +283,8 @@ function shibboleth_options_page() {
 						);
 						?>
 						<br /><?php esc_html_e( 'Wiki Documentation', 'shibboleth' ); ?>:
-						<a href="https://spaces.internet2.edu/display/SHIB/SPMainConfig" target="_blank">Shibboleth 1.3</a> |
-						<a href="https://spaces.internet2.edu/display/SHIB2/NativeSPLogoutInitiator" target="_blank">Shibboleth 2</a>
+						<a href="https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065334687/LogoutInitiator" target="_blank">Shibboleth SP v3</a> |
+						<a href="https://shibboleth.atlassian.net/wiki/spaces/SHIB2/pages/2577072384/NativeSPLogoutInitiator" target="_blank">Shibboleth SP v2</a>
 					</td>
 				</tr>
 				<tr valign="top">
