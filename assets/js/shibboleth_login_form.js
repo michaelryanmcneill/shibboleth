@@ -6,7 +6,7 @@
  */
 
 jQuery( document ).ready(
-	function( $ ) {
+	function ( $ ) {
 		var body = $( 'body' ),
 			userLogin = $( '#user_login' ),
 			ssoWrap   = $( '#shibboleth-wrap' ),
