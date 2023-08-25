@@ -9,5 +9,10 @@
 	"require": {},
 	"require-dev" : {
 		"wp-coding-standards/wpcs": "@stable"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	}
 }

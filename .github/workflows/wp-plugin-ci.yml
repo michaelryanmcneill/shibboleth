@@ -32,4 +32,4 @@ jobs:
       run: |
         touch $GITHUB_WORKSPACE/tmp.php
         export CHANGED_FILES=$(git diff --name-only --diff-filter=AM remotes/origin/${{ github.base_ref }} | tr '\n' ' ')
-        vendor/bin/phpcs -q -n --ignore=vendor --runtime-set installed_paths vendor/wp-coding-standards/wpcs --standard=WordPress --report=checkstyle $GITHUB_WORKSPACE/tmp.php $(echo $CHANGED_FILES) | cs2pr
+        vendor/bin/phpcs -q -n --ignore=vendor --standard=WordPress --report=checkstyle $GITHUB_WORKSPACE/tmp.php $(echo $CHANGED_FILES) | cs2pr

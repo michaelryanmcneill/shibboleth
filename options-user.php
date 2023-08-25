@@ -44,7 +44,7 @@ function shibboleth_disable_managed_fields() {
 		$selectors = join(
 			',',
 			array_map(
-				function( $a ) {
+				function ( $a ) {
 					return "#$a";
 				},
 				$managed_fields
