@@ -9,7 +9,7 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- * Version: 2.4.2
+ * Version: 2.5.0
  * Requires PHP: 5.6
  * Requires at least: 4.0
  * License: Apache 2 (https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -18,7 +18,7 @@
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.4.2' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.0' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -198,6 +198,7 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_login_url', get_site_option( 'home' ) . '/Shibboleth.sso/Login' );
 	add_site_option( 'shibboleth_default_to_shib_login', false );
 	add_site_option( 'shibboleth_auto_login', false );
+	add_site_option( 'shibboleth_allow_rememberme', false );
 	add_site_option( 'shibboleth_logout_url', get_site_option( 'home' ) . '/Shibboleth.sso/Logout' );
 	add_site_option( 'shibboleth_attribute_access_method', 'standard' );
 	add_site_option( 'shibboleth_default_role', '' );
@@ -876,6 +877,17 @@ function shibboleth_login_enqueue_scripts() {
 		wp_enqueue_style( 'shibboleth-login', plugins_url( 'assets/css/shibboleth_login_form.css', __FILE__ ), array( 'login' ), SHIBBOLETH_PLUGIN_VERSION );
 		wp_enqueue_script( 'shibboleth-login', plugins_url( 'assets/js/shibboleth_login_form.js', __FILE__ ), array( 'jquery' ), SHIBBOLETH_PLUGIN_VERSION, true );
 	}
+
+	if ( shibboleth_getoption( 'shibboleth_allow_rememberme' ) == 1 ) {
+		$ajaxurl = admin_url( 'admin-ajax.php' );
+		$js = '
+			if( ! window.ajaxurl ) {
+				ajaxurl = "' . esc_js( $ajaxurl ) . '";
+			}
+		';
+
+		wp_add_inline_script( 'shibboleth-login', $js, 'before' );
+	}
 }
 add_action( 'login_enqueue_scripts', 'shibboleth_login_enqueue_scripts' );
 
@@ -966,6 +978,10 @@ function shibboleth_login_form() {
 	$login_url = remove_query_arg( 'reauth', $login_url );
 	$button_text = shibboleth_getoption( 'shibboleth_button_text', __( 'Log in with Shibboleth', 'shibboleth' ) );
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
+	$allow_rememberme = shibboleth_getoption( 'shibboleth_allow_rememberme' );
+	// in case we have this a previous login
+	setcookie( 'shibboleth_extend_cookie', '', time() - 3600, '/' );
+
 	?>
 	<div id="shibboleth-wrap" <?php echo $disable ? 'style="margin-top:0;"' : ''; ?>>
 		<?php
@@ -981,6 +997,16 @@ function shibboleth_login_form() {
 			<span class="shibboleth-icon"></span>
 			<?php echo esc_html( $button_text ); ?>
 		</a>
+		<?php
+		if ( $allow_rememberme ) {
+			?>
+			<div class="shibboleth-remember-me-wrap">
+				<input type="checkbox" name="shibboleth-lengthen-cookie" id="shibboleth-lengthen-cookie" value="1">
+				<label for="shibboleth-lengthen-cookie">Remember Me</label>
+			</div>
+			<?php
+		}
+		?>
 	</div>
 	<?php
 }
@@ -1026,3 +1052,39 @@ function shibboleth_load_textdomain() {
 	load_plugin_textdomain( 'shibboleth', false, dirname( plugin_basename( __FILE__ ) ) . '/localization/' );
 }
 add_action( 'plugins_loaded', 'shibboleth_load_textdomain' );
+
+
+/**
+ * Allow extending the shibboleth cookie
+ */
+function shibboleth_extend_cookie_expiration ( $length ) {
+	if (
+		shibboleth_getoption( 'shibboleth_allow_rememberme' ) == 1
+		&&
+		isset( $_COOKIE['shibboleth_extend_cookie'] )
+		&&
+		$_COOKIE['shibboleth_extend_cookie'] === 'yes'
+	) {
+		$length = 14 * DAY_IN_SECONDS;
+	}
+
+	return $length;
+}
+add_filter( 'auth_cookie_expiration', 'shibboleth_extend_cookie_expiration' );
+
+/**
+ * In response to an ajax call, set a temporary "remember me" to lengthen the
+ * cookie after shib resopnse comes back
+ */
+function shibboleth_ajax_set_temporary_rememberme_cookie () {
+	$remember_me = ( $_GET['value'] === '1' );
+
+	if ( $remember_me ) {
+		setcookie( 'shibboleth_extend_cookie', 'yes', 0, '/' );
+		wp_send_json_success( 'ok' );
+	} else {
+		setcookie( 'shibboleth_extend_cookie', '', time() - 3600, '/' );
+		wp_send_json_success( 'ok' );
+	}
+}
+add_action( 'wp_ajax_nopriv_shibboleth_remember_me', 'shibboleth_ajax_set_temporary_rememberme_cookie' );

@@ -123,6 +123,10 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Format: boolean
    - Available options: `true` to automatically login users with an existing Shibboleth session or `false` to not check for an existing Shibboleth session.
    - Example: `define('SHIBBOLETH_AUTO_LOGIN', true);`
+ - `SHIBBOLETH_ALLOW_REMEMBERME`
+   - Format: boolean
+   - Available options: `true` to include a "remember me" checkbox along with Shib login button to allow users to extend their cookie
+   - Example: `define( 'SHIBBOLETH_ALLOW_REMEMBERME', true );`
  - `SHIBBOLETH_BUTTON_TEXT`
    - Format: string
    - Available options: none

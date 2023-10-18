@@ -108,3 +108,46 @@
 .shibboleth-repositioned #shibboleth-wrap .button .dashicons {
 	font-size: 24px;
 }
+
+
+.shibboleth-remember-me-wrap {
+	margin-top: 1em;
+}
+.shibboleth-remember-me-wrap input[type="checkbox"] {
+	margin-right: .5em;
+}
+
+#shibboleth-wrap._rememberme-loading {
+	pointer-events: none;
+	position: relative;
+}
+
+#shibboleth-wrap._rememberme-loading * {
+	opacity: .4;
+}
+
+@keyframes L7 {
+	33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
+	50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
+	66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
+}
+#shibboleth-wrap._rememberme-loading::after {
+	content: '';
+	opacity: 1;
+	width: 60px;
+	aspect-ratio: 4;
+	--_g: no-repeat radial-gradient(circle closest-side,hsl(350, 20%, 28%) 90%,#0000);
+	background: 
+	var(--_g) 0%   50%,
+	var(--_g) 50%  50%,
+	var(--_g) 100% 50%;
+	background-size: calc(100%/3) 100%;
+	animation: L7 1s infinite linear;
+	position: absolute;
+	top: 50%;
+	left: 40%;
+}
+
+#shibboleth-wrap:has( .shibboleth-remember-me-wrap ) a.shibboleth-button[href*="wp-login.php"] {
+	float: none;
+}

@@ -130,6 +130,9 @@ function shibboleth_options_general() {
 		if ( ! defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
 			update_site_option( 'shibboleth_auto_login', ! empty( $_POST['auto_login'] ) );
 		}
+		if ( ! defined( 'SHIBBOLETH_ALLOW_REMEMBERME' ) ) {
+			update_site_option( 'shibboleth_allow_rememberme', ! empty( $_POST['allow_rememberme'] ) );
+		}
 		if ( ! defined( 'SHIBBOLETH_BUTTON_TEXT' ) && isset( $_POST['button_text'] ) ) {
 			update_site_option( 'shibboleth_button_text', sanitize_text_field( wp_unslash( $_POST['button_text'] ) ) );
 		}
@@ -160,6 +163,8 @@ function shibboleth_options_general() {
 	list( $default_login, $from_constant ) = shibboleth_getoption( 'shibboleth_default_to_shib_login', false, false, true );
 	$constant = $constant || $from_constant;
 	list( $auto_login, $from_constant ) = shibboleth_getoption( 'shibboleth_auto_login', false, false, true );
+	$constant = $constant || $from_constant;
+	list( $allow_rememberme, $from_constant ) = shibboleth_getoption( 'shibboleth_allow_rememberme', false, false, true );
 	$constant = $constant || $from_constant;
 	list( $disable_local_auth, $from_constant ) = shibboleth_getoption( 'shibboleth_disable_local_auth', false, false, true );
 	$constant = $constant || $from_constant;
@@ -330,6 +335,24 @@ function shibboleth_options_general() {
 					__(
 						'If set, this option checks to see if a Shibboleth session exists on every page load, and,
 						if it does, forces a <code>wp_signon()</code> call and <code>wp_safe_redirect()</code> back to the <code>$_SERVER[\'REQUEST_URI\']</code>.',
+						'shibboleth'
+					)
+				);
+				?>
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><?php esc_html_e( 'Cookie Extension', 'shibboleth' ); ?></th>
+			<td>
+				<input type="checkbox" id="allow_rememberme" name="allow_rememberme" <?php checked( (bool) $allow_rememberme ); ?> <?php defined( 'SHIBBOLETH_ALLOW_REMEMBERME' ) && disabled( $allow_rememberme, SHIBBOLETH_ALLOW_REMEMBERME ); ?> />
+				<label for="allow_rememberme"><?php esc_html_e( 'Allow individual users to extend their shib cookie with a "Remember me" checkbox', 'shibboleth' ); ?></label>
+
+				<p>
+				<?php
+				echo wp_kses_post(
+					__(
+						'If set, this option displays a checkbox for "Remember Me" below the Shibboleth login button on the login page',
 						'shibboleth'
 					)
 				);

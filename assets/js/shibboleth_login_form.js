@@ -28,5 +28,27 @@ jQuery( document ).ready(
 		// positioning of the SSO UI.
 		loginForm.append( ssoWrap );
 		body.addClass( 'shibboleth-repositioned' );
+
+
+		var $checkbox = $( '#shibboleth-wrap input[name="shibboleth-lengthen-cookie"]' );
+		if( $checkbox ) {
+
+			$checkbox.on( 'change', function(e) {
+
+				var rememberMe = this.checked;
+				ssoWrap.addClass('_rememberme-loading');
+
+				var params = new URLSearchParams({
+					action: 'shibboleth_remember_me',
+					value: (rememberMe) ? '1' : '0',
+				});
+				var fetchurl = window.ajaxurl + '?' + params.toString();
+
+				fetch( fetchurl ).then( json => {
+					ssoWrap.removeClass('_rememberme-loading');
+				});
+				
+			});
+		}
 	}
 );
