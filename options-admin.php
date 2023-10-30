@@ -124,6 +124,9 @@ function shibboleth_options_general() {
 		if ( ! defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) && isset( $_POST['password_reset_url'] ) ) {
 			update_site_option( 'shibboleth_password_reset_url', esc_url_raw( wp_unslash( $_POST['password_reset_url'] ) ) );
 		}
+		if ( ! defined( 'SHIBBOLETH_SESSION_ID_HEADER' ) && isset( $_POST['session_id_header'] ) ) {
+			update_site_option( 'shibboleth_session_id_header', sanitize_text_field( wp_unslash( $_POST['session_id_header'] ) ) );
+		}
 		if ( ! defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
 			update_site_option( 'shibboleth_default_to_shib_login', ! empty( $_POST['default_login'] ) );
 		}
@@ -148,6 +151,8 @@ function shibboleth_options_general() {
 	list( $password_change_url, $from_constant ) = shibboleth_getoption( 'shibboleth_password_change_url', false, false, true );
 	$constant = $constant || $from_constant;
 	list( $password_reset_url, $from_constant ) = shibboleth_getoption( 'shibboleth_password_reset_url', false, false, true );
+	$constant = $constant || $from_constant;
+	list($session_id_header, $from_constant) = shibboleth_getoption('shibboleth_session_id_header', false, false, true);
 	$constant = $constant || $from_constant;
 	list( $attribute_access, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true );
 	$constant = $constant || $from_constant;
@@ -222,6 +227,13 @@ function shibboleth_options_general() {
 			<td>
 				<input type="text" id="password_reset_url" name="password_reset_url" value="<?php echo esc_url( $password_reset_url ); ?>" size="50" <?php defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) && disabled( $password_reset_url, SHIBBOLETH_PASSWORD_RESET_URL ); ?> /><br />
 				<?php echo wp_kses_post( __( 'If this option is set, wp-login.php will send <b><i>ALL</i></b> users here to reset their password.', 'shibboleth' ) ); ?>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><label for="session_id_header"><?php esc_html_e( 'Session ID Header', 'shibboleth' ); ?></label></th>
+			<td>
+				<input type="text" id="session_id_header" name="session_id_header" value="<?php echo esc_attr( $session_id_header ); ?>" size="50" <?php defined( 'SHIBBOLETH_SESSION_ID_HEADER' ) && disabled( $session_id_header, SHIBBOLETH_SESSION_ID_HEADER ); ?> /><br />
+				<?php echo wp_kses_post( __( 'If this option is set, the entered value will override the default Shibboleth header which maps to the Session ID.', 'shibboleth' ) ); ?>
 			</td>
 		</tr>
 		<tr valign="top">
