@@ -8,8 +8,8 @@
  * Plugin Name: Shibboleth
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
- * Author: Michael McNeill, mitcho (Michael 芳貴 Erlewine), Will Norris
- * Version: 2.4.2
+ * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
+ * Version: 2.4.3
  * Requires PHP: 5.6
  * Requires at least: 4.0
  * License: Apache 2 (https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -18,7 +18,7 @@
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.4.2' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.4.3' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -552,6 +552,7 @@ function shibboleth_session_initiator_url( $redirect = null ) {
  *
  * @param string $message_type Message type.
  * @param string $message Message.
+ * @since 2.4.3
  */
 function shibboleth_log_message( $message_type, $message ) {
 	static $shib_logging;
