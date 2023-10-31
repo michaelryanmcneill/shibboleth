@@ -206,7 +206,6 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_auto_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_disable_local_auth', false );
-	add_site_option( 'shibboleth_session_id_header', '' );
 
 	$headers = array(
 		'username' => array(
@@ -377,8 +376,8 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 function shibboleth_session_active( $auto_login = false ) {
 	$active = false;
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method' );
-	$session_id_header = shibboleth_getoption('shibboleth_session_id_header') ? shibboleth_getoption('shibboleth_session_id_header') : 'Shib-Session-ID';
-	$session = shibboleth_getenv( $session_id_header );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true ); 
+	$session = shibboleth_getenv( $shib_headers['username']['name'] );
 
 	if ( $session && 'http' !== $method ) {
 		$active = true;
