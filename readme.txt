@@ -1,10 +1,10 @@
 === Shibboleth ===
-Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz
+Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz, masteradhoc, junaidkbr
 Tags: shibboleth, authentication, login, saml
 Requires at least: 4.0
-Tested up to: 6.3
+Tested up to: 6.4
 Requires PHP: 5.6
-Stable tag: 2.4.2
+Stable tag: 2.4.3
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -197,8 +197,10 @@ This update brings with it a major change to the way Shibboleth attributes are a
 This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
 
 == Changelog ==
-= version 2.4.3 (not yet released) =
+= version 2.4.3 (2023-10-31) =
+ - Compatibility: Check for Shibboleth username instead of Shib-Session-ID; thanks @spfncer [#97](https://github.com/michaelryanmcneill/shibboleth/pull/97)
  - CI: Update GitHub Action workflows and code for WordPress coding standard v3 [#94](https://github.com/michaelryanmcneill/shibboleth/pull/94)
+ - Cleanup: Reduced duplication via a logging helper function [#95](https://github.com/michaelryanmcneill/shibboleth/pull/95)
 
 = version 2.4.2 (2023-04-07) =
  - Documentation: Updated Shibboleth documentation external links [#92](https://github.com/michaelryanmcneill/shibboleth/pull/92)
