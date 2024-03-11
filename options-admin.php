@@ -14,10 +14,11 @@
  */
 function shibboleth_admin_tabs( $current = 'general' ) {
 	$tabs = array(
-		'general' => 'General',
-		'user' => 'User',
-		'authorization' => 'Authorization',
-		'logging' => 'Logging',
+		'general' => __( 'General' ),
+		'idps' => __( 'Identity Providers', 'shibboleth' ),
+		'user' => __( 'User' ),
+		'authorization' => __( 'Authorization', 'shibboleth' ),
+		'logging' => __( 'Logging', 'shibboleth' ),
 	);
 	echo '<nav class="nav-tab-wrapper">';
 	foreach ( $tabs as $tab => $name ) {
@@ -118,20 +119,11 @@ function shibboleth_options_general() {
 		if ( ! defined( 'SHIBBOLETH_SPOOF_KEY' ) && isset( $_POST['spoofkey'] ) ) {
 			update_site_option( 'shibboleth_spoof_key', sanitize_text_field( wp_unslash( $_POST['spoofkey'] ) ) );
 		}
-		if ( ! defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) && isset( $_POST['password_change_url'] ) ) {
-			update_site_option( 'shibboleth_password_change_url', esc_url_raw( wp_unslash( $_POST['password_change_url'] ) ) );
-		}
-		if ( ! defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) && isset( $_POST['password_reset_url'] ) ) {
-			update_site_option( 'shibboleth_password_reset_url', esc_url_raw( wp_unslash( $_POST['password_reset_url'] ) ) );
-		}
 		if ( ! defined( 'SHIBBOLETH_DEFAULT_TO_SHIB_LOGIN' ) ) {
 			update_site_option( 'shibboleth_default_to_shib_login', ! empty( $_POST['default_login'] ) );
 		}
 		if ( ! defined( 'SHIBBOLETH_AUTO_LOGIN' ) ) {
 			update_site_option( 'shibboleth_auto_login', ! empty( $_POST['auto_login'] ) );
-		}
-		if ( ! defined( 'SHIBBOLETH_BUTTON_TEXT' ) && isset( $_POST['button_text'] ) ) {
-			update_site_option( 'shibboleth_button_text', sanitize_text_field( wp_unslash( $_POST['button_text'] ) ) );
 		}
 		if ( ! defined( 'SHIBBOLETH_DISABLE_LOCAL_AUTH' ) ) {
 			update_site_option( 'shibboleth_disable_local_auth', ! empty( $_POST['disable_local_auth'] ) );
@@ -144,10 +136,6 @@ function shibboleth_options_general() {
 	list( $login_url, $from_constant ) = shibboleth_getoption( 'shibboleth_login_url', false, false, true );
 	$constant = $constant || $from_constant;
 	list( $logout_url, $from_constant ) = shibboleth_getoption( 'shibboleth_logout_url', false, false, true );
-	$constant = $constant || $from_constant;
-	list( $password_change_url, $from_constant ) = shibboleth_getoption( 'shibboleth_password_change_url', false, false, true );
-	$constant = $constant || $from_constant;
-	list( $password_reset_url, $from_constant ) = shibboleth_getoption( 'shibboleth_password_reset_url', false, false, true );
 	$constant = $constant || $from_constant;
 	list( $attribute_access, $from_constant ) = shibboleth_getoption( 'shibboleth_attribute_access_method', false, false, true );
 	$constant = $constant || $from_constant;
@@ -162,8 +150,6 @@ function shibboleth_options_general() {
 	list( $auto_login, $from_constant ) = shibboleth_getoption( 'shibboleth_auto_login', false, false, true );
 	$constant = $constant || $from_constant;
 	list( $disable_local_auth, $from_constant ) = shibboleth_getoption( 'shibboleth_disable_local_auth', false, false, true );
-	$constant = $constant || $from_constant;
-	list( $button_text, $from_constant ) = shibboleth_getoption( 'shibboleth_button_text', false, false, true );
 	$constant = $constant || $from_constant;
 	?>
 
@@ -208,20 +194,6 @@ function shibboleth_options_general() {
 				<br /><?php esc_html_e( 'Wiki Documentation', 'shibboleth' ); ?>:
 				<a href="https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065334687/LogoutInitiator" target="_blank">Shibboleth SP v3</a> |
 				<a href="https://shibboleth.atlassian.net/wiki/spaces/SHIB2/pages/2577072384/NativeSPLogoutInitiator" target="_blank">Shibboleth SP v2</a>
-			</td>
-		</tr>
-		<tr valign="top">
-			<th scope="row"><label for="password_change_url"><?php esc_html_e( 'Password Change URL', 'shibboleth' ); ?></label></th>
-			<td>
-				<input type="text" id="password_change_url" name="password_change_url" value="<?php echo esc_url( $password_change_url ); ?>" size="50" <?php defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) && disabled( $password_change_url, SHIBBOLETH_PASSWORD_CHANGE_URL ); ?> /><br />
-				<?php esc_html_e( 'If this option is set, Shibboleth users will see a "change password" link on their profile page directing them to this URL.', 'shibboleth' ); ?>
-			</td>
-		</tr>
-		<tr valign="top">
-			<th scope="row"><label for="password_reset_url"><?php esc_html_e( 'Password Reset URL', 'shibboleth' ); ?></label></th>
-			<td>
-				<input type="text" id="password_reset_url" name="password_reset_url" value="<?php echo esc_url( $password_reset_url ); ?>" size="50" <?php defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) && disabled( $password_reset_url, SHIBBOLETH_PASSWORD_RESET_URL ); ?> /><br />
-				<?php echo wp_kses_post( __( 'If this option is set, wp-login.php will send <b><i>ALL</i></b> users here to reset their password.', 'shibboleth' ) ); ?>
 			</td>
 		</tr>
 		<tr valign="top">
@@ -355,13 +327,6 @@ function shibboleth_options_general() {
 				</p>
 			</td>
 		</tr>
-		<tr valign="top">
-			<th scope="row"><label for="button_text"><?php esc_html_e( 'Button Text', 'shibboleth' ); ?></label></th>
-			<td>
-				<input type="text" id="button_text" name="button_text" value="<?php echo esc_attr( $button_text ); ?>" size="50" <?php defined( 'SHIBBOLETH_BUTTON_TEXT' ) && disabled( $button_text, SHIBBOLETH_BUTTON_TEXT ); ?> /><br />
-				<p><?php echo wp_kses_post( __( 'Set the text of the button that appears on the <code>wp-login.php</code> page.', 'shibboleth' ) ); ?></p>
-			</td>
-		</tr>
 		<?php
 		/**
 		 * Action shibboleth_options_table
@@ -407,6 +372,137 @@ function shibboleth_options_general() {
 	</script>
 
 		<?php
+}
+
+/**
+ * Shibboleth - IdP options tab.
+ *
+ * @since 2.5.0
+ */
+function shibboleth_options_idps() {
+	if ( isset( $_POST['submit'] ) ) {
+		check_admin_referer( 'shibboleth_update_options' );
+
+		$idp_options = shibboleth_getoption( 'shibboleth_idps', array(), true, false );
+
+		if ( ! defined( 'SHIBBOLETH_IDPS' ) ) {
+			if ( isset( $_POST['idps'] ) ) {
+				// phpcs:disable WordPress.Security.ValidatedSanitizedInput
+				$idps = wp_unslash( $_POST['idps'] );
+				// phpcs:enable WordPress.Security.ValidatedSanitizedInput
+
+				foreach ( $idps as $current_short_label => $idp ) {
+					$short_label = sanitize_text_field( $idp['short_label'] );
+					$current_short_label = sanitize_text_field( $current_short_label );
+
+					if ( ! empty( $current_short_label ) ) {
+						// If the short_label is being updated, then update the IdP for those users to match.
+						shibboleth_update_idp_users( $short_label, $current_short_label );
+
+						unset( $idp_options[ $current_short_label ] );
+					}
+
+					if ( empty( $short_label ) ) {
+						continue;
+					}
+
+					$idp_options[ $short_label ] = array(
+						'entity_id' => sanitize_text_field( $idp['entity_id'] ),
+						'password_change_url' => esc_url_raw( $idp['password_change_url'] ),
+						'password_reset_url' => esc_url_raw( $idp['password_reset_url'] ),
+						'button_text' => sanitize_text_field( $idp['button_text'] ),
+					);
+				}
+
+				update_site_option( 'shibboleth_idps', $idp_options );
+			}
+		}
+
+		shibboleth_options_updated();
+	}
+
+	$constant = false;
+	list( $idps, $from_constant ) = shibboleth_getoption( 'shibboleth_idps', array(), false, true );
+	$constant = $constant || $from_constant;
+	?>
+
+	<h2><?php esc_html_e( 'IdP Configuration', 'shibboleth' ); ?></h2>
+	<?php if ( $constant ) { ?>
+		<div class="notice notice-warning">
+			<p><?php echo wp_kses_post( __( '<strong>Note:</strong> Some options below are defined in the <code>wp-config.php</code> file as constants and cannot be modified from this page.', 'shibboleth' ) ); ?></p>
+		</div>
+		<?php
+	} else {
+		$idps['__new'] = array(
+			'entity_id' => '',
+			'password_change_url' => '',
+			'password_reset_url' => '',
+			'button_text' => '',
+		);
+	}
+	?>
+
+	<?php
+	foreach ( $idps as $idp_code => $idp ) {
+		if ( '__new' === $idp_code ) {
+			$idp_code_value = '';
+		} else {
+			$idp_code_value = $idp_code;
+		}
+		?>
+
+	<fieldset class="card tool-box">
+	<legend class="title">
+		<?php
+		if ( '' === $idp_code_value ) {
+			esc_html_e( 'Add new Identity Provider', 'shibboleth' );
+		} else {
+			esc_html_e( 'Identity Provider', 'shibboleth' );
+			echo ' "' . esc_html( $idp_code_value ) . '"';
+		}
+		?>
+	</legend>
+	<table class="form-table">
+		<tr>
+			<th scope="row"><label for="short_label_<?php echo esc_attr( $idp_code ); ?>"><?php esc_html_e( 'Short Label', 'shibboleth' ); ?></label></th>
+			<td>
+				<input type="text" id="short_label_<?php echo esc_attr( $idp_code ); ?>" name="idps[<?php echo esc_attr( $idp_code ); ?>][short_label]" value="<?php echo esc_attr( $idp_code_value ); ?>" size="50" <?php disabled( $constant ); ?> /><br />
+				<?php esc_html_e( 'A short label for the Identity Provider.', 'shibboleth' ); ?>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="entity_id_<?php echo esc_attr( $idp_code ); ?>"><?php esc_html_e( 'Entity ID', 'shibboleth' ); ?></label></th>
+			<td>
+				<input type="text" id="entity_id_<?php echo esc_attr( $idp_code ); ?>" name="idps[<?php echo esc_attr( $idp_code ); ?>][entity_id]" value="<?php echo esc_url( $idp['entity_id'] ); ?>" size="50" <?php disabled( $constant ); ?> /><br />
+				<?php esc_html_e( 'The entityID is the public URI for an Identity Provider.', 'shibboleth' ); ?>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="password_change_url_<?php echo esc_attr( $idp_code ); ?>"><?php esc_html_e( 'Password Change URL', 'shibboleth' ); ?></label></th>
+			<td>
+				<input type="text" id="password_change_url_<?php echo esc_attr( $idp_code ); ?>" name="idps[<?php echo esc_attr( $idp_code ); ?>][password_change_url]" value="<?php echo esc_url( $idp['password_change_url'] ); ?>" size="50" <?php disabled( $constant ); ?> /><br />
+				<?php esc_html_e( 'If this option is set, Shibboleth users will see a "change password" link on their profile page directing them to this URL.', 'shibboleth' ); ?>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="password_reset_url_<?php echo esc_attr( $idp_code ); ?>"><?php esc_html_e( 'Password Reset URL', 'shibboleth' ); ?></label></th>
+			<td>
+				<input type="text" id="password_reset_url_<?php echo esc_attr( $idp_code ); ?>" name="idps[<?php echo esc_attr( $idp_code ); ?>][password_reset_url]" value="<?php echo esc_url( $idp['password_reset_url'] ); ?>" size="50" <?php disabled( $constant ); ?> /><br />
+				<?php echo wp_kses_post( __( 'If this option is set, wp-login.php will send <b><i>ALL</i></b> users here to reset their password.', 'shibboleth' ) ); ?>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="button_text_<?php echo esc_attr( $idp_code ); ?>"><?php esc_html_e( 'Button Text', 'shibboleth' ); ?></label></th>
+			<td>
+				<input type="text" id="button_text_<?php echo esc_attr( $idp_code ); ?>" name="idps[<?php echo esc_attr( $idp_code ); ?>][button_text]" value="<?php echo esc_attr( $idp['button_text'] ); ?>" size="50" <?php disabled( $constant ); ?> /><br />
+				<p><?php echo wp_kses_post( __( 'Set the text of the button that appears on the <code>wp-login.php</code> page.', 'shibboleth' ) ); ?></p>
+			</td>
+		</tr>
+	</table>
+	</fieldset>
+
+		<?php
+	} // Close IdP foreach
 }
 
 /**
@@ -899,6 +995,10 @@ function shibboleth_options_page() {
 	switch ( $tab ) {
 		case 'general':
 			shibboleth_options_general();
+			break;
+
+		case 'idps':
+			shibboleth_options_idps();
 			break;
 
 		case 'user':

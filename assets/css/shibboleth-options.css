@@ -1,0 +1,4 @@
+/* Allow Identity Provider cards to be full width. */
+.card {
+	max-width: none;
+}

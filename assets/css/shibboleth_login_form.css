@@ -13,12 +13,12 @@
 	padding-bottom: 26px;
 }
 
-#loginform #shibboleth-wrap,
-#loginform #shibboleth-wrap * {
+#loginform .shibboleth-wrap,
+#loginform .shibboleth-wrap * {
 	box-sizing: border-box;
 }
 
-#shibboleth-wrap {
+.shibboleth-wrap {
 	position: absolute;
 		bottom: 20px;
 	padding: 0 24px;
@@ -27,7 +27,7 @@
 	width: 100%;
 }
 
-.shibboleth-repositioned #shibboleth-wrap {
+.shibboleth-repositioned .shibboleth-wrap {
 	position: relative;
 		bottom: auto;
 	padding: 0;
@@ -36,7 +36,7 @@
 	margin-right: 0;
 }
 
-.shibboleth-form-display #shibboleth-wrap {
+.shibboleth-form-display .shibboleth-wrap {
 	position: relative;
 		bottom: auto;
 	padding: 0;
@@ -45,15 +45,16 @@
 	margin-right: 0;
 }
 
-#loginform #shibboleth-wrap p {
+#loginform .shibboleth-wrap p {
 	margin-bottom: 16px;
 }
 
-#shibboleth-wrap a {
+.shibboleth-wrap .shibboleth-button {
 	display: block;
 	width: 100%;
 	text-align: center;
 	text-decoration: none;
+	float: none;
 }
 
 .shibboleth-form-display #loginform > p,
@@ -61,7 +62,7 @@
 	display: none;
 }
 
-.shibboleth-form-display #loginform #shibboleth-wrap {
+.shibboleth-form-display #loginform .shibboleth-wrap {
 	display: block;
 }
 
@@ -105,6 +106,6 @@
 	clear: both;
 }
 
-.shibboleth-repositioned #shibboleth-wrap .button .dashicons {
+.shibboleth-repositioned .shibboleth-wrap .button .dashicons {
 	font-size: 24px;
 }
