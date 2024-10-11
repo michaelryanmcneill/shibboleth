@@ -9,7 +9,7 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
- * Version: 2.4.3
+ * Version: 2.5.0
  * Requires PHP: 5.6
  * Requires at least: 4.0
  * License: Apache 2 (https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -18,7 +18,7 @@
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.4.3' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.0' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -202,7 +202,6 @@ function shibboleth_activate_plugin() {
 	add_site_option( 'shibboleth_attribute_access_method', 'standard' );
 	add_site_option( 'shibboleth_default_role', '' );
 	add_site_option( 'shibboleth_update_roles', false );
-	add_site_option( 'shibboleth_button_text', 'Log in with Shibboleth' );
 	add_site_option( 'shibboleth_auto_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_manually_combine_accounts', 'disallow' );
 	add_site_option( 'shibboleth_disable_local_auth', false );
@@ -271,6 +270,28 @@ function shibboleth_deactivate_plugin() {
 }
 register_deactivation_hook( __FILE__, 'shibboleth_deactivate_plugin' );
 
+
+/**
+ * Update user meta from old IdP code to new IdP code.
+ *
+ * @since 2.5.0
+ * @param string $new_idp_code New IdP code.
+ * @param string $old_idp_code Old IdP code.
+ */
+function shibboleth_update_idp_users( $new_idp_code, $old_idp_code ) {
+	// Update the shibboleth_account rows to have the new IdP code value.
+	$shibboleth_users = get_users(
+		array(
+			'meta_key' => 'shibboleth_account',
+			'fields' => 'ID',
+		)
+	);
+
+	foreach ( $shibboleth_users as $user_id ) {
+		update_user_meta( $user_id, 'shibboleth_account', $new_idp_code, $old_idp_code );
+	}
+}
+
 /**
  * Migrate old (before version 1.9) data to a newer format that
  * doesn't allow the default role to be stored with the rest of
@@ -315,13 +336,11 @@ function shibboleth_migrate_old_data() {
 	 */
 	$roles = get_site_option( 'shibboleth_roles', array() );
 	if ( isset( $roles['default'] ) && '' !== $roles['default'] ) {
-		update_site_option( 'shibboleth_testing', '1' );
 		update_site_option( 'shibboleth_default_role', $roles['default'] );
 		update_site_option( 'shibboleth_create_accounts', true );
 		unset( $roles['default'] );
 		update_site_option( 'shibboleth_roles', $roles );
 	} elseif ( isset( $roles['default'] ) && '' === $roles['default'] ) {
-		update_site_option( 'shibboleth_testing', '2' );
 		update_site_option( 'shibboleth_default_role', 'subscriber' );
 		update_site_option( 'shibboleth_create_accounts', false );
 		unset( $roles['default'] );
@@ -348,6 +367,33 @@ function shibboleth_migrate_old_data() {
 	if ( $default_login ) {
 		update_site_option( 'shibboleth_default_to_shib_login', $default_login );
 		delete_site_option( 'shibboleth_default_login' );
+	}
+
+	/**
+	 * Convert from single to multiple IdP support.
+	 *
+	 * @since 2.5.0
+	 */
+	$idps = get_site_option( 'shibboleth_idps', array() );
+	if ( empty( $idps ) ) {
+		$button_text = get_site_option( 'shibboleth_button_text', '' );
+		if ( 'Log in with Shibboleth' === $button_text ) {
+			$button_text = '';
+		}
+
+		$idps['preset'] = array(
+			'entity_id' => '',
+			'password_change_url' => get_site_option( 'shibboleth_password_change_url', '' ),
+			'password_reset_url' => get_site_option( 'shibboleth_password_reset_url', '' ),
+			'button_text' => $button_text,
+		);
+		update_site_option( 'shibboleth_idps', $idps );
+		delete_site_option( 'shibboleth_password_change_url' );
+		delete_site_option( 'shibboleth_password_reset_url' );
+		delete_site_option( 'shibboleth_button_text' );
+
+		// Update existing users to have the new IdP code value.
+		shibboleth_update_idp_users( 'preset', '1' );
 	}
 }
 
@@ -426,12 +472,19 @@ function shibboleth_authenticate( $user, $username, $password ) {
 	if ( shibboleth_session_active() ) {
 		return shibboleth_authenticate_user();
 	} else {
+		$idps = shibboleth_getoption( 'shibboleth_idps' );
+		$idp = key( $idps );
+		$redirect_to = null;
+
+		if ( isset( $_REQUEST['idp'] ) ) {
+			$idp = sanitize_text_field( wp_unslash( $_REQUEST['idp'] ) );
+		}
+
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
 			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
-			$initiator_url = shibboleth_session_initiator_url( $redirect_to );
-		} else {
-			$initiator_url = shibboleth_session_initiator_url();
 		}
+
+		$initiator_url = shibboleth_session_initiator_url( $redirect_to, $idp );
 		wp_redirect( $initiator_url );
 		exit;
 	}
@@ -449,6 +502,41 @@ function shibboleth_login_form_shibboleth() {
 }
 add_action( 'login_form_shibboleth', 'shibboleth_login_form_shibboleth' );
 
+/**
+ * Get the associated password reset URL for the user.
+ *
+ * @since 2.5.0
+ * @param string $user_login Username.
+ * @return ?string
+ */
+function shibboleth_get_password_reset_url( $user_login ) {
+	$user_idp = '';
+
+	$idps = shibboleth_getoption( 'shibboleth_idps' );
+
+	if ( ! empty( $user_login ) ) {
+		$user = get_user_by( 'login', $user_login );
+		if ( $user ) {
+			$user_idp = shibboleth_get_user_idp( $user->ID );
+
+			if ( empty( $user_idp ) ) {
+				return null;
+			}
+		}
+	} elseif ( count( $idps ) === 1 ) {
+		// If there is only one IdP, we can use it as the default.
+		$user_idp = key( $idps );
+	}
+
+	// Use the provided constant for all Shibboleth accounts.
+	if ( defined( 'SHIBBOLETH_PASSWORD_RESET_URL' ) ) {
+		return SHIBBOLETH_PASSWORD_RESET_URL;
+	}
+
+	if ( ! empty( $user_idp ) && isset( $idps[ $user_idp ] ) ) {
+		return $idps[ $user_idp ]['password_reset_url'];
+	}
+}
 
 /**
  * If a Shibboleth user requests a password reset, and the Shibboleth password
@@ -458,14 +546,11 @@ add_action( 'login_form_shibboleth', 'shibboleth_login_form_shibboleth' );
  * @param string $user_login Username.
  */
 function shibboleth_retrieve_password( $user_login ) {
-	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url' );
+	$password_reset_url = shibboleth_get_password_reset_url( $user_login );
 
 	if ( ! empty( $password_reset_url ) ) {
-		$user = get_user_by( 'login', $user_login );
-		if ( $user && get_user_meta( $user->ID, 'shibboleth_account' ) ) {
-			wp_redirect( $password_reset_url );
-			exit;
-		}
+		wp_redirect( $password_reset_url );
+		exit;
 	}
 }
 add_action( 'retrieve_password', 'shibboleth_retrieve_password' );
@@ -482,8 +567,15 @@ function shibboleth_login_url( $login_url ) {
 	$default = shibboleth_getoption( 'shibboleth_default_to_shib_login' );
 
 	if ( $default ) {
-		$login_url = add_query_arg( 'action', 'shibboleth', $login_url );
+		$idps = shibboleth_getoption( 'shibboleth_idps' );
+
+		// Only send people directly to Shibboleth if there is only 1 IdP.
+		if ( count( $idps ) === 1 ) {
+			$login_url = add_query_arg( 'action', 'shibboleth', $login_url );
+			$login_url = add_query_arg( 'idp', key( $idps ), $login_url );
+		}
 	}
+
 	return $login_url;
 }
 add_filter( 'login_url', 'shibboleth_login_url' );
@@ -510,12 +602,12 @@ add_action( 'wp_logout', 'shibboleth_logout', 20 );
  * Generate the URL to initiate Shibboleth login.
  *
  * @param string $redirect the final URL to redirect the user to after all login is complete.
+ * @param string $idp_code The chosen IdP to use for the login process.
  * @return the URL to direct the user to in order to initiate Shibboleth login
  * @uses apply_filters() Calls 'shibboleth_session_initiator_url' before returning session intiator URL
  * @since 1.3
  */
-function shibboleth_session_initiator_url( $redirect = null ) {
-
+function shibboleth_session_initiator_url( $redirect = null, $idp_code = null ) {
 	// first build the target URL.  This is the WordPress URL the user will be returned to after Shibboleth
 	// is done, and will handle actually logging the user into WordPress using the data provided by Shibboleth.
 	if ( function_exists( 'switch_to_blog' ) ) {
@@ -542,6 +634,11 @@ function shibboleth_session_initiator_url( $redirect = null ) {
 
 	$initiator_url = add_query_arg( 'target', rawurlencode( $target ), $initiator_url );
 
+	$idps = shibboleth_getoption( 'shibboleth_idps' );
+	if ( isset( $idps[ $idp_code ] ) && $idps[ $idp_code ]['entity_id'] ) {
+		$initiator_url = add_query_arg( 'entityID', rawurlencode( $idps[ $idp_code ]['entity_id'] ), $initiator_url );
+	}
+
 	$initiator_url = apply_filters( 'shibboleth_session_initiator_url', $initiator_url );
 
 	return $initiator_url;
@@ -561,9 +658,63 @@ function shibboleth_log_message( $message_type, $message ) {
 		$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
 	}
 
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG || in_array( $message_type, $shib_logging, true ) ) {
+	if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || in_array( $message_type, $shib_logging, true ) ) {
 		error_log( '[Shibboleth WordPress Plugin Logging] ' . $message );
 	}
+}
+
+/**
+ * Get a user's Shibboleth IdP.
+ *
+ * @param int $user_id The ID of the user.
+ * @return string
+ * @since 2.5.0
+ */
+function shibboleth_get_user_idp( $user_id ) {
+	return get_user_meta( $user_id, 'shibboleth_account', true );
+}
+
+/**
+ * Set a user's Shibboleth IdP.
+ *
+ * @param int    $user_id The ID of the user.
+ * @param string $user_idp IdP short label.
+ * @return bool
+ * @since 2.5.0
+ */
+function shibboleth_set_user_idp( $user_id, $user_idp = null ) {
+	if ( empty( $user_idp ) ) {
+		$default_idp = null;
+
+		// Allow the environment variable name to be overriden.
+		$entity_id_env_var = 'Shib-Identity-Provider';
+		if ( defined( 'SHIBBOLETH_IDP_ENV_VAR' ) ) {
+			$entity_id_env_var = SHIBBOLETH_IDP_ENV_VAR;
+		}
+
+		$session_entity_id = shibboleth_getenv( $entity_id_env_var );
+
+		$idps = get_site_option( 'shibboleth_idps', array() );
+
+		foreach ( $idps as $idp_code => $idp_config ) {
+			if ( empty( $idp_config['entity_id'] ) ) {
+				$default_idp = $idp_code;
+			} elseif ( ! empty( $session_entity_id ) && $idp_config['entity_id'] === $session_entity_id ) {
+				$user_idp = $idp_code;
+			}
+		}
+
+		if ( empty( $user_idp ) ) {
+			$user_idp = $default_idp;
+		}
+	}
+
+	if ( ! empty( $user_idp ) ) {
+		update_user_meta( $user_id, 'shibboleth_account', $user_idp );
+		return true;
+	}
+
+	return false;
 }
 
 /**
@@ -641,7 +792,7 @@ function shibboleth_authenticate_user() {
 	}
 
 	// if this account is not a Shibboleth account, then do account combine (if allowed).
-	if ( is_object( $user ) && $user->ID && ! get_user_meta( $user->ID, 'shibboleth_account' ) ) {
+	if ( is_object( $user ) && $user->ID && ! shibboleth_get_user_idp( $user->ID ) ) {
 		$do_account_combine = false;
 		if ( 'username' === $user_by && ( 'allow' === $auto_combine_accounts || 'allow' === $manually_combine_accounts ) ) {
 			$do_account_combine = true;
@@ -650,8 +801,12 @@ function shibboleth_authenticate_user() {
 		}
 
 		if ( $do_account_combine ) {
-			update_user_meta( $user->ID, 'shibboleth_account', true );
-			shibboleth_log_message( 'account_merge', 'SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') merged accounts automatically.' );
+			if ( shibboleth_set_user_idp( $user->ID ) ) {
+				shibboleth_log_message( 'account_merge', 'SUCCESS: User ' . $user->user_login . ' (ID: ' . $user->ID . ') merged accounts automatically.' );
+			} else {
+				shibboleth_log_message( 'account_merge', 'ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to automatically merge accounts. Reason: Unable to automatically determine IdP.' );
+				return new WP_Error( 'missing_data', __( 'Failed to match Identity Provider.', 'shibboleth' ) );
+			}
 		} elseif ( 'username' === $user_by ) {
 			shibboleth_log_message( 'account_merge', 'ERROR: User ' . $user->user_login . ' (ID: ' . $user->ID . ') failed to automatically merge accounts. Reason: An account already exists with this username.' );
 			return new WP_Error( 'invalid_username', __( 'An account already exists with this username.', 'shibboleth' ) );
@@ -722,7 +877,9 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 			return new WP_Error( 'account_create_failed', $user_id->get_error_message() );
 		} else {
 			$user = new WP_User( $user_id );
-			update_user_meta( $user->ID, 'shibboleth_account', true );
+			shibboleth_set_user_idp( $user->ID );
+
+			wp_new_user_notification( $user_id );
 
 			// always update user data and role on account creation.
 			shibboleth_update_user_data( $user->ID, true );
@@ -866,6 +1023,20 @@ function shibboleth_update_user_data( $user_id, $force_update = false ) {
 add_filter( 'shibboleth_user_nicename', 'sanitize_title' );
 
 /**
+ * Enqueue styles for the Shibboleth WordPress admin pages.
+ *
+ * @param string $hook_suffix The current admin page.
+ */
+function shibboleth_admin_enqueue_scripts( $hook_suffix ) {
+	if ( 'settings_page_shibboleth-options' !== $hook_suffix ) {
+		return;
+	}
+
+	wp_enqueue_style( 'shibboleth-options', plugins_url( 'assets/css/shibboleth-options.css', __FILE__ ), array(), SHIBBOLETH_PLUGIN_VERSION );
+}
+add_action( 'admin_enqueue_scripts', 'shibboleth_admin_enqueue_scripts' );
+
+/**
  * Enqueues scripts and styles necessary for the Shibboleth button.
  *
  * @since 2.0
@@ -912,11 +1083,10 @@ add_action( 'login_init', 'shibboleth_disable_login' );
  */
 function shibboleth_disable_login_form() {
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
-	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
-
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 
 	if ( $disable && ! $bypass ) {
+		$password_reset_url = shibboleth_get_password_reset_url( '' );
 		?>
 		<style type="text/css">
 			.login #loginform p,
@@ -941,7 +1111,7 @@ add_action( 'login_enqueue_scripts', 'shibboleth_disable_login_form' );
  * @since 2.1
  */
 function shibboleth_custom_password_reset_url( $url ) {
-	$password_reset_url = shibboleth_getoption( 'shibboleth_password_reset_url', false );
+	$password_reset_url = shibboleth_get_password_reset_url( '' );
 
 	if ( $password_reset_url ) {
 		return $password_reset_url;
@@ -966,12 +1136,26 @@ function shibboleth_login_form() {
 	}
 	$login_url = add_query_arg( 'action', 'shibboleth', $url );
 	$login_url = remove_query_arg( 'reauth', $login_url );
-	$button_text = shibboleth_getoption( 'shibboleth_button_text', __( 'Log in with Shibboleth', 'shibboleth' ) );
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
-	?>
-	<div id="shibboleth-wrap" <?php echo $disable ? 'style="margin-top:0;"' : ''; ?>>
+
+	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
+
+	$first = true;
+
+	foreach ( $idps as $idp_code => $idp ) {
+		$idp_login_url = add_query_arg( 'idp', $idp_code, $login_url );
+
+		if ( defined( 'SHIBBOLETH_BUTTON_TEXT' ) && SHIBBOLETH_BUTTON_TEXT ) {
+			$button_text = SHIBBOLETH_BUTTON_TEXT;
+		} elseif ( ! empty( $idp['button_text'] ) ) {
+			$button_text = $idp['button_text'];
+		} else {
+			$button_text = __( 'Log in with Shibboleth', 'shibboleth' );
+		}
+		?>
+	<div class="shibboleth-wrap" <?php echo ( $first && $disable ) ? 'style="margin-top:0;"' : ''; ?>>
 		<?php
-		if ( ! $disable ) {
+		if ( $first && ! $disable ) {
 			?>
 			<div class="shibboleth-or">
 				<span><?php esc_html_e( 'Or', 'shibboleth' ); ?></span>
@@ -979,12 +1163,14 @@ function shibboleth_login_form() {
 			<?php
 		}
 		?>
-		<a href="<?php echo esc_url( $login_url ); ?>" rel="nofollow" class="shibboleth-button button button-primary default">
+		<a href="<?php echo esc_url( $idp_login_url ); ?>" rel="nofollow" class="shibboleth-button button button-primary default">
 			<span class="shibboleth-icon"></span>
 			<?php echo esc_html( $button_text ); ?>
 		</a>
 	</div>
-	<?php
+		<?php
+		$first = false;
+	}
 }
 add_action( 'login_form', 'shibboleth_login_form' );
 

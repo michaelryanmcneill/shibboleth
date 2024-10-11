@@ -7,11 +7,10 @@
 
 jQuery( document ).ready(
 	function ( $ ) {
-		var body = $( 'body' ),
-			userLogin = $( '#user_login' ),
-			ssoWrap   = $( '#shibboleth-wrap' ),
+		const body = $( 'body' ),
+			ssoWrap = $( '.shibboleth-wrap' ),
 			loginForm = $( '#loginform' ),
-			overflow  = $( '<div class="shibboleth-clear"></div>' );
+			overflow = $( '<div class="shibboleth-clear"></div>' );
 
 		// The overflow div is a poor man's clearfloat. We reposition the remember me
 		// checkbox and the submit button within that to clear the float on the
