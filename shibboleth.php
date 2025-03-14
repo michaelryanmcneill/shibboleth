@@ -12,7 +12,7 @@
  * Version: 2.5.0
  * Requires PHP: 5.6
  * Requires at least: 4.0
- * License: Apache 2 (https://www.apache.org/licenses/LICENSE-2.0.html)
+ * License: Apache-2.0
  * Text Domain: shibboleth
  */
 
