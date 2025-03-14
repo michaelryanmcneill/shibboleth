@@ -14,9 +14,9 @@
  */
 function shibboleth_admin_tabs( $current = 'general' ) {
 	$tabs = array(
-		'general' => __( 'General' ),
+		'general' => __( 'General', 'shibboleth' ),
 		'idps' => __( 'Identity Providers', 'shibboleth' ),
-		'user' => __( 'User' ),
+		'user' => __( 'User', 'shibboleth' ),
 		'authorization' => __( 'Authorization', 'shibboleth' ),
 		'logging' => __( 'Logging', 'shibboleth' ),
 	);
@@ -60,12 +60,12 @@ add_action( 'network_admin_menu', 'shibboleth_network_admin_panels' );
  */
 function shibboleth_header_fields() {
 	return array(
-		'username' => __( 'Username' ),
-		'first_name' => __( 'First Name' ),
-		'last_name' => __( 'Last Name' ),
-		'nickname' => __( 'Nickname' ),
+		'username' => __( 'Username', 'shibboleth' ),
+		'first_name' => __( 'First Name', 'shibboleth' ),
+		'last_name' => __( 'Last Name', 'shibboleth' ),
+		'nickname' => __( 'Nickname', 'shibboleth' ),
 		'display_name' => __( 'Display name', 'shibboleth' ),
-		'email' => __( 'Email' ),
+		'email' => __( 'Email', 'shibboleth' ),
 	);
 }
 
@@ -816,7 +816,7 @@ function shibboleth_options_authorization() {
 		<col></col>
 		<thead>
 			<tr>
-				<th scope="col"><?php esc_html_e( 'Role' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Role', 'shibboleth' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Header Name', 'shibboleth' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Header Value', 'shibboleth' ); ?></th>
 			</tr>
@@ -1017,7 +1017,7 @@ function shibboleth_options_page() {
 	wp_nonce_field( 'shibboleth_update_options' );
 	?>
 			<p class="submit">
-				<input type="submit" name="submit" class="button-primary" value="<?php esc_html_e( 'Save Changes' ); ?>" />
+				<input type="submit" name="submit" class="button-primary" value="<?php esc_html_e( 'Save Changes', 'shibboleth' ); ?>" />
 			</p>
 		</form>
 	</div>

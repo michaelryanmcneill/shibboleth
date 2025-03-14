@@ -890,7 +890,7 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
 		}
 	} else {
 		shibboleth_log_message( 'auth', 'ERROR: User account does not exist and account creation is disabled.' );
-		return new WP_Error( 'no_access', __( 'You do not have sufficient access.' ) );
+		return new WP_Error( 'no_access', __( 'You do not have sufficient access.', 'shibboleth' ) );
 	}
 }
 
