@@ -55,7 +55,7 @@ function shibboleth_disable_managed_fields() {
 		echo "
 		<script type=\"text/javascript\">
 			jQuery(function () {
-				jQuery('" . esc_attr( $selectors ) . "').attr('disabled', true);
+				jQuery('" . esc_attr( $selectors ) . "').attr('readonly', true);
 				jQuery('#first_name')
 					.parents('.form-table')
 					.before(
@@ -64,9 +64,9 @@ function shibboleth_disable_managed_fields() {
 						. "</p></div>'
 					);
 				jQuery('form#your-profile').submit(function () {
-					jQuery('" . esc_attr( $selectors ) . "').attr('disabled', false);
+					jQuery('" . esc_attr( $selectors ) . "').attr('readonly', false);
 				});
-				if (jQuery('#email').is(':disabled')) {
+				if (jQuery('#email').is(':readonly')) {
 					jQuery('#email-description').hide();
 				}
 			});
