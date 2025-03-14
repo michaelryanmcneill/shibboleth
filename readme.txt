@@ -188,13 +188,13 @@ This update increases the minimum PHP version to 5.6 and the minimum WordPress v
 This update re-implements a previously reverted <IfModule> conditional for three aliases of the Shibboleth Apache module: `mod_shib`, `mod_shib.c`, and `mod_shib.cpp`. If you run into issues related to this change, please open an issue on [GitHub](https://github.com/michaelryanmcneill/shibboleth/issues).
 
 = 2.0.2 =
-This update brings with it a major change to the way Shibboleth attributes are accessed from versions less than 2.0. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 = 2.0.1 =
-This update brings with it a major change to the way Shibboleth attributes are accessed from versions less than 2.0. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 = 2.0 =
-This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
 = version 2.5.0 (2024-10-11) =
