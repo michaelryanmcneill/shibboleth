@@ -83,6 +83,10 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
  * @return string|bool
  */
 function shibboleth_getenv( $var ) {
+	if ( empty( $var ) ) {
+		return false;
+	}
+
 	// Get the specified shibboleth attribute access method; if one isn't specified
 	// simply use standard environment variables since they're the safest.
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
@@ -423,7 +427,10 @@ function shibboleth_session_active( $auto_login = false ) {
 	$active = false;
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method' );
 	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
-	$session = shibboleth_getenv( $shib_headers['username']['name'] );
+	$session = null;
+	if ( isset( $shib_headers['username']['name'] ) ) {
+		$session = shibboleth_getenv( $shib_headers['username']['name'] );
+	}
 
 	if ( $session && 'http' !== $method ) {
 		$active = true;
