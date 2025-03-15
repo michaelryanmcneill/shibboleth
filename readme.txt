@@ -133,9 +133,8 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Available options: `true` to prevent users logging in using WordPress local authentication or `false` allow WordPress local authentication AND Shibboleth authentication.
    - Example: `define('SHIBBOLETH_DISABLE_LOCAL_AUTH', true);`
  - `SHIBBOLETH_HEADERS`
-   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Format: array (>= PHP 5.6)
    - Available options: none
-   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_HEADERS', serialize( array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) ) ) );`
    - PHP 5.6 (and above) example: `const SHIBBOLETH_HEADERS = array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_HEADERS', array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) ) );`
  - `SHIBBOLETH_CREATE_ACCOUNTS`
@@ -151,9 +150,8 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Available options: `'disallow'` for the default "Prevent Manual Account Merging" option, `'allow'` for the "Allow Manual Account Merging" option, and `'bypass'` for the "Allow Manual Account Merging (Bypass Username Management)" option.
    - Example: `define('SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS', 'disallow');`
  - `SHIBBOLETH_ROLES`
-   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Format: array (>= PHP 5.6)
    - Available options: none
-   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_ROLES', serialize( array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) ) );`
    - PHP 5.6 (and above) example: `const SHIBBOLETH_ROLES = array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_ROLES', array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) );`
  - `SHIBBOLETH_DEFAULT_ROLE`
@@ -165,9 +163,8 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Available options: `true` to automatically use Shibboleth data to update user role mappings each time the user logs in or `false` to only update role mappings when a user is initally created.
    - Example: `define('SHIBBOLETH_UPDATE_ROLES', true);`
  - `SHIBBOLETH_LOGGING`
-   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Format: array (>= PHP 5.6)
    - Available options: account_merge, account_create, auth, role_update
-   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_LOGGING', serialize( array( 'account_merge', 'account_create', 'auth', 'role_update' ) ) );`
    - PHP 5.6 (and above) example: `const SHIBBOLETH_LOGGING = array( 'account_merge', 'account_create', 'auth', 'role_update' );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_LOGGING', array( 'account_merge', 'account_create', 'auth', 'role_update' ) );`
  - `SHIBBOLETH_DISALLOW_FILE_MODS`
