@@ -2,7 +2,7 @@
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz, masteradhoc, junaidkbr
 Tags: shibboleth, authentication, login, saml
 Requires at least: 4.0
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 5.6
 Stable tag: 2.5.0
 License: Apache-2.0
