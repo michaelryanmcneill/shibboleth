@@ -2,9 +2,10 @@
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz, masteradhoc, junaidkbr
 Tags: shibboleth, authentication, login, saml
 Requires at least: 4.0
-Tested up to: 6.4
+Tested up to: 6.7
 Requires PHP: 5.6
 Stable tag: 2.5.0
+License: Apache-2.0
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
 
@@ -132,9 +133,8 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Available options: `true` to prevent users logging in using WordPress local authentication or `false` allow WordPress local authentication AND Shibboleth authentication.
    - Example: `define('SHIBBOLETH_DISABLE_LOCAL_AUTH', true);`
  - `SHIBBOLETH_HEADERS`
-   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Format: array (>= PHP 5.6)
    - Available options: none
-   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_HEADERS', serialize( array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) ) ) );`
    - PHP 5.6 (and above) example: `const SHIBBOLETH_HEADERS = array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_HEADERS', array( 'username' => array( 'name' => 'eppn' ), 'first_name' => array( 'name' => 'givenName', 'managed' => 'on' ), 'last_name' => array( 'name' => 'sn', 'managed' => 'on' ), 'nickname' => array( 'name' => 'eppn', 'managed' => 'off' ), 'display_name' => array( 'name' => 'displayName', 'managed' => 'off' ), 'email' => array( 'name' => 'mail', 'managed' => 'on' ) ) );`
  - `SHIBBOLETH_CREATE_ACCOUNTS`
@@ -150,9 +150,8 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Available options: `'disallow'` for the default "Prevent Manual Account Merging" option, `'allow'` for the "Allow Manual Account Merging" option, and `'bypass'` for the "Allow Manual Account Merging (Bypass Username Management)" option.
    - Example: `define('SHIBBOLETH_MANUALLY_COMBINE_ACCOUNTS', 'disallow');`
  - `SHIBBOLETH_ROLES`
-   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Format: array (>= PHP 5.6)
    - Available options: none
-   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_ROLES', serialize( array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) ) );`
    - PHP 5.6 (and above) example: `const SHIBBOLETH_ROLES = array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_ROLES', array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) );`
  - `SHIBBOLETH_DEFAULT_ROLE`
@@ -164,9 +163,8 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Available options: `true` to automatically use Shibboleth data to update user role mappings each time the user logs in or `false` to only update role mappings when a user is initally created.
    - Example: `define('SHIBBOLETH_UPDATE_ROLES', true);`
  - `SHIBBOLETH_LOGGING`
-   - Format: array (>= PHP 5.6) OR serialized string (< PHP 5.6)
+   - Format: array (>= PHP 5.6)
    - Available options: account_merge, account_create, auth, role_update
-   - PHP 5.5 (and earlier) example: `define( 'SHIBBOLETH_LOGGING', serialize( array( 'account_merge', 'account_create', 'auth', 'role_update' ) ) );`
    - PHP 5.6 (and above) example: `const SHIBBOLETH_LOGGING = array( 'account_merge', 'account_create', 'auth', 'role_update' );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_LOGGING', array( 'account_merge', 'account_create', 'auth', 'role_update' ) );`
  - `SHIBBOLETH_DISALLOW_FILE_MODS`
@@ -188,13 +186,13 @@ This update increases the minimum PHP version to 5.6 and the minimum WordPress v
 This update re-implements a previously reverted <IfModule> conditional for three aliases of the Shibboleth Apache module: `mod_shib`, `mod_shib.c`, and `mod_shib.cpp`. If you run into issues related to this change, please open an issue on [GitHub](https://github.com/michaelryanmcneill/shibboleth/issues).
 
 = 2.0.2 =
-This update brings with it a major change to the way Shibboleth attributes are accessed from versions less than 2.0. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 = 2.0.1 =
-This update brings with it a major change to the way Shibboleth attributes are accessed from versions less than 2.0. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 = 2.0 =
-This update brings with it a major change to the way Shibboleth attributes are accessed. For most users, no additional configuration will be necessary. If you are using a specialized server configuration, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that results in environment variables being sent with the prefix REDIRECT_, you should see the changelog for additional details: https://wordpress.org/plugins/shibboleth/#developers
+Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
 = version 2.5.0 (2024-10-11) =

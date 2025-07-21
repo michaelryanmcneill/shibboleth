@@ -55,7 +55,7 @@ function shibboleth_disable_managed_fields() {
 		echo "
 		<script type=\"text/javascript\">
 			jQuery(function () {
-				jQuery('" . esc_attr( $selectors ) . "').attr('disabled', true);
+				jQuery('" . esc_attr( $selectors ) . "').attr('readonly', true);
 				jQuery('#first_name')
 					.parents('.form-table')
 					.before(
@@ -64,9 +64,9 @@ function shibboleth_disable_managed_fields() {
 						. "</p></div>'
 					);
 				jQuery('form#your-profile').submit(function () {
-					jQuery('" . esc_attr( $selectors ) . "').attr('disabled', false);
+					jQuery('" . esc_attr( $selectors ) . "').attr('readonly', false);
 				});
-				if (jQuery('#email').is(':disabled')) {
+				if (jQuery('#email').is(':readonly')) {
 					jQuery('#email-description').hide();
 				}
 			});
@@ -313,20 +313,20 @@ add_action( 'current_screen', 'shibboleth_disable_password_changes' );
  * @since 1.9
  */
 function shibboleth_link_accounts_notice() {
-	if ( isset( $_GET['shibboleth'] ) ) {
-		if ( 'failed' === $_GET['shibboleth'] ) {
-			$class = 'notice notice-error';
-			$message = __( 'Your account was unable to be linked with Shibboleth.', 'shibboleth' );
-		} elseif ( 'linked' === $_GET['shibboleth'] ) {
-			$class = 'notice notice-success is-dismissible';
-			$message = __( 'Your account has been linked with Shibboleth.', 'shibboleth' );
-		} elseif ( 'duplicate' === $_GET['shibboleth'] ) {
-			$class = 'notice notice-info is-dismissible';
-			$message = __( 'Your account is already linked with Shibboleth.', 'shibboleth' );
-		} else {
-			$class = '';
-			$message = '';
-		}
+	$message_code = isset( $_GET['shibboleth'] ) ? sanitize_key( wp_unslash( $_GET['shibboleth'] ) ) : '';
+
+	if ( 'failed' === $message_code ) {
+		$class = 'notice notice-error';
+		$message = __( 'Your account was unable to be linked with Shibboleth.', 'shibboleth' );
+	} elseif ( 'linked' === $message_code ) {
+		$class = 'notice notice-success is-dismissible';
+		$message = __( 'Your account has been linked with Shibboleth.', 'shibboleth' );
+	} elseif ( 'duplicate' === $message_code ) {
+		$class = 'notice notice-info is-dismissible';
+		$message = __( 'Your account is already linked with Shibboleth.', 'shibboleth' );
+	}
+
+	if ( isset( $message ) ) {
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}
 }
