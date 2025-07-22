@@ -88,7 +88,7 @@ function shibboleth_change_password_profile_link() {
 		if ( defined( 'SHIBBOLETH_PASSWORD_CHANGE_URL' ) ) {
 			$password_change_url = SHIBBOLETH_PASSWORD_CHANGE_URL;
 		} else {
-			$idps = shibboleth_getoption( 'shibboleth_idps' );
+			$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 
 			if ( isset( $idps[ $user_idp ] ) ) {
 				$password_change_url = $shibboleth_idps[ $user_idp ]['password_change_url'];

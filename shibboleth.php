@@ -479,7 +479,7 @@ function shibboleth_authenticate( $user, $username, $password ) {
 	if ( shibboleth_session_active() ) {
 		return shibboleth_authenticate_user();
 	} else {
-		$idps = shibboleth_getoption( 'shibboleth_idps' );
+		$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 		$idp = key( $idps );
 		$redirect_to = null;
 
@@ -519,7 +519,7 @@ add_action( 'login_form_shibboleth', 'shibboleth_login_form_shibboleth' );
 function shibboleth_get_password_reset_url( $user_login ) {
 	$user_idp = '';
 
-	$idps = shibboleth_getoption( 'shibboleth_idps' );
+	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 
 	if ( ! empty( $user_login ) ) {
 		$user = get_user_by( 'login', $user_login );
@@ -574,7 +574,7 @@ function shibboleth_login_url( $login_url ) {
 	$default = shibboleth_getoption( 'shibboleth_default_to_shib_login' );
 
 	if ( $default ) {
-		$idps = shibboleth_getoption( 'shibboleth_idps' );
+		$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 
 		// Only send people directly to Shibboleth if there is only 1 IdP.
 		if ( count( $idps ) === 1 ) {
@@ -641,7 +641,7 @@ function shibboleth_session_initiator_url( $redirect = null, $idp_code = null ) 
 
 	$initiator_url = add_query_arg( 'target', rawurlencode( $target ), $initiator_url );
 
-	$idps = shibboleth_getoption( 'shibboleth_idps' );
+	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 	if ( isset( $idps[ $idp_code ] ) && $idps[ $idp_code ]['entity_id'] ) {
 		$initiator_url = add_query_arg( 'entityID', rawurlencode( $idps[ $idp_code ]['entity_id'] ), $initiator_url );
 	}
