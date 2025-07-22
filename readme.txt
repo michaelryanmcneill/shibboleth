@@ -4,7 +4,7 @@ Tags: shibboleth, authentication, login, saml
 Requires at least: 4.0
 Tested up to: 6.8
 Requires PHP: 5.6
-Stable tag: 2.5.1
+Stable tag: 2.5.2
 License: Apache-2.0
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
@@ -195,6 +195,9 @@ Accessing Shibboleth attributes has changed. Typically, no additional configurat
 Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
+= version 2.5.2 (2025-07-22) =
+ - Compatibility: PHP 8.0 and newer require count() argument to be countable [#108](https://github.com/michaelryanmcneill/shibboleth/issues/108) (thanks @Gameink, @frereut)
+
 = version 2.5.1 (2025-07-21) =
  - Compatibility: Fix profile save on WordPress 6.6 [#104](https://github.com/michaelryanmcneill/shibboleth/pull/104) (thanks @MadtownLems)
 
