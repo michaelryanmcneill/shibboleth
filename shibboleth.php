@@ -95,9 +95,8 @@ function shibboleth_getenv( $var ) {
 	switch ( $method ) {
 		// Use standard by default for security.
 		case 'standard':
+		default:
 			$var_method = '';
-			// Disable fallback to prevent the same variables from being checked twice.
-			$fallback = false;
 			break;
 		// If specified, use redirect.
 		case 'redirect':
@@ -112,11 +111,11 @@ function shibboleth_getenv( $var ) {
 			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
 			$var_method = $custom;
 			break;
-		// Otherwise, fall back to standard for security.
-		default:
-			$var_method = '';
-			// Disable fallback to prevent the same variables from being checked twice.
-			$fallback = false;
+	}
+
+	// Disable fallback to prevent the same variables from being checked twice.
+	if ( empty( $var_method ) ) {
+		$fallback = false;
 	}
 
 	// Using the selected attribute access method, check all possible cases.
@@ -364,7 +363,7 @@ function shibboleth_migrate_old_data() {
 	}
 	$spoofkey = get_site_option( 'shibboleth_spoofkey' );
 	if ( $spoofkey ) {
-		update_site_option( 'shibboleth_spoof_key', $attribute_access );
+		update_site_option( 'shibboleth_spoof_key', $spoofkey );
 		delete_site_option( 'shibboleth_spoofkey' );
 	}
 	$default_login = get_site_option( 'shibboleth_default_login' );
@@ -432,26 +431,29 @@ function shibboleth_session_active( $auto_login = false ) {
 		$session = shibboleth_getenv( $shib_headers['username']['name'] );
 	}
 
-	if ( $session && 'http' !== $method ) {
-		$active = true;
-	} elseif ( $session && 'http' === $method ) {
-		/**
-		 * Handling HTTP header cases with a spoofkey to better protect against
-		 * HTTP header spoofing.
-		 *
-		 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
-		 */
-		$spoofkey = shibboleth_getoption( 'shibboleth_spoof_key' );
-		$shibboleth_auto_login = shibboleth_getoption( 'shibboleth_auto_login' );
+	if ( $session ) {
+		if ( 'http' === $method ) {
+			/**
+			 * Check spoofkey to provide some protection against HTTP header spoofing.
+			 *
+			 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
+			 */
+			$spoofkey = shibboleth_getoption( 'shibboleth_spoof_key' );
 
-		if ( false !== $spoofkey && '' !== $spoofkey ) {
+			if ( ! empty( $spoofkey ) ) {
+				$checkkey = shibboleth_getenv( 'Shib-Spoof-Check' );
+				if ( $checkkey === $spoofkey ) {
+					$active = true;
+				}
+			}
+
+			// Deprecated: No spoofkey or spoofkey bypass is active. This is strongly discouraged!
 			$bypass = defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING;
-			$checkkey = shibboleth_getenv( 'Shib-Spoof-Check' );
-			if ( $checkkey === $spoofkey || $bypass ) {
+			if ( empty( $spoofkey ) || $bypass ) {
 				$active = true;
-			} elseif ( $auto_login ) {
-				$active = false;
-			} else {
+			}
+
+			if ( ! $active && ! $auto_login ) {
 				wp_die( esc_html( __( 'The Shibboleth request you submitted failed validation. Please contact your site administrator for further assistance.', 'shibboleth' ) ) );
 			}
 		} else {
