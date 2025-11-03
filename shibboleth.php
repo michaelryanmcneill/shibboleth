@@ -931,15 +931,12 @@ function shibboleth_get_user_role() {
 	$user_role = shibboleth_getoption( 'shibboleth_default_role' );
 
 	foreach ( $roles->role_names as $key => $name ) {
-		if ( isset( $shib_roles[ $key ]['header'] ) ) {
-			$role_header = $shib_roles[ $key ]['header'];
-		}
-		if ( isset( $shib_roles[ $key ]['value'] ) ) {
-			$role_value = $shib_roles[ $key ]['value'];
-		}
-		if ( empty( $role_header ) || empty( $role_value ) ) {
+		if ( empty( $shib_roles[ $key ]['header'] ) || empty( $shib_roles[ $key ]['value'] ) ) {
 			continue;
 		}
+
+		$role_header = $shib_roles[ $key ]['header'];
+		$role_value = $shib_roles[ $key ]['value'];
 		$values = explode( ';', shibboleth_getenv( $role_header ) );
 		if ( in_array( $role_value, $values, true ) ) {
 			$user_role = $key;
