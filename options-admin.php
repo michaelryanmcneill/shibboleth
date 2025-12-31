@@ -6,6 +6,8 @@
  * @package shibboleth
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Setup admin tabs for the Shibboleth option page.
  *
