@@ -5,6 +5,8 @@
  * @package shibboleth
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * For WordPress accounts that were created by Shibboleth, limit what administrators and users
  * can edit via user-edit.php and profile.php.
