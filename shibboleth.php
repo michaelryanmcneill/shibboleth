@@ -9,16 +9,18 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
- * Version: 2.5.2
+ * Version: 2.5.3
  * Requires PHP: 5.6
  * Requires at least: 4.0
  * License: Apache-2.0
  * Text Domain: shibboleth
  */
 
+defined( 'ABSPATH' ) || exit;
+
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.2' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.3' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -26,8 +28,8 @@ define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.2' );
  *
  * @since 1.0
  */
-$plugin_version = get_site_option( 'shibboleth_plugin_version', '0' );
-if ( SHIBBOLETH_PLUGIN_VERSION !== $plugin_version ) {
+$shibboleth_plugin_version = get_site_option( 'shibboleth_plugin_version', '0' );
+if ( SHIBBOLETH_PLUGIN_VERSION !== $shibboleth_plugin_version ) {
 	add_action( 'admin_init', 'shibboleth_activate_plugin' );
 }
 
