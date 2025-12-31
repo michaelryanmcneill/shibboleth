@@ -491,6 +491,9 @@ function shibboleth_authenticate( $user, $username, $password ) {
 
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
 			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+
+			// Make sure the redirect is in the allowed list.
+			$redirect_to = wp_validate_redirect( $redirect_to );
 		}
 
 		$initiator_url = shibboleth_session_initiator_url( $redirect_to, $idp );
@@ -499,6 +502,28 @@ function shibboleth_authenticate( $user, $username, $password ) {
 	}
 }
 
+/**
+ * Add a filter for allowed_redirect_hosts so that safe redirects work on multisite.
+ *
+ * @since 2.5.3
+ * @param array  $hosts An array of allowed host names.
+ * @param string $host The host name of the redirect destination; empty string if not set.
+ * @return array
+ */
+function shibboleth_allowed_redirect_hosts( $hosts, $host ) {
+	// If the host is blank or already in the list, return early.
+	if ( empty( $host ) || in_array( $host, $hosts, true ) ) {
+		return $hosts;
+	}
+
+	// Check if this host belongs to any site in our Multisite network.
+	$site = get_site_by_path( $host, '/' );
+	if ( $site ) {
+		$hosts[] = $site->domain;
+	}
+
+	return $hosts;
+}
 
 /**
  * When wp-login.php is loaded with 'action=shibboleth', hook Shibboleth
@@ -508,6 +533,10 @@ function shibboleth_authenticate( $user, $username, $password ) {
  */
 function shibboleth_login_form_shibboleth() {
 	add_filter( 'authenticate', 'shibboleth_authenticate', 10, 3 );
+
+	if ( is_multisite() ) {
+		add_filter( 'allowed_redirect_hosts', 'shibboleth_allowed_redirect_hosts', 20, 2 );
+	}
 }
 add_action( 'login_form_shibboleth', 'shibboleth_login_form_shibboleth' );
 
