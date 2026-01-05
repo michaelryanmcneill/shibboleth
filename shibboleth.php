@@ -513,11 +513,15 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		$idp = key( $idps );
 		$redirect_to = null;
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_REQUEST['idp'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$idp = sanitize_text_field( wp_unslash( $_REQUEST['idp'] ) );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 
 			// Make sure the redirect is in the allowed list.

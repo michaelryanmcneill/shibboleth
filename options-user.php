@@ -316,6 +316,7 @@ add_action( 'current_screen', 'shibboleth_disable_password_changes' );
  * @since 1.9
  */
 function shibboleth_link_accounts_notice() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$message_code = isset( $_GET['shibboleth'] ) ? sanitize_key( wp_unslash( $_GET['shibboleth'] ) ) : '';
 
 	if ( 'failed' === $message_code ) {
