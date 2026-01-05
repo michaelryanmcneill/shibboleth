@@ -161,6 +161,7 @@ function shibboleth_auto_login() {
 	$shibboleth_auto_login = shibboleth_getoption( 'shibboleth_auto_login' );
 
 	if ( ! is_user_logged_in() && shibboleth_session_active( true ) && $shibboleth_auto_login ) {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'login_form_shibboleth' );
 
 		$userobj = wp_signon( '', true );
@@ -285,6 +286,7 @@ function shibboleth_update_idp_users( $new_idp_code, $old_idp_code ) {
 	// Update the shibboleth_account rows to have the new IdP code value.
 	$shibboleth_users = get_users(
 		array(
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'meta_key' => 'shibboleth_account',
 			'fields' => 'ID',
 		)
@@ -1073,8 +1075,8 @@ function shibboleth_update_user_data( $user_id, $force_update = false ) {
 			$managed = $shib_headers[ $header ]['managed'];
 		}
 		if ( $force_update || $managed ) {
-			$filter = 'shibboleth_' . ( strpos( $field, 'user_' ) === 0 ? '' : 'user_' ) . $field;
-			$user_data[ $field ] = apply_filters( $filter, shibboleth_getenv( $shib_headers[ $header ]['name'] ) );
+			$filter = ( strpos( $field, 'user_' ) === 0 ? '' : 'user_' ) . $field;
+			$user_data[ $field ] = apply_filters( 'shibboleth_' . $filter, shibboleth_getenv( $shib_headers[ $header ]['name'] ) );
 		}
 	}
 

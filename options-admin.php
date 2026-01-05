@@ -984,6 +984,7 @@ function shibboleth_options_logging() {
  * @since ?
  */
 function shibboleth_options_page() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general';
 	?>
 	<div class="wrap">
