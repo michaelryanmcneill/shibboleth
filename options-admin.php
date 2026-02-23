@@ -385,7 +385,7 @@ function shibboleth_options_idps() {
 	if ( isset( $_POST['submit'] ) ) {
 		check_admin_referer( 'shibboleth_update_options' );
 
-		$idp_options = shibboleth_getoption( 'shibboleth_idps', array(), true, false );
+		$idp_options = shibboleth_getoption( 'shibboleth_idps', array() );
 
 		if ( ! defined( 'SHIBBOLETH_IDPS' ) ) {
 			if ( isset( $_POST['idps'] ) ) {

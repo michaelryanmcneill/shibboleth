@@ -33,33 +33,30 @@ if ( SHIBBOLETH_PLUGIN_VERSION !== $plugin_version ) {
 
 /**
  * Determine if a constant is defined. If it is, return the value of the constant.
- * If it isn't, return the value from get_site_option(). If you'd like to pass a default
- * for get_site_option(), set $default to the requested default. If you'd like to check
- * for arrays in constants, set $array to true. If you'd like to return that the object
- * was obtained as a constant, set $compact to true and the result is an array. To get the
- * value of the constant or option, look at the value key. To check if the value was
- * retreived from a constant, look at the constant key.
+ * If it isn't, return the value from get_site_option().
+ * If you'd like to known whether or not the value was obtained as a constant,
+ * set $return_array to true and check the resulting array.
  *
  * @since 2.1
  * @param string $option Option identifier.
- * @param bool   $default Default value.
- * @param bool   $array If we expect the value to be an array.
- * @param bool   $compact If you want the constant and value returned as an array.
+ * @param bool   $default_value Default value.
+ * @param bool   $unused Deprecated parameter; unused.
+ * @param bool   $return_array If you want the constant and value returned as an array.
  * @return mixed
  */
-function shibboleth_getoption( $option, $default = false, $array = false, $compact = false ) {
+function shibboleth_getoption( $option, $default_value = false, $unused = false, $return_array = false ) {
 	// If a constant is defined with the provided option name, get the value of the constant.
 	if ( defined( strtoupper( $option ) ) ) {
 		$value = constant( strtoupper( $option ) );
 		$constant = true;
 	} else {
 		// If no constant is set, just get the value from get_site_option().
-		$value = get_site_option( $option, $default );
+		$value = get_site_option( $option, $default_value );
 		$constant = false;
 	}
 
-	// If compact is set to true, we compact $value and $constant together for easy use.
-	if ( $compact ) {
+	// If $return_array, we return the $value and $constant together for easy use.
+	if ( $return_array ) {
 		return array(
 			$value,
 			$constant,
@@ -427,7 +424,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 function shibboleth_session_active( $auto_login = false ) {
 	$active = false;
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method' );
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 	$session = null;
 	if ( isset( $shib_headers['username']['name'] ) ) {
 		$session = shibboleth_getenv( $shib_headers['username']['name'] );
@@ -730,7 +727,7 @@ function shibboleth_log_message( $message_type, $message ) {
 	static $shib_logging;
 
 	if ( ! isset( $shib_logging ) ) {
-		$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
+		$shib_logging = shibboleth_getoption( 'shibboleth_logging', array() );
 	}
 
 	if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || in_array( $message_type, $shib_logging, true ) ) {
@@ -812,7 +809,7 @@ function shibboleth_set_user_idp( $user_id, $user_idp = null ) {
  * @since 1.0
  */
 function shibboleth_authenticate_user() {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 	$auto_combine_accounts = shibboleth_getoption( 'shibboleth_auto_combine_accounts' );
 	$manually_combine_accounts = shibboleth_getoption( 'shibboleth_manually_combine_accounts' );
 
@@ -994,7 +991,7 @@ function shibboleth_get_user_role() {
 		}
 	}
 
-	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', array(), true ) );
+	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', array() ) );
 	$user_role = shibboleth_getoption( 'shibboleth_default_role' );
 
 	foreach ( $roles->role_names as $key => $name ) {
@@ -1024,7 +1021,7 @@ function shibboleth_get_user_role() {
  * @since 1.3
  */
 function shibboleth_get_managed_user_fields() {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 
 	$managed = array();
 
@@ -1053,7 +1050,7 @@ function shibboleth_get_managed_user_fields() {
  * @since 1.0
  */
 function shibboleth_update_user_data( $user_id, $force_update = false ) {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 
 	$user_fields = array(
 		'user_login' => 'username',

@@ -233,7 +233,7 @@ function shibboleth_link_accounts() {
 			exit;
 		}
 
-		$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+		$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 
 		$username = shibboleth_getenv( $shib_headers['username']['name'] );
 		$email = shibboleth_getenv( $shib_headers['email']['name'] );
