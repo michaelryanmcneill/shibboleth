@@ -269,7 +269,8 @@ function shibboleth_link_accounts() {
 						// If there is no existing shibboleth session, kick to the shibboleth_session_initiator_url
 						// and redirect to this page with the ?shibboleth=link action.
 						$initiator_url = shibboleth_session_initiator_url( wp_nonce_url( get_edit_user_link() . '?shibboleth=link', 'shibboleth-link' ) );
-						wp_redirect( $initiator_url );
+						shibboleth_allow_redirect( $initiator_url );
+						wp_safe_redirect( $initiator_url );
 						exit;
 					}
 					// If manual merging is disabled, fail.

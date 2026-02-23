@@ -465,6 +465,34 @@ function shibboleth_session_active( $auto_login = false ) {
 	return $active;
 }
 
+/**
+ * Add an allowed_redirect_hosts filter to trust the provided URL's host.
+ *
+ * @since 2.5.3
+ * @param string $url The trusted URL.
+ */
+function shibboleth_allow_redirect( $url ) {
+	// Note: When this plugin requires at least WordPress 4.4/4.7, we can use wp_parse_url.
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
+	$allow_host = parse_url( $url, PHP_URL_HOST );
+
+	if ( empty( $allow_host ) ) {
+		return;
+	}
+
+	add_filter(
+		'allowed_redirect_hosts',
+		function ( $hosts, $host ) use ( $allow_host ) {
+			if ( ! in_array( $allow_host, $hosts, true ) ) {
+				$hosts[] = $allow_host;
+			}
+
+			return $hosts;
+		},
+		10,
+		2
+	);
+}
 
 /**
  * Authenticate the user using Shibboleth.  If a Shibboleth session is active,
@@ -497,7 +525,8 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		}
 
 		$initiator_url = shibboleth_session_initiator_url( $redirect_to, $idp );
-		wp_redirect( $initiator_url );
+		shibboleth_allow_redirect( $initiator_url );
+		wp_safe_redirect( $initiator_url );
 		exit;
 	}
 }
@@ -587,7 +616,8 @@ function shibboleth_retrieve_password( $user_login ) {
 	$password_reset_url = shibboleth_get_password_reset_url( $user_login );
 
 	if ( ! empty( $password_reset_url ) ) {
-		wp_redirect( $password_reset_url );
+		shibboleth_allow_redirect( $password_reset_url );
+		wp_safe_redirect( $password_reset_url );
 		exit;
 	}
 }
@@ -629,7 +659,8 @@ function shibboleth_logout() {
 	$logout_url = shibboleth_getoption( 'shibboleth_logout_url' );
 
 	if ( ! empty( $logout_url ) && shibboleth_session_active() ) {
-		wp_redirect( $logout_url );
+		shibboleth_allow_redirect( $logout_url );
+		wp_safe_redirect( $logout_url );
 		exit;
 	}
 }
@@ -642,7 +673,7 @@ add_action( 'wp_logout', 'shibboleth_logout', 20 );
  * @param string $redirect the final URL to redirect the user to after all login is complete.
  * @param string $idp_code The chosen IdP to use for the login process.
  * @return the URL to direct the user to in order to initiate Shibboleth login
- * @uses apply_filters() Calls 'shibboleth_session_initiator_url' before returning session intiator URL
+ * @uses apply_filters() Calls 'shibboleth_session_initiator_url' before returning session initiator URL
  * @since 1.3
  */
 function shibboleth_session_initiator_url( $redirect = null, $idp_code = null ) {
@@ -697,6 +728,7 @@ function shibboleth_log_message( $message_type, $message ) {
 	}
 
 	if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || in_array( $message_type, $shib_logging, true ) ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( '[Shibboleth WordPress Plugin Logging] ' . $message );
 	}
 }
