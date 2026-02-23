@@ -29,9 +29,8 @@ jobs:
       run: |
         vendor/bin/phpcs -q -n --ignore=vendor --standard=WordPress --report=checkstyle $GITHUB_WORKSPACE | cs2pr
 
-    - name: Be evil and hide .eslintrc from plugin check
-      run: |
-        rm $GITHUB_WORKSPACE/.eslintrc
-
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
+      with:
+        exclude-directories: '.github'
+        exclude-files: '.eslintrc'

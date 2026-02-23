@@ -6,6 +6,8 @@
  * @package shibboleth
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Setup admin tabs for the Shibboleth option page.
  *
@@ -383,7 +385,7 @@ function shibboleth_options_idps() {
 	if ( isset( $_POST['submit'] ) ) {
 		check_admin_referer( 'shibboleth_update_options' );
 
-		$idp_options = shibboleth_getoption( 'shibboleth_idps', array(), true, false );
+		$idp_options = shibboleth_getoption( 'shibboleth_idps', array() );
 
 		if ( ! defined( 'SHIBBOLETH_IDPS' ) ) {
 			if ( isset( $_POST['idps'] ) ) {
@@ -982,6 +984,7 @@ function shibboleth_options_logging() {
  * @since ?
  */
 function shibboleth_options_page() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general';
 	?>
 	<div class="wrap">

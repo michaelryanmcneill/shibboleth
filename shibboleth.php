@@ -9,16 +9,18 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
- * Version: 2.5.2
+ * Version: 2.5.3
  * Requires PHP: 5.6
  * Requires at least: 4.0
  * License: Apache-2.0
  * Text Domain: shibboleth
  */
 
+defined( 'ABSPATH' ) || exit;
+
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.2' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.3' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -26,40 +28,37 @@ define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.2' );
  *
  * @since 1.0
  */
-$plugin_version = get_site_option( 'shibboleth_plugin_version', '0' );
-if ( SHIBBOLETH_PLUGIN_VERSION !== $plugin_version ) {
+$shibboleth_plugin_version = get_site_option( 'shibboleth_plugin_version', '0' );
+if ( SHIBBOLETH_PLUGIN_VERSION !== $shibboleth_plugin_version ) {
 	add_action( 'admin_init', 'shibboleth_activate_plugin' );
 }
 
 /**
  * Determine if a constant is defined. If it is, return the value of the constant.
- * If it isn't, return the value from get_site_option(). If you'd like to pass a default
- * for get_site_option(), set $default to the requested default. If you'd like to check
- * for arrays in constants, set $array to true. If you'd like to return that the object
- * was obtained as a constant, set $compact to true and the result is an array. To get the
- * value of the constant or option, look at the value key. To check if the value was
- * retreived from a constant, look at the constant key.
+ * If it isn't, return the value from get_site_option().
+ * If you'd like to known whether or not the value was obtained as a constant,
+ * set $return_array to true and check the resulting array.
  *
  * @since 2.1
  * @param string $option Option identifier.
- * @param bool   $default Default value.
- * @param bool   $array If we expect the value to be an array.
- * @param bool   $compact If you want the constant and value returned as an array.
+ * @param bool   $default_value Default value.
+ * @param bool   $unused Deprecated parameter; unused.
+ * @param bool   $return_array If you want the constant and value returned as an array.
  * @return mixed
  */
-function shibboleth_getoption( $option, $default = false, $array = false, $compact = false ) {
+function shibboleth_getoption( $option, $default_value = false, $unused = false, $return_array = false ) {
 	// If a constant is defined with the provided option name, get the value of the constant.
 	if ( defined( strtoupper( $option ) ) ) {
 		$value = constant( strtoupper( $option ) );
 		$constant = true;
 	} else {
 		// If no constant is set, just get the value from get_site_option().
-		$value = get_site_option( $option, $default );
+		$value = get_site_option( $option, $default_value );
 		$constant = false;
 	}
 
-	// If compact is set to true, we compact $value and $constant together for easy use.
-	if ( $compact ) {
+	// If $return_array, we return the $value and $constant together for easy use.
+	if ( $return_array ) {
 		return array(
 			$value,
 			$constant,
@@ -79,11 +78,11 @@ function shibboleth_getoption( $option, $default = false, $array = false, $compa
  * secure configuration possible.
  *
  * @since 1.8
- * @param string $var Environment variable.
+ * @param string $variable Environment variable.
  * @return string|bool
  */
-function shibboleth_getenv( $var ) {
-	if ( empty( $var ) ) {
+function shibboleth_getenv( $variable ) {
+	if ( empty( $variable ) ) {
 		return false;
 	}
 
@@ -96,55 +95,56 @@ function shibboleth_getenv( $var ) {
 		// Use standard by default for security.
 		case 'standard':
 		default:
-			$var_method = '';
+			$prefix = '';
 			break;
+
 		// If specified, use redirect.
 		case 'redirect':
-			$var_method = 'REDIRECT_';
+			$prefix = 'REDIRECT_';
 			break;
+
 		// If specified, use http.
 		case 'http':
-			$var_method = 'HTTP_';
+			$prefix = 'HTTP_';
 			break;
+
 		// If specified, use the custom specified method.
 		case 'custom':
 			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
-			$var_method = $custom;
+			$prefix = $custom;
 			break;
 	}
 
 	// Disable fallback to prevent the same variables from being checked twice.
-	if ( empty( $var_method ) ) {
+	if ( empty( $prefix ) ) {
 		$fallback = false;
 	}
 
 	// Using the selected attribute access method, check all possible cases.
-	$var_under = str_replace( '-', '_', $var );
-	$var_upper = strtoupper( $var );
-	$var_under_upper = strtoupper( $var_under );
+	$variable_under = str_replace( '-', '_', $variable );
+	$variable_upper = strtoupper( $variable );
+	$variable_under_upper = strtoupper( $variable_under );
 
-	$check_vars = array(
-		$var_method . $var => true,
-		$var_method . $var_under => true,
-		$var_method . $var_upper => true,
-		$var_method . $var_under_upper => true,
+	$check_variables = array(
+		$prefix . $variable => true,
+		$prefix . $variable_under => true,
+		$prefix . $variable_upper => true,
+		$prefix . $variable_under_upper => true,
 	);
 
 	// If fallback is enabled, we will add the standard environment variables to the end of the array to allow for fallback.
 	if ( $fallback ) {
-		$fallback_check_vars = array(
-			$var => true,
-			$var_under => true,
-			$var_upper => true,
-			$var_under_upper => true,
+		$check_variables += array(
+			$variable => true,
+			$variable_under => true,
+			$variable_upper => true,
+			$variable_under_upper => true,
 		);
-
-		$check_vars = array_merge( $check_vars, $fallback_check_vars );
 	}
 
-	foreach ( $check_vars as $check_var => $true ) {
-		if ( isset( $_SERVER[ $check_var ] ) && false !== $_SERVER[ $check_var ] ) {
-			return sanitize_text_field( wp_unslash( $_SERVER[ $check_var ] ) );
+	foreach ( $check_variables as $check_variable => $true ) {
+		if ( isset( $_SERVER[ $check_variable ] ) && false !== $_SERVER[ $check_variable ] ) {
+			return sanitize_text_field( wp_unslash( $_SERVER[ $check_variable ] ) );
 		}
 	}
 
@@ -161,6 +161,7 @@ function shibboleth_auto_login() {
 	$shibboleth_auto_login = shibboleth_getoption( 'shibboleth_auto_login' );
 
 	if ( ! is_user_logged_in() && shibboleth_session_active( true ) && $shibboleth_auto_login ) {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'login_form_shibboleth' );
 
 		$userobj = wp_signon( '', true );
@@ -285,6 +286,7 @@ function shibboleth_update_idp_users( $new_idp_code, $old_idp_code ) {
 	// Update the shibboleth_account rows to have the new IdP code value.
 	$shibboleth_users = get_users(
 		array(
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'meta_key' => 'shibboleth_account',
 			'fields' => 'ID',
 		)
@@ -425,7 +427,7 @@ add_action( 'init', 'shibboleth_admin_hooks' );
 function shibboleth_session_active( $auto_login = false ) {
 	$active = false;
 	$method = shibboleth_getoption( 'shibboleth_attribute_access_method' );
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 	$session = null;
 	if ( isset( $shib_headers['username']['name'] ) ) {
 		$session = shibboleth_getenv( $shib_headers['username']['name'] );
@@ -465,6 +467,34 @@ function shibboleth_session_active( $auto_login = false ) {
 	return $active;
 }
 
+/**
+ * Add an allowed_redirect_hosts filter to trust the provided URL's host.
+ *
+ * @since 2.5.3
+ * @param string $url The trusted URL.
+ */
+function shibboleth_allow_redirect( $url ) {
+	// Note: When this plugin requires at least WordPress 4.4/4.7, we can use wp_parse_url.
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
+	$allow_host = parse_url( $url, PHP_URL_HOST );
+
+	if ( empty( $allow_host ) ) {
+		return;
+	}
+
+	add_filter(
+		'allowed_redirect_hosts',
+		function ( $hosts, $host ) use ( $allow_host ) {
+			if ( ! in_array( $allow_host, $hosts, true ) ) {
+				$hosts[] = $allow_host;
+			}
+
+			return $hosts;
+		},
+		10,
+		2
+	);
+}
 
 /**
  * Authenticate the user using Shibboleth.  If a Shibboleth session is active,
@@ -485,20 +515,50 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		$idp = key( $idps );
 		$redirect_to = null;
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_REQUEST['idp'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$idp = sanitize_text_field( wp_unslash( $_REQUEST['idp'] ) );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+
+			// Make sure the redirect is in the allowed list.
+			$redirect_to = wp_validate_redirect( $redirect_to );
 		}
 
 		$initiator_url = shibboleth_session_initiator_url( $redirect_to, $idp );
-		wp_redirect( $initiator_url );
+		shibboleth_allow_redirect( $initiator_url );
+		wp_safe_redirect( $initiator_url );
 		exit;
 	}
 }
 
+/**
+ * Add a filter for allowed_redirect_hosts so that safe redirects work on multisite.
+ *
+ * @since 2.5.3
+ * @param array  $hosts An array of allowed host names.
+ * @param string $host The host name of the redirect destination; empty string if not set.
+ * @return array
+ */
+function shibboleth_allowed_redirect_hosts( $hosts, $host ) {
+	// If the host is blank or already in the list, return early.
+	if ( empty( $host ) || in_array( $host, $hosts, true ) ) {
+		return $hosts;
+	}
+
+	// Check if this host belongs to any site in our Multisite network.
+	$site = get_site_by_path( $host, '/' );
+	if ( $site ) {
+		$hosts[] = $site->domain;
+	}
+
+	return $hosts;
+}
 
 /**
  * When wp-login.php is loaded with 'action=shibboleth', hook Shibboleth
@@ -508,6 +568,10 @@ function shibboleth_authenticate( $user, $username, $password ) {
  */
 function shibboleth_login_form_shibboleth() {
 	add_filter( 'authenticate', 'shibboleth_authenticate', 10, 3 );
+
+	if ( is_multisite() ) {
+		add_filter( 'allowed_redirect_hosts', 'shibboleth_allowed_redirect_hosts', 20, 2 );
+	}
 }
 add_action( 'login_form_shibboleth', 'shibboleth_login_form_shibboleth' );
 
@@ -558,7 +622,8 @@ function shibboleth_retrieve_password( $user_login ) {
 	$password_reset_url = shibboleth_get_password_reset_url( $user_login );
 
 	if ( ! empty( $password_reset_url ) ) {
-		wp_redirect( $password_reset_url );
+		shibboleth_allow_redirect( $password_reset_url );
+		wp_safe_redirect( $password_reset_url );
 		exit;
 	}
 }
@@ -600,7 +665,8 @@ function shibboleth_logout() {
 	$logout_url = shibboleth_getoption( 'shibboleth_logout_url' );
 
 	if ( ! empty( $logout_url ) && shibboleth_session_active() ) {
-		wp_redirect( $logout_url );
+		shibboleth_allow_redirect( $logout_url );
+		wp_safe_redirect( $logout_url );
 		exit;
 	}
 }
@@ -613,7 +679,7 @@ add_action( 'wp_logout', 'shibboleth_logout', 20 );
  * @param string $redirect the final URL to redirect the user to after all login is complete.
  * @param string $idp_code The chosen IdP to use for the login process.
  * @return the URL to direct the user to in order to initiate Shibboleth login
- * @uses apply_filters() Calls 'shibboleth_session_initiator_url' before returning session intiator URL
+ * @uses apply_filters() Calls 'shibboleth_session_initiator_url' before returning session initiator URL
  * @since 1.3
  */
 function shibboleth_session_initiator_url( $redirect = null, $idp_code = null ) {
@@ -664,10 +730,11 @@ function shibboleth_log_message( $message_type, $message ) {
 	static $shib_logging;
 
 	if ( ! isset( $shib_logging ) ) {
-		$shib_logging = shibboleth_getoption( 'shibboleth_logging', array(), true );
+		$shib_logging = shibboleth_getoption( 'shibboleth_logging', array() );
 	}
 
 	if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || in_array( $message_type, $shib_logging, true ) ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( '[Shibboleth WordPress Plugin Logging] ' . $message );
 	}
 }
@@ -745,7 +812,7 @@ function shibboleth_set_user_idp( $user_id, $user_idp = null ) {
  * @since 1.0
  */
 function shibboleth_authenticate_user() {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 	$auto_combine_accounts = shibboleth_getoption( 'shibboleth_auto_combine_accounts' );
 	$manually_combine_accounts = shibboleth_getoption( 'shibboleth_manually_combine_accounts' );
 
@@ -927,7 +994,7 @@ function shibboleth_get_user_role() {
 		}
 	}
 
-	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', array(), true ) );
+	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', array() ) );
 	$user_role = shibboleth_getoption( 'shibboleth_default_role' );
 
 	foreach ( $roles->role_names as $key => $name ) {
@@ -957,7 +1024,7 @@ function shibboleth_get_user_role() {
  * @since 1.3
  */
 function shibboleth_get_managed_user_fields() {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 
 	$managed = array();
 
@@ -986,7 +1053,7 @@ function shibboleth_get_managed_user_fields() {
  * @since 1.0
  */
 function shibboleth_update_user_data( $user_id, $force_update = false ) {
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array(), true );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 
 	$user_fields = array(
 		'user_login' => 'username',
@@ -1008,8 +1075,8 @@ function shibboleth_update_user_data( $user_id, $force_update = false ) {
 			$managed = $shib_headers[ $header ]['managed'];
 		}
 		if ( $force_update || $managed ) {
-			$filter = 'shibboleth_' . ( strpos( $field, 'user_' ) === 0 ? '' : 'user_' ) . $field;
-			$user_data[ $field ] = apply_filters( $filter, shibboleth_getenv( $shib_headers[ $header ]['name'] ) );
+			$filter = ( strpos( $field, 'user_' ) === 0 ? '' : 'user_' ) . $field;
+			$user_data[ $field ] = apply_filters( 'shibboleth_' . $filter, shibboleth_getenv( $shib_headers[ $header ]['name'] ) );
 		}
 	}
 
