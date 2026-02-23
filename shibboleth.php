@@ -76,11 +76,11 @@ function shibboleth_getoption( $option, $default_value = false, $unused = false,
  * secure configuration possible.
  *
  * @since 1.8
- * @param string $var Environment variable.
+ * @param string $variable Environment variable.
  * @return string|bool
  */
-function shibboleth_getenv( $var ) {
-	if ( empty( $var ) ) {
+function shibboleth_getenv( $variable ) {
+	if ( empty( $variable ) ) {
 		return false;
 	}
 
@@ -93,55 +93,56 @@ function shibboleth_getenv( $var ) {
 		// Use standard by default for security.
 		case 'standard':
 		default:
-			$var_method = '';
+			$prefix = '';
 			break;
+
 		// If specified, use redirect.
 		case 'redirect':
-			$var_method = 'REDIRECT_';
+			$prefix = 'REDIRECT_';
 			break;
+
 		// If specified, use http.
 		case 'http':
-			$var_method = 'HTTP_';
+			$prefix = 'HTTP_';
 			break;
+
 		// If specified, use the custom specified method.
 		case 'custom':
 			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
-			$var_method = $custom;
+			$prefix = $custom;
 			break;
 	}
 
 	// Disable fallback to prevent the same variables from being checked twice.
-	if ( empty( $var_method ) ) {
+	if ( empty( $prefix ) ) {
 		$fallback = false;
 	}
 
 	// Using the selected attribute access method, check all possible cases.
-	$var_under = str_replace( '-', '_', $var );
-	$var_upper = strtoupper( $var );
-	$var_under_upper = strtoupper( $var_under );
+	$variable_under = str_replace( '-', '_', $variable );
+	$variable_upper = strtoupper( $variable );
+	$variable_under_upper = strtoupper( $variable_under );
 
-	$check_vars = array(
-		$var_method . $var => true,
-		$var_method . $var_under => true,
-		$var_method . $var_upper => true,
-		$var_method . $var_under_upper => true,
+	$check_variables = array(
+		$prefix . $variable => true,
+		$prefix . $variable_under => true,
+		$prefix . $variable_upper => true,
+		$prefix . $variable_under_upper => true,
 	);
 
 	// If fallback is enabled, we will add the standard environment variables to the end of the array to allow for fallback.
 	if ( $fallback ) {
-		$fallback_check_vars = array(
-			$var => true,
-			$var_under => true,
-			$var_upper => true,
-			$var_under_upper => true,
+		$check_variables += array(
+			$variable => true,
+			$variable_under => true,
+			$variable_upper => true,
+			$variable_under_upper => true,
 		);
-
-		$check_vars = array_merge( $check_vars, $fallback_check_vars );
 	}
 
-	foreach ( $check_vars as $check_var => $true ) {
-		if ( isset( $_SERVER[ $check_var ] ) && false !== $_SERVER[ $check_var ] ) {
-			return sanitize_text_field( wp_unslash( $_SERVER[ $check_var ] ) );
+	foreach ( $check_variables as $check_variable => $true ) {
+		if ( isset( $_SERVER[ $check_variable ] ) && false !== $_SERVER[ $check_variable ] ) {
+			return sanitize_text_field( wp_unslash( $_SERVER[ $check_variable ] ) );
 		}
 	}
 
