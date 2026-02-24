@@ -1201,6 +1201,12 @@ add_filter( 'lostpassword_url', 'shibboleth_custom_password_reset_url' );
  */
 function shibboleth_login_form() {
 	global $wp;
+
+	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
+	if ( empty( $idps ) ) {
+		return;
+	}
+
 	$url = false;
 	if ( ! empty( $wp->request ) ) {
 		$url = wp_login_url( home_url( $wp->request ) );
@@ -1208,8 +1214,6 @@ function shibboleth_login_form() {
 	$login_url = add_query_arg( 'action', 'shibboleth', $url );
 	$login_url = remove_query_arg( 'reauth', $login_url );
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
-
-	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 
 	$first = true;
 
