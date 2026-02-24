@@ -158,9 +158,7 @@ function shibboleth_getenv( $variable ) {
  * @since 1.6
  */
 function shibboleth_auto_login() {
-	$shibboleth_auto_login = shibboleth_getoption( 'shibboleth_auto_login' );
-
-	if ( ! is_user_logged_in() && shibboleth_session_active( true ) && $shibboleth_auto_login ) {
+	if ( ! is_user_logged_in() && shibboleth_getoption( 'shibboleth_auto_login' ) && shibboleth_session_active( true ) ) {
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'login_form_shibboleth' );
 
