@@ -1134,14 +1134,14 @@ function shibboleth_disable_login() {
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 
 	if ( $disable && ! $bypass ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['action'] ) && 'lostpassword' === $_GET['action'] ) {
 			// Disable the ability to reset passwords from wp-login.php.
 			add_filter( 'allow_password_reset', '__return_false' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		} elseif ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
 			// Disable the ability to login using local authentication.
 			wp_die( esc_html( __( 'Shibboleth authentication is required.', 'shibboleth' ) ) );
-
-			check_admin_referer( 'log-in' );
 		}
 	}
 }
