@@ -158,9 +158,7 @@ function shibboleth_getenv( $variable ) {
  * @since 1.6
  */
 function shibboleth_auto_login() {
-	$shibboleth_auto_login = shibboleth_getoption( 'shibboleth_auto_login' );
-
-	if ( ! is_user_logged_in() && shibboleth_session_active( true ) && $shibboleth_auto_login ) {
+	if ( ! is_user_logged_in() && shibboleth_getoption( 'shibboleth_auto_login' ) && shibboleth_session_active( true ) ) {
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'login_form_shibboleth' );
 
@@ -1136,14 +1134,14 @@ function shibboleth_disable_login() {
 	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
 
 	if ( $disable && ! $bypass ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['action'] ) && 'lostpassword' === $_GET['action'] ) {
 			// Disable the ability to reset passwords from wp-login.php.
 			add_filter( 'allow_password_reset', '__return_false' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		} elseif ( isset( $_POST['log'] ) || isset( $_POST['user_login'] ) ) {
 			// Disable the ability to login using local authentication.
 			wp_die( esc_html( __( 'Shibboleth authentication is required.', 'shibboleth' ) ) );
-
-			check_admin_referer( 'log-in' );
 		}
 	}
 }
@@ -1203,6 +1201,12 @@ add_filter( 'lostpassword_url', 'shibboleth_custom_password_reset_url' );
  */
 function shibboleth_login_form() {
 	global $wp;
+
+	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
+	if ( empty( $idps ) ) {
+		return;
+	}
+
 	$url = false;
 	if ( ! empty( $wp->request ) ) {
 		$url = wp_login_url( home_url( $wp->request ) );
@@ -1210,8 +1214,6 @@ function shibboleth_login_form() {
 	$login_url = add_query_arg( 'action', 'shibboleth', $url );
 	$login_url = remove_query_arg( 'reauth', $login_url );
 	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
-
-	$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 
 	$first = true;
 
