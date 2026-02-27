@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<ruleset name="WordPress Plugin: shibboleth">
+	<arg value="s"/>
+	<arg name="extensions" value="php"/>
+	<file>.</file>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
+
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
+
+	<!-- Check for PHP and WordPress cross-version compatibility. -->
+	<config name="minimum_supported_wp_version" value="4.0" />
+	<config name="testVersion" value="5.6-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="shibboleth" />
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="PSR2.Methods.FunctionClosingBrace"/>
+
+	<!-- Code quality. -->
+	<rule ref="Generic.PHP.Syntax"/>
+	<rule ref="Generic.Strings.UnnecessaryStringConcat">
+		<properties>
+			<property name="allowMultiline" value="true" />
+		</properties>
+	</rule>
+	<rule ref="Squiz.PHP.DisallowMultipleAssignments"/>
+	<rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
+	<rule ref="Squiz.PHP.Eval"/>
+	<rule ref="Squiz.PHP.InnerFunctions"/>
+	<rule ref="Squiz.PHP.LowercasePHPFunctions"/>
+	<rule ref="Squiz.PHP.NonExecutableCode"/>
+
+	<!-- Code commenting. -->
+	<rule ref="Squiz.Commenting.ClassComment"/>
+	<rule ref="Squiz.Commenting.FunctionComment">
+		<!-- Comment alignment spacing. -->
+		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+	</rule>
+	<rule ref="Squiz.Commenting.VariableComment"/>
+
+	<!-- Override statement alignment to have a single space. -->
+	<rule ref="Generic.Formatting.MultipleStatementAlignment">
+		<properties>
+			<property name="maxPadding" value="1" />
+		</properties>
+	</rule>
+	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
+		<properties>
+			<property name="maxColumn" value="1"/>
+		</properties>
+	</rule>
+
+	<!-- Set is_theme property to allow theme filenames with theme hierarchy exceptions. -->
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="is_theme" value="true"/>
+		</properties>
+	</rule>
+
+	<!-- Forbidden functions. -->
+	<rule ref="Generic.PHP.ForbiddenFunctions">
+		<properties>
+			<property name="forbiddenFunctions" type="array">
+				<element key="sizeof" value="count"/>
+				<element key="delete" value="unset"/>
+				<element key="print" value="echo"/>
+				<element key="create_function" value="null"/>
+				<element key="array_push" value="null"/>
+				<element key="array_key_exists" value="isset"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Exclude the Composer Vendor directory. -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<!-- Exclude the Node Modules directory. -->
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+</ruleset>
