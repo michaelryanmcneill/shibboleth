@@ -1,5 +1,6 @@
 {
 	"name": "michaelryanmcneill/shibboleth",
+	"type": "wordpress-plugin",
 	"description": "Shibboleth plugin for WordPress",
 	"homepage": "https://github.com/michaelryanmcneill/shibboleth",
 	"license": "Apache-2.0",
@@ -8,7 +9,8 @@
 	},
 	"require": {},
 	"require-dev" : {
-		"wp-coding-standards/wpcs": "@stable"
+		"wp-coding-standards/wpcs": "@stable",
+		"phpcompatibility/phpcompatibility-wp": "@stable"
 	},
 	"config": {
 		"allow-plugins": {

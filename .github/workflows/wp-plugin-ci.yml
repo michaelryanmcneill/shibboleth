@@ -32,4 +32,5 @@ jobs:
       run: |
         touch $GITHUB_WORKSPACE/tmp.php
         export CHANGED_FILES=$(git diff --name-only --diff-filter=AM remotes/origin/${{ github.base_ref }} | tr '\n' ' ')
-        vendor/bin/phpcs -q -n --ignore=vendor --standard=WordPress --report=checkstyle $GITHUB_WORKSPACE/tmp.php $(echo $CHANGED_FILES) | cs2pr
+        vendor/bin/phpcs -q -n --ignore=vendor --standard=WordPress --runtime-set text_domain shibboleth --report=checkstyle $GITHUB_WORKSPACE/tmp.php $(echo $CHANGED_FILES) | cs2pr
+        vendor/bin/phpcs -q -n --ignore=vendor --standard=PHPCompatibilityWP --runtime-set testVersion 5.6- --runtime-set minimum_supported_wp_version 4.0 --report=checkstyle $GITHUB_WORKSPACE/tmp.php $(echo $CHANGED_FILES) | cs2pr
