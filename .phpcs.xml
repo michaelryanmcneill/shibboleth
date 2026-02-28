@@ -25,32 +25,17 @@
 		</properties>
 	</rule>
 
-	<rule ref="PSR2.Methods.FunctionClosingBrace"/>
-
 	<!-- Code quality. -->
-	<rule ref="Generic.PHP.Syntax"/>
-	<rule ref="Generic.Strings.UnnecessaryStringConcat">
-		<properties>
-			<property name="allowMultiline" value="true" />
-		</properties>
-	</rule>
-	<rule ref="Squiz.PHP.DisallowMultipleAssignments"/>
-	<rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
-	<rule ref="Squiz.PHP.Eval"/>
 	<rule ref="Squiz.PHP.InnerFunctions"/>
 	<rule ref="Squiz.PHP.LowercasePHPFunctions"/>
-	<rule ref="Squiz.PHP.NonExecutableCode"/>
 
-	<!-- Code commenting. -->
-	<rule ref="Squiz.Commenting.ClassComment"/>
+	<!-- Exclude comment alignment spacing (it does not allow overrides). -->
 	<rule ref="Squiz.Commenting.FunctionComment">
-		<!-- Comment alignment spacing. -->
 		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
 		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
 	</rule>
-	<rule ref="Squiz.Commenting.VariableComment"/>
 
-	<!-- Override statement alignment to have a single space. -->
+	<!-- Override statement alignment to use a single space. -->
 	<rule ref="Generic.Formatting.MultipleStatementAlignment">
 		<properties>
 			<property name="maxPadding" value="1" />
@@ -59,13 +44,6 @@
 	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
 		<properties>
 			<property name="maxColumn" value="1"/>
-		</properties>
-	</rule>
-
-	<!-- Set is_theme property to allow theme filenames with theme hierarchy exceptions. -->
-	<rule ref="WordPress.Files.FileName">
-		<properties>
-			<property name="is_theme" value="true"/>
 		</properties>
 	</rule>
 
