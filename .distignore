@@ -9,4 +9,5 @@ node_modules/
 package.json
 package-lock.json
 phpcs.xml
+README.md
 vendor/
