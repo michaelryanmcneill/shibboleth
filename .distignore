@@ -3,10 +3,10 @@
 .eslintrc
 .git/
 .github
-.phpcs.xml
 composer.json
 composer.lock
 node_modules/
 package.json
 package-lock.json
+phpcs.xml
 vendor/

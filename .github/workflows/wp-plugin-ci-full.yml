@@ -33,4 +33,4 @@ jobs:
       uses: wordpress/plugin-check-action@v1
       with:
         exclude-directories: '.github'
-        exclude-files: '.eslintrc,.phpcs.xml'
+        exclude-files: '.distignore,.eslintrc'
