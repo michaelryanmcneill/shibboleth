@@ -20,7 +20,7 @@ jobs:
       with:
         php-version: '8.1'
         coverage: none
-        tools: cs2pr
+        tools: cs2pr, wp-cli
 
     - name: Install Composer dependencies
       uses: ramsey/composer-install@v3
@@ -29,8 +29,16 @@ jobs:
       run: |
         vendor/bin/phpcs -q -n --report=checkstyle $GITHUB_WORKSPACE | cs2pr
 
+    - name: Install latest version of dist-archive-command
+      run: wp package install wp-cli/dist-archive-command:@stable
+
+    - name: Build plugin
+      run: |
+        wp dist-archive . ./shibboleth.zip
+        mkdir tmp-build
+        unzip shibboleth.zip -d tmp-build
+
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
       with:
-        exclude-directories: '.github'
-        exclude-files: '.distignore,.eslintrc'
+        build-dir: './tmp-build/shibboleth'
