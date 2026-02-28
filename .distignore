@@ -1,0 +1,12 @@
+# Files that should not be copied to SVN.
+.distignore
+.eslintrc
+.git/
+.github
+.phpcs.xml
+composer.json
+composer.lock
+node_modules/
+package.json
+package-lock.json
+vendor/
