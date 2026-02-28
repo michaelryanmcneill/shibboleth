@@ -30,7 +30,7 @@ jobs:
         vendor/bin/phpcs -q -n --report=checkstyle $GITHUB_WORKSPACE | cs2pr
 
     - name: Install latest version of dist-archive-command
-      run: wp package install wp-cli/dist-archive-command:@stable
+      run: wp package install wp-cli/dist-archive-command:v3.1.0
 
     - name: Build plugin
       run: |
