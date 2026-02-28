@@ -20,7 +20,7 @@
 
 .shibboleth-wrap {
 	position: absolute;
-		bottom: 20px;
+	bottom: 20px;
 	padding: 0 24px;
 	margin-left: -24px;
 	margin-right: -24px;
@@ -29,7 +29,7 @@
 
 .shibboleth-repositioned .shibboleth-wrap {
 	position: relative;
-		bottom: auto;
+	bottom: auto;
 	padding: 0;
 	margin-top: 16px;
 	margin-left: 0;
@@ -38,7 +38,7 @@
 
 .shibboleth-form-display .shibboleth-wrap {
 	position: relative;
-		bottom: auto;
+	bottom: auto;
 	padding: 0;
 	margin-top: 0;
 	margin-left: 0;
@@ -81,8 +81,8 @@
 	content: '';
 	height: 1px;
 	position: absolute;
-		left: 0;
-		top: 50%;
+	left: 0;
+	top: 50%;
 	width: 100%;
 }
 .shibboleth-or span {

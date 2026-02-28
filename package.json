@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@wordpress/eslint-plugin": "^24.2.0",
+    "eslint": "^8.57.1"
+  }
+}

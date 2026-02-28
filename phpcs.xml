@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<ruleset name="WordPress Plugin: shibboleth">
+	<arg value="s"/>
+	<arg name="extensions" value="php"/>
+	<file>.</file>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
+
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
+
+	<!-- Check for PHP and WordPress cross-version compatibility. -->
+	<config name="minimum_supported_wp_version" value="4.0" />
+	<config name="testVersion" value="5.6-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="shibboleth" />
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Code quality. -->
+	<rule ref="Squiz.PHP.InnerFunctions"/>
+	<rule ref="Squiz.PHP.LowercasePHPFunctions"/>
+
+	<!-- Exclude comment alignment spacing (it does not allow overrides). -->
+	<rule ref="Squiz.Commenting.FunctionComment">
+		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+	</rule>
+
+	<!-- Override statement alignment to use a single space. -->
+	<rule ref="Generic.Formatting.MultipleStatementAlignment">
+		<properties>
+			<property name="maxPadding" value="1" />
+		</properties>
+	</rule>
+	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
+		<properties>
+			<property name="maxColumn" value="1"/>
+		</properties>
+	</rule>
+
+	<!-- Forbidden functions. -->
+	<rule ref="Generic.PHP.ForbiddenFunctions">
+		<properties>
+			<property name="forbiddenFunctions" type="array">
+				<element key="sizeof" value="count"/>
+				<element key="delete" value="unset"/>
+				<element key="print" value="echo"/>
+				<element key="create_function" value="null"/>
+				<element key="array_push" value="null"/>
+				<element key="array_key_exists" value="isset"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Exclude the Composer Vendor directory. -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<!-- Exclude the Node Modules directory. -->
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+</ruleset>
