@@ -156,8 +156,9 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_ROLES', array( 'administrator' => array( 'header' => 'entitlement', 'value' => 'urn:mace:example.edu:entitlement:wordpress:admin' ), 'author' => array( 'header' => 'affiliation', 'value' => 'faculty' ) ) );`
  - `SHIBBOLETH_DEFAULT_ROLE`
    - Format: string
-   - Available options: All available WordPress roles. The defaults are `'administrator'`, `'subscriber'`, `'author'`, `'editor'`, and `'contributor'`. Leave this constant empty `''` to make the default no allowed access.
+   - Available options: All available WordPress roles. The defaults are `'administrator'`, `'subscriber'`, `'author'`, `'editor'`, and `'contributor'`. Leave this constant empty `''` to make the default no allowed access, or set it to `'_no_account'` to skip account creation when no Shibboleth role mapping applies.
    - Example: `define('SHIBBOLETH_DEFAULT_ROLE', 'subscriber');`
+   - Example: `define('SHIBBOLETH_DEFAULT_ROLE', '_no_account');`
  - `SHIBBOLETH_UPDATE_ROLES`
    - Format: boolean
    - Available options: `true` to automatically use Shibboleth data to update user role mappings each time the user logs in or `false` to only update role mappings when a user is initally created.
