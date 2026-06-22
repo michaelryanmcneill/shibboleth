@@ -5,6 +5,9 @@ on:
   # Allow manually triggering the workflow.
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   phpcs:
     name: PHP CodeSniffer
@@ -13,10 +16,11 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         # Fetch all history so we can diff.
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
