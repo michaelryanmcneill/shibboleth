@@ -28,7 +28,7 @@ jobs:
         tools: cs2pr, wp-cli
 
     - name: Install Composer dependencies
-      uses: ramsey/composer-install@v3
+      uses: ramsey/composer-install@v4
 
     - name: Run PHPCS on all files
       run: |
