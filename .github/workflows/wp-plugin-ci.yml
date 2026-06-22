@@ -5,6 +5,9 @@ on:
   # Allow manually triggering the workflow.
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   phpcs:
     name: PHP CodeSniffer
