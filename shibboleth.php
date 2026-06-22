@@ -252,6 +252,10 @@ function shibboleth_activate_plugin() {
 
 	shibboleth_migrate_old_data();
 
+	if ( empty( shibboleth_getoption( 'shibboleth_spoof_key' ) ) ) {
+		update_site_option( 'shibboleth_spoof_key', wp_generate_password( 64, true, true ) );
+	}
+
 	update_site_option( 'shibboleth_plugin_version', SHIBBOLETH_PLUGIN_VERSION );
 
 	if ( function_exists( 'restore_current_blog' ) ) {
@@ -447,9 +451,12 @@ function shibboleth_session_active( $auto_login = false ) {
 				}
 			}
 
-			// Deprecated: No spoofkey or spoofkey bypass is active. This is strongly discouraged!
-			$bypass = defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING;
-			if ( empty( $spoofkey ) || $bypass ) {
+			/**
+			 * Deprecated: Spoof key bypass is active. This is strongly discouraged!
+			 *
+			 * @deprecated 2.5
+			 */
+			if ( defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) && SHIBBOLETH_BYPASS_SPOOF_CHECKING ) {
 				$active = true;
 			}
 

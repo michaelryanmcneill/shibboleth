@@ -131,6 +131,10 @@ function shibboleth_options_general() {
 			update_site_option( 'shibboleth_disable_local_auth', ! empty( $_POST['disable_local_auth'] ) );
 		}
 
+		if ( 'http' === shibboleth_getoption( 'shibboleth_attribute_access_method' ) && empty( shibboleth_getoption( 'shibboleth_spoof_key' ) ) ) {
+			add_settings_error( 'shibboleth', 'missing-spoof-key', __( 'Spoof Key is required when using the HTTP Headers attribute access method.', 'shibboleth' ), 'error' );
+		}
+
 		shibboleth_options_updated();
 	}
 
@@ -214,7 +218,7 @@ function shibboleth_options_general() {
 						'By default, attributes passed from your Shibboleth Service Provider will be accessed using standard environment variables.
 						For most users, leaving these defaults is perfectly fine. If you are running a special server configuration that results in environment variables
 						being sent with the prefix <code>REDIRECT_</code>, you should select the "Redirected Environment Variables" option. If you are running
-						your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and, if at all possible, add a spoofkey below.
+						your Shibboleth Service Provider on a reverse proxy, you should select the "HTTP Headers" option and configure a spoof key below.
 						If you are running Shibboleth with a custom prefix, you should select the "Custom Prefix" option and complete the "Custom Attribute Access Prefix" field that appears below.',
 						'shibboleth'
 					)
@@ -243,6 +247,11 @@ function shibboleth_options_general() {
 		<tr id="spoofkey_row" <?php echo ( 'http' === $attribute_access ? '' : 'style="display:none;"' ); ?>>
 			<th scope="row"><label for="spoofkey"><?php esc_html_e( 'Spoof Key', 'shibboleth' ); ?></label></th>
 			<td>
+				<?php if ( 'http' === $attribute_access && empty( $spoofkey ) ) { ?>
+					<div class="notice notice-warning">
+						<p><?php esc_html_e( 'Spoof Key is required when using HTTP Headers. Authentication will fail until one is configured.', 'shibboleth' ); ?></p>
+					</div>
+				<?php } ?>
 				<input type="text" id="spoofkey" name="spoofkey" value="<?php echo esc_attr( $spoofkey ); ?>" size="50" <?php defined( 'SHIBBOLETH_SPOOF_KEY' ) && disabled( $spoofkey, SHIBBOLETH_SPOOF_KEY ); ?> /><br />
 				<p>
 				<?php
