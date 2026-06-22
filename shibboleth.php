@@ -9,18 +9,18 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
- * Version: 2.5.3
+ * Version: 2.5.4
  * Requires PHP: 5.6
- * Requires at least: 4.0
+ * Requires at least: 4.3
  * License: Apache-2.0
  * Text Domain: shibboleth
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.0' );
+define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.3' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.3' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.4' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -976,21 +976,10 @@ function shibboleth_create_new_user( $user_login, $user_email ) {
  * @since 1.0
  */
 function shibboleth_get_user_role() {
-	// wp_roles() requires WordPress version 4.3 or higher.
-	if ( function_exists( 'wp_roles' ) ) {
-		$roles = wp_roles();
-	} else {
-		global $wp_roles;
-
-		if ( isset( $wp_roles ) ) {
-			$roles = $wp_roles;
-		} else {
-			$roles = new WP_Roles();
-		}
-	}
-
 	$shib_roles = apply_filters( 'shibboleth_roles', shibboleth_getoption( 'shibboleth_roles', array() ) );
 	$user_role = shibboleth_getoption( 'shibboleth_default_role' );
+
+	$roles = wp_roles();
 
 	foreach ( $roles->role_names as $key => $name ) {
 		if ( empty( $shib_roles[ $key ]['header'] ) || empty( $shib_roles[ $key ]['value'] ) ) {

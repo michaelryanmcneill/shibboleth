@@ -1,10 +1,10 @@
 === Shibboleth ===
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz, masteradhoc, junaidkbr
 Tags: shibboleth, authentication, login, saml
-Requires at least: 4.0
-Tested up to: 6.9
+Requires at least: 4.3
+Tested up to: 7.0
 Requires PHP: 5.6
-Stable tag: 2.5.3
+Stable tag: 2.5.4
 License: Apache-2.0
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
@@ -179,6 +179,9 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Upgrade Notice ==
+= 2.5.4 =
+This update increases the minimum WordPress version to 4.3. The plugin will fail to activate if you are running below the minimum version.
+
 = 2.3 =
 This update increases the minimum PHP version to 5.6 and the minimum WordPress version to 4.0. The plugin will fail to activate if you are running below those minimum versions. 
 
@@ -195,6 +198,11 @@ Accessing Shibboleth attributes has changed. Typically, no additional configurat
 Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
+= version 2.5.4 (2026-06-22) =
+ - Security: Always require Spoof Key for HTTP auth [#117](https://github.com/michaelryanmcneill/shibboleth/pull/117) (thanks @Nxploited)
+ - Documentation: Document the _no_account default role option [#116](https://github.com/michaelryanmcneill/shibboleth/pull/116) (thanks @beanscg, @dmrzzz)
+ - Bumped minimum WordPress version to 4.3 (mostly to appease plugin-check-action, but it does allow cleanup).
+
 = version 2.5.3 (2026-02-23) =
  - Security: Limit redirects to approved hosts [#112](https://github.com/michaelryanmcneill/shibboleth/issues/112) (thanks @Belippo, @Jefhumbe)
 
