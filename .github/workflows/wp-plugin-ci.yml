@@ -20,6 +20,7 @@ jobs:
       with:
         # Fetch all history so we can diff.
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
