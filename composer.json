@@ -10,7 +10,8 @@
 	"require": {},
 	"require-dev" : {
 		"wp-coding-standards/wpcs": "@stable",
-		"phpcompatibility/phpcompatibility-wp": "@stable"
+		"phpcompatibility/phpcompatibility-wp": "@stable",
+		"wp-cli/dist-archive-command": "v3.1.0"
 	},
 	"config": {
 		"allow-plugins": {
