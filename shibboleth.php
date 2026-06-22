@@ -236,17 +236,7 @@ function shibboleth_activate_plugin() {
 	);
 	add_site_option( 'shibboleth_headers', $headers );
 
-	$roles = array(
-		'administrator' => array(
-			'header' => 'entitlement',
-			'value' => 'urn:mace:example.edu:entitlement:wordpress:admin',
-		),
-		'author' => array(
-			'header' => 'affiliation',
-			'value' => 'faculty',
-		),
-	);
-	add_site_option( 'shibboleth_roles', $roles );
+	add_site_option( 'shibboleth_roles', array() );
 
 	shibboleth_insert_htaccess();
 
