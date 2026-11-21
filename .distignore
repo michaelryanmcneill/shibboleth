@@ -2,6 +2,7 @@
 .distignore
 .eslintrc
 .git/
+.gitignore
 .github
 composer.json
 composer.lock
@@ -11,3 +12,4 @@ package-lock.json
 phpcs.xml
 README.md
 vendor/
+.DS_Store
