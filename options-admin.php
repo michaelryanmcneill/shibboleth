@@ -131,8 +131,8 @@ function shibboleth_options_general() {
 			update_site_option( 'shibboleth_disable_local_auth', ! empty( $_POST['disable_local_auth'] ) );
 		}
 
-		if ( 'http' === shibboleth_getoption( 'shibboleth_attribute_access_method' ) && empty( shibboleth_getoption( 'shibboleth_spoof_key' ) ) ) {
-			add_settings_error( 'shibboleth', 'missing-spoof-key', __( 'Spoof Key is required when using the HTTP Headers attribute access method.', 'shibboleth' ), 'error' );
+		if ( shibboleth_requires_spoof_check() && empty( shibboleth_getoption( 'shibboleth_spoof_key' ) ) ) {
+			add_settings_error( 'shibboleth', 'missing-spoof-key', __( 'Spoof Key is required when attributes are read from HTTP headers (the HTTP Headers attribute access method, or a custom prefix such as HTTP_).', 'shibboleth' ), 'error' );
 		}
 
 		shibboleth_options_updated();
@@ -236,7 +236,8 @@ function shibboleth_options_general() {
 				echo wp_kses_post(
 					__(
 						'If you wish to use a custom attribute access prefix, enter it here. This field is case-insensitive.
-						<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.',
+						<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.
+						<br /><b>WARNING:</b> Prefixes beginning with <code>HTTP_</code> (or <code>REDIRECT_HTTP_</code>) read client-supplied HTTP request headers and require a Spoof Key.',
 						'shibboleth'
 					)
 				);
@@ -244,12 +245,12 @@ function shibboleth_options_general() {
 				</p>
 			</td>
 		</tr>
-		<tr id="spoofkey_row" <?php echo ( 'http' === $attribute_access ? '' : 'style="display:none;"' ); ?>>
+		<tr id="spoofkey_row" <?php echo ( 'http' === $attribute_access || 'custom' === $attribute_access ? '' : 'style="display:none;"' ); ?>>
 			<th scope="row"><label for="spoofkey"><?php esc_html_e( 'Spoof Key', 'shibboleth' ); ?></label></th>
 			<td>
-				<?php if ( 'http' === $attribute_access && empty( $spoofkey ) ) { ?>
+				<?php if ( shibboleth_requires_spoof_check() && empty( $spoofkey ) ) { ?>
 					<div class="notice notice-warning">
-						<p><?php esc_html_e( 'Spoof Key is required when using HTTP Headers. Authentication will fail until one is configured.', 'shibboleth' ); ?></p>
+						<p><?php esc_html_e( 'Spoof Key is required when attributes are read from HTTP headers. Authentication will fail until one is configured.', 'shibboleth' ); ?></p>
 					</div>
 				<?php } ?>
 				<input type="text" id="spoofkey" name="spoofkey" value="<?php echo esc_attr( $spoofkey ); ?>" size="50" <?php defined( 'SHIBBOLETH_SPOOF_KEY' ) && disabled( $spoofkey, SHIBBOLETH_SPOOF_KEY ); ?> /><br />
@@ -257,7 +258,8 @@ function shibboleth_options_general() {
 				<?php
 				echo wp_kses_post(
 					__(
-						'For more details on setting a spoof key on the Shibboleth Service Provider, see <a href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking">this wiki document</a>.
+						'A Spoof Key is required when using HTTP Headers, or a Custom Prefix that reads HTTP headers (such as <code>HTTP_</code>).
+						For more details on setting a spoof key on the Shibboleth Service Provider, see <a href="https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking">this wiki document</a>.
 						<br /><b>WARNING:</b> If you incorrectly set this option, you will force <b><i>ALL</i></b> attempts to authenticate with Shibboleth to fail.',
 						'shibboleth'
 					)
@@ -365,7 +367,7 @@ function shibboleth_options_general() {
 			if (selectedValue === "custom") {
 				document.getElementById("attribute_custom_access_row").style.display = "table-row";
 				document.getElementById("attribute_access_fallback_row").style.display = "table-row";
-				document.getElementById("spoofkey_row").style.display = "none";
+				document.getElementById("spoofkey_row").style.display = "table-row";
 			} else if (selectedValue === "http") {
 				document.getElementById("attribute_custom_access_row").style.display = "none";
 				document.getElementById("attribute_access_fallback_row").style.display = "table-row";

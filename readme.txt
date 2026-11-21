@@ -2,9 +2,9 @@
 Contributors: michaelryanmcneill, willnorris, mitchoyoshitaka, jrchamp, dericcrago, bshelton229, Alhrath, dandalpiaz, masteradhoc, junaidkbr
 Tags: shibboleth, authentication, login, saml
 Requires at least: 4.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 2.5.4
+Stable tag: 2.5.5
 License: Apache-2.0
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
@@ -130,7 +130,7 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Example: `define('SHIBBOLETH_BUTTON_TEXT', 'Login with Shibboleth');`
  - `SHIBBOLETH_DISABLE_LOCAL_AUTH`
    - Format: boolean
-   - Available options: `true` to prevent users logging in using WordPress local authentication or `false` allow WordPress local authentication AND Shibboleth authentication.
+   - Available options: `true` to prevent users logging in using WordPress local authentication (including wp-login.php, XML-RPC, and Application Passwords) or `false` allow WordPress local authentication AND Shibboleth authentication. Existing passwords and Application Passwords are not deleted; they are rejected while local authentication is disabled. Define `SHIBBOLETH_ALLOW_LOCAL_AUTH` as `true` to temporarily bypass this setting.
    - Example: `define('SHIBBOLETH_DISABLE_LOCAL_AUTH', true);`
  - `SHIBBOLETH_HEADERS`
    - Format: array (>= PHP 5.6)
@@ -180,6 +180,9 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Upgrade Notice ==
+= 2.5.5 =
+Security update. A Custom Prefix that reads HTTP headers (e.g. HTTP_) now requires a Spoof Key. Disabling local authentication now also blocks XML-RPC logins and Application Passwords.
+
 = 2.5.4 =
 This update increases the minimum WordPress version to 4.3. The plugin will fail to activate if you are running below the minimum version.
 
@@ -199,6 +202,10 @@ Accessing Shibboleth attributes has changed. Typically, no additional configurat
 Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
+= version 2.5.5 =
+ - Security: Require Spoof Key whenever attributes are read from HTTP headers, including Custom Prefix (CVE-2026-121719)
+ - Security: Enforce Disable Local Authentication for XML-RPC, REST API, and Application Passwords (CVE-2026-121718)
+
 = version 2.5.4 (2026-06-22) =
  - Security: Always require Spoof Key for HTTP auth [#117](https://github.com/michaelryanmcneill/shibboleth/pull/117) (thanks @Nxploited)
  - Documentation: Document the _no_account default role option [#116](https://github.com/michaelryanmcneill/shibboleth/pull/116) (thanks @beanscg, @dmrzzz)

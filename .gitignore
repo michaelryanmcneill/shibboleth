@@ -1,0 +1,35 @@
+# Dependencies
+/vendor/
+/node_modules/
+composer.lock
+package-lock.json
+
+# Build artifacts
+/dist/
+*.zip
+
+# Tooling caches
+.phpcs-cache
+.phpunit.result.cache
+.eslintcache
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.*
+
+# OS files
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

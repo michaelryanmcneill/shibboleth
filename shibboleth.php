@@ -9,7 +9,7 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
- * Version: 2.5.4
+ * Version: 2.5.5
  * Requires PHP: 5.6
  * Requires at least: 4.3
  * License: Apache-2.0
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.3' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.4' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.5' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -86,34 +86,8 @@ function shibboleth_getenv( $variable ) {
 		return false;
 	}
 
-	// Get the specified shibboleth attribute access method; if one isn't specified
-	// simply use standard environment variables since they're the safest.
-	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
+	$prefix = shibboleth_get_attribute_prefix();
 	$fallback = shibboleth_getoption( 'shibboleth_attribute_access_method_fallback' );
-
-	switch ( $method ) {
-		// Use standard by default for security.
-		case 'standard':
-		default:
-			$prefix = '';
-			break;
-
-		// If specified, use redirect.
-		case 'redirect':
-			$prefix = 'REDIRECT_';
-			break;
-
-		// If specified, use http.
-		case 'http':
-			$prefix = 'HTTP_';
-			break;
-
-		// If specified, use the custom specified method.
-		case 'custom':
-			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
-			$prefix = $custom;
-			break;
-	}
 
 	// Disable fallback to prevent the same variables from being checked twice.
 	if ( empty( $prefix ) ) {
@@ -146,6 +120,81 @@ function shibboleth_getenv( $variable ) {
 		if ( isset( $_SERVER[ $check_variable ] ) && false !== $_SERVER[ $check_variable ] ) {
 			return sanitize_text_field( wp_unslash( $_SERVER[ $check_variable ] ) );
 		}
+	}
+
+	return false;
+}
+
+/**
+ * Get the $_SERVER prefix for the configured attribute access method.
+ *
+ * @since 2.5.5
+ * @return string
+ */
+function shibboleth_get_attribute_prefix() {
+	// Get the specified shibboleth attribute access method; if one isn't specified
+	// simply use standard environment variables since they're the safest.
+	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
+
+	switch ( $method ) {
+		// Use standard by default for security.
+		case 'standard':
+		default:
+			$prefix = '';
+			break;
+
+		// If specified, use redirect.
+		case 'redirect':
+			$prefix = 'REDIRECT_';
+			break;
+
+		// If specified, use http.
+		case 'http':
+			$prefix = 'HTTP_';
+			break;
+
+		// If specified, use the custom specified method.
+		case 'custom':
+			$custom = shibboleth_getoption( 'shibboleth_attribute_custom_access_method', '' );
+			$prefix = $custom;
+			break;
+	}
+
+	return $prefix;
+}
+
+/**
+ * Determine whether a $_SERVER variable name is populated from client-supplied
+ * HTTP request headers (e.g. HTTP_EPPN or REDIRECT_HTTP_EPPN).
+ *
+ * @since 2.5.5
+ * @param string $name The $_SERVER variable name or prefix.
+ * @return bool
+ */
+function shibboleth_is_http_header_variable( $name ) {
+	return (bool) preg_match( '/^(REDIRECT_)*HTTP_/', strtoupper( (string) $name ) );
+}
+
+/**
+ * Determine whether Shibboleth attributes are read from HTTP request headers,
+ * which requires a spoof key to protect against header spoofing.
+ *
+ * @since 2.5.5
+ * @return bool
+ */
+function shibboleth_requires_spoof_check() {
+	if ( 'http' === shibboleth_getoption( 'shibboleth_attribute_access_method' ) ) {
+		return true;
+	}
+
+	$prefix = shibboleth_get_attribute_prefix();
+	if ( shibboleth_is_http_header_variable( $prefix ) ) {
+		return true;
+	}
+
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
+	if ( isset( $shib_headers['username']['name'] ) && shibboleth_is_http_header_variable( $prefix . $shib_headers['username']['name'] ) ) {
+		return true;
 	}
 
 	return false;
@@ -408,8 +457,9 @@ function shibboleth_admin_hooks() {
 add_action( 'init', 'shibboleth_admin_hooks' );
 
 /**
- * Check if a Shibboleth session is active. If HTTP headers are being used
- * we do additional testing to see if a spoofkey needs to be validated.
+ * Check if a Shibboleth session is active. If attributes are being read from
+ * HTTP headers (the HTTP Headers method, or a custom prefix that maps to HTTP
+ * headers), a spoofkey must be validated.
  *
  * @uses apply_filters calls 'shibboleth_session_active' before returning final result
  * @param boolean $auto_login whether this is being triggered by an auto_login request or not.
@@ -418,7 +468,6 @@ add_action( 'init', 'shibboleth_admin_hooks' );
  */
 function shibboleth_session_active( $auto_login = false ) {
 	$active = false;
-	$method = shibboleth_getoption( 'shibboleth_attribute_access_method' );
 	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
 	$session = null;
 	if ( isset( $shib_headers['username']['name'] ) ) {
@@ -426,7 +475,7 @@ function shibboleth_session_active( $auto_login = false ) {
 	}
 
 	if ( $session ) {
-		if ( 'http' === $method ) {
+		if ( shibboleth_requires_spoof_check() ) {
 			/**
 			 * Check spoofkey to provide some protection against HTTP header spoofing.
 			 *
@@ -504,7 +553,11 @@ function shibboleth_allow_redirect( $url ) {
  */
 function shibboleth_authenticate( $user, $username, $password ) {
 	if ( shibboleth_session_active() ) {
-		return shibboleth_authenticate_user();
+		$user = shibboleth_authenticate_user();
+		if ( $user instanceof WP_User ) {
+			shibboleth_authenticated_user_id( $user->ID );
+		}
+		return $user;
 	} else {
 		$idps = shibboleth_getoption( 'shibboleth_idps', array() );
 		$idp = key( $idps );
@@ -530,6 +583,24 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		wp_safe_redirect( $initiator_url );
 		exit;
 	}
+}
+
+/**
+ * Track the ID of the user authenticated via Shibboleth during this request so
+ * that local authentication blocking can distinguish it from other channels.
+ *
+ * @since 2.5.5
+ * @param int|null $user_id The user ID to record, or null to retrieve the recorded ID.
+ * @return int|null The user ID authenticated via Shibboleth, if any.
+ */
+function shibboleth_authenticated_user_id( $user_id = null ) {
+	static $authenticated_user_id = null;
+
+	if ( null !== $user_id ) {
+		$authenticated_user_id = (int) $user_id;
+	}
+
+	return $authenticated_user_id;
 }
 
 /**
@@ -1110,16 +1181,62 @@ function shibboleth_login_enqueue_scripts() {
 add_action( 'login_enqueue_scripts', 'shibboleth_login_enqueue_scripts' );
 
 /**
+ * Determine whether local WordPress authentication has been disabled by an
+ * administrator and is not bypassed with SHIBBOLETH_ALLOW_LOCAL_AUTH.
+ *
+ * @since 2.5.5
+ * @return bool
+ */
+function shibboleth_local_auth_disabled() {
+	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
+	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
+
+	return $disable && ! $bypass;
+}
+
+/**
+ * Prevents local WordPress authentication through any channel that uses
+ * wp_authenticate() (wp-login.php, XML-RPC, Basic Auth plugins, etc.) if
+ * disabled by an administrator. Only users authenticated via Shibboleth during
+ * this request are allowed through.
+ *
+ * @since 2.5.5
+ * @param null|WP_User|WP_Error $user WP_User if the user is authenticated. WP_Error or null otherwise.
+ * @return null|WP_User|WP_Error
+ */
+function shibboleth_block_local_authenticate( $user ) {
+	if ( $user instanceof WP_User && shibboleth_local_auth_disabled() && shibboleth_authenticated_user_id() !== $user->ID ) {
+		return new WP_Error( 'shibboleth_local_auth_disabled', __( 'Shibboleth authentication is required.', 'shibboleth' ) );
+	}
+
+	return $user;
+}
+add_filter( 'authenticate', 'shibboleth_block_local_authenticate', 999 );
+
+/**
+ * Disables Application Passwords (REST API and XML-RPC) if local
+ * authentication is disabled by an administrator.
+ *
+ * @since 2.5.5
+ * @param bool $available Whether Application Passwords are available.
+ * @return bool
+ */
+function shibboleth_disable_application_passwords( $available ) {
+	if ( shibboleth_local_auth_disabled() ) {
+		return false;
+	}
+
+	return $available;
+}
+add_filter( 'wp_is_application_passwords_available', 'shibboleth_disable_application_passwords' );
+
+/**
  * Prevents local WordPress authentication if disabled by an administrator.
  *
  * @since 2.0
  */
 function shibboleth_disable_login() {
-	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
-
-	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
-
-	if ( $disable && ! $bypass ) {
+	if ( shibboleth_local_auth_disabled() ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['action'] ) && 'lostpassword' === $_GET['action'] ) {
 			// Disable the ability to reset passwords from wp-login.php.
@@ -1139,10 +1256,7 @@ add_action( 'login_init', 'shibboleth_disable_login' );
  * @since 2.0
  */
 function shibboleth_disable_login_form() {
-	$disable = shibboleth_getoption( 'shibboleth_disable_local_auth', false );
-	$bypass = defined( 'SHIBBOLETH_ALLOW_LOCAL_AUTH' ) && SHIBBOLETH_ALLOW_LOCAL_AUTH;
-
-	if ( $disable && ! $bypass ) {
+	if ( shibboleth_local_auth_disabled() ) {
 		$password_reset_url = shibboleth_get_password_reset_url( '' );
 		?>
 		<style type="text/css">
