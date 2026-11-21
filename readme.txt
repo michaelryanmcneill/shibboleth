@@ -202,9 +202,9 @@ Accessing Shibboleth attributes has changed. Typically, no additional configurat
 Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
-= version 2.5.5 =
- - Security: Require Spoof Key whenever attributes are read from HTTP headers, including Custom Prefix (CVE-2026-121719)
- - Security: Enforce Disable Local Authentication for XML-RPC, REST API, and Application Passwords (CVE-2026-121718)
+= version 2.5.5 (2026-11-21) =
+ - Security: Require Spoof Key whenever attributes are read from HTTP headers, including Custom Prefix (CVE-2026-121719) [#119](https://github.com/michaelryanmcneill/shibboleth/pull/119) (thanks Wordfence)
+ - Security: Enforce Disable Local Authentication for XML-RPC, REST API, and Application Passwords (CVE-2026-121718) [#119](https://github.com/michaelryanmcneill/shibboleth/pull/119) (thanks Wordfence)
 
 = version 2.5.4 (2026-06-22) =
  - Security: Always require Spoof Key for HTTP auth [#117](https://github.com/michaelryanmcneill/shibboleth/pull/117) (thanks @Nxploited)
