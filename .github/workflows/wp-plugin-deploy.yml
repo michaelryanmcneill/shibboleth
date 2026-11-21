@@ -1,0 +1,103 @@
+name: Deploy to WordPress.org
+
+on:
+  release:
+    types: [published]
+  # Allow manually deploying (or dry-running) an existing tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g. 2.5.5)'
+        required: true
+      dry_run:
+        description: 'Dry run (build and check, but do not commit to SVN)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wporg-deploy
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    name: Authorize deployer
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check that the triggering user is an allowed deployer
+      env:
+        ACTOR: ${{ github.triggering_actor }}
+        # Space or comma separated GitHub logins, managed in Settings > Secrets and variables > Actions > Variables.
+        DEPLOYERS: ${{ vars.WPORG_DEPLOYERS }}
+      run: |
+        if ! echo "$DEPLOYERS" | tr ', ' '\n' | grep -qixF -- "$ACTOR"; then
+          echo "::error::$ACTOR is not allowed to deploy to WordPress.org (see the WPORG_DEPLOYERS repository variable)."
+          exit 1
+        fi
+        echo "$ACTOR is allowed to deploy."
+
+  deploy:
+    name: Deploy to WordPress.org
+
+    needs: authorize
+
+    runs-on: ubuntu-latest
+
+    # Holds the SVN_USERNAME and SVN_PASSWORD secrets and requires reviewer approval before deploying.
+    environment: wordpress.org
+
+    env:
+      VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        ref: refs/tags/${{ env.VERSION }}
+        persist-credentials: false
+
+    - name: Verify version numbers match the tag
+      run: |
+        header=$(sed -n 's/^ \* Version: *//p' shibboleth.php)
+        constant=$(sed -n "s/^define( 'SHIBBOLETH_PLUGIN_VERSION', '\(.*\)' );/\1/p" shibboleth.php)
+        stable=$(sed -n 's/^Stable tag: *//p' readme.txt)
+        echo "tag=$VERSION header=$header constant=$constant stable=$stable"
+        if [ "$header" != "$VERSION" ] || [ "$constant" != "$VERSION" ] || [ "$stable" != "$VERSION" ]; then
+          echo "::error::Version mismatch: tag $VERSION, plugin header $header, SHIBBOLETH_PLUGIN_VERSION $constant, readme Stable tag $stable"
+          exit 1
+        fi
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        coverage: none
+
+    - name: Install Composer dependencies
+      uses: ramsey/composer-install@v4
+
+    - name: Build plugin
+      run: |
+        vendor/bin/wp dist-archive . ./shibboleth.zip
+        mkdir tmp-build
+        unzip shibboleth.zip -d tmp-build
+
+    - name: Run plugin check
+      uses: wordpress/plugin-check-action@v1
+      with:
+        build-dir: './tmp-build/shibboleth'
+
+    - name: Deploy to WordPress.org SVN
+      # v2.3.0
+      uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2
+      with:
+        dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+      env:
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SLUG: shibboleth
+        BUILD_DIR: ./tmp-build/shibboleth
