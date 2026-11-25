@@ -985,6 +985,25 @@ function shibboleth_options_logging() {
 				<label for="log_role_update"><?php esc_html_e( 'Log when the plugin updates a user\'s role.', 'shibboleth' ); ?></label>
 			</td>
 		</tr>
+		<tr>
+			<th scope="row"><?php esc_html_e( 'Debug Logging', 'shibboleth' ); ?></th>
+			<td>
+				<input type="checkbox" id="log_debug" name="logging[]" value="debug" <?php checked( in_array( 'debug', $shib_logging, true ) ); ?> <?php defined( $shib_logging_constant ) && disabled( $shib_logging_constant, true, false ); ?> />
+				<label for="log_debug"><?php esc_html_e( 'Log detailed diagnostics to help troubleshoot failed logins.', 'shibboleth' ); ?></label>
+				<p>
+				<?php
+				echo wp_kses_post(
+					__(
+						'Logs the attribute access configuration, which server variables provided each attribute, spoof key checks, and blocked local logins.
+						Spoof keys and attribute values are never logged. Messages are written to the PHP error log, or to <code>wp-content/debug.log</code> when <code>WP_DEBUG_LOG</code> is enabled.
+						Unlike the other options, debug messages are not enabled by <code>WP_DEBUG</code>. Disable this option when you are finished troubleshooting.',
+						'shibboleth'
+					)
+				);
+				?>
+				</p>
+			</td>
+		</tr>
 	</table>
 	<?php
 }
