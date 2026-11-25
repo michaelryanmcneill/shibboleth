@@ -4,7 +4,7 @@ Tags: shibboleth, authentication, login, saml
 Requires at least: 4.3
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 2.5.5
+Stable tag: 2.5.6
 License: Apache-2.0
 
 Allows WordPress to externalize user authentication and account creation to a Shibboleth Service Provider.
@@ -72,6 +72,16 @@ For more information on how to install the Native Shibboleth Service Provider on
 For more information on how to install Shibboleth on Nginx, see [this GitHub repo](https://github.com/nginx-shib/nginx-http-shibboleth).
 
 Note, we cannot provide support for installation, configuration, or troubleshooting of Shibboleth Service Provider issues.
+
+= How do I generate debug logs for troubleshooting? =
+
+1. Make sure PHP errors are logged somewhere you can read. The easiest option is to add `define( 'WP_DEBUG', true );`, `define( 'WP_DEBUG_LOG', true );` and `define( 'WP_DEBUG_DISPLAY', false );` to `wp-config.php`, which writes to `wp-content/debug.log`.
+2. In Settings > Shibboleth > Logging, check **Debug Logging** (or add `'debug'` to the `SHIBBOLETH_LOGGING` constant).
+3. Reproduce the problem, for example by logging in with Shibboleth.
+4. Collect the lines containing `[Shibboleth WordPress Plugin Logging] DEBUG:` from the log. If `wp-content/debug.log` is not created (for example, because changes to `wp-config.php` are not taking effect), the messages are written to the server's PHP error log instead, such as the PHP-FPM or Apache error log, or the file set by `error_log` in `php.ini` on IIS.
+5. Turn **Debug Logging** off again when you are finished.
+
+Debug logs record the attribute access configuration, which server variables provided each attribute, spoof key checks, and blocked local logins. They never include the spoof key or attribute values, but they may include WordPress usernames, so review them before sharing.
 
 = Can I extend the Shibboleth plugin to provide custom logic? =
 
@@ -165,7 +175,7 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
    - Example: `define('SHIBBOLETH_UPDATE_ROLES', true);`
  - `SHIBBOLETH_LOGGING`
    - Format: array (>= PHP 5.6)
-   - Available options: account_merge, account_create, auth, role_update
+   - Available options: account_merge, account_create, auth, role_update, debug (detailed troubleshooting diagnostics; not enabled by `WP_DEBUG`)
    - PHP 5.6 (and above) example: `const SHIBBOLETH_LOGGING = array( 'account_merge', 'account_create', 'auth', 'role_update' );`
    - PHP 7.0 (and above) example: `define('SHIBBOLETH_LOGGING', array( 'account_merge', 'account_create', 'auth', 'role_update' ) );`
  - `SHIBBOLETH_DISALLOW_FILE_MODS`
@@ -180,6 +190,9 @@ Yes, the plugin allows for all settings to be controlled via constants in `wp-co
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Upgrade Notice ==
+= 2.5.6 =
+Fixes "The Shibboleth request you submitted failed validation" errors introduced in 2.5.5 for sites using Environment Variables with attribute names such as HTTP_EPPN.
+
 = 2.5.5 =
 Security update. A Custom Prefix that reads HTTP headers (e.g. HTTP_) now requires a Spoof Key. Disabling local authentication now also blocks XML-RPC logins and Application Passwords.
 
@@ -202,6 +215,10 @@ Accessing Shibboleth attributes has changed. Typically, no additional configurat
 Accessing Shibboleth attributes has changed. Typically, no additional configuration is necessary. Check the changelog if you have specialized server configurations, such as a Shibboleth Service Provider on a reverse proxy or a server configuration that prefixes environment variables with REDIRECT_.
 
 == Changelog ==
+= version 2.5.6 (2026-11-25) =
+ - Fix: Do not require a Spoof Key for the Environment Variables and Redirected Environment Variables access methods when attribute names begin with HTTP_ (regression in 2.5.5) [#121](https://github.com/michaelryanmcneill/shibboleth/pull/121)
+ - Feature: Add an opt-in Debug Logging option to help troubleshoot failed logins [#121](https://github.com/michaelryanmcneill/shibboleth/pull/121)
+
 = version 2.5.5 (2026-11-21) =
  - Security: Require Spoof Key whenever attributes are read from HTTP headers, including Custom Prefix (CVE-2026-121719) [#119](https://github.com/michaelryanmcneill/shibboleth/pull/119) (thanks Wordfence)
  - Security: Enforce Disable Local Authentication for XML-RPC, REST API, and Application Passwords (CVE-2026-121718) [#119](https://github.com/michaelryanmcneill/shibboleth/pull/119) (thanks Wordfence)

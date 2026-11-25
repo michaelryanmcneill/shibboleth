@@ -9,7 +9,7 @@
  * Plugin URI: https://wordpress.org/plugins/shibboleth/
  * Description: Easily externalize user authentication to a <a href="https://www.incommon.org/software/shibboleth/">Shibboleth</a> Service Provider
  * Author: Michael McNeill, Jonathan Champ, Michael Erlewine, Will Norris
- * Version: 2.5.5
+ * Version: 2.5.6
  * Requires PHP: 5.6
  * Requires at least: 4.3
  * License: Apache-2.0
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'SHIBBOLETH_MINIMUM_WP_VERSION', '4.3' );
 define( 'SHIBBOLETH_MINIMUM_PHP_VERSION', '5.6' );
-define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.5' );
+define( 'SHIBBOLETH_PLUGIN_VERSION', '2.5.6' );
 
 /**
  * Determine if this is a new install or upgrade and, if so, run the
@@ -82,8 +82,26 @@ function shibboleth_getoption( $option, $default_value = false, $unused = false,
  * @return string|bool
  */
 function shibboleth_getenv( $variable ) {
-	if ( empty( $variable ) ) {
+	$source = shibboleth_getenv_source( $variable );
+
+	if ( false === $source || ! isset( $_SERVER[ $source ] ) ) {
 		return false;
+	}
+
+	return sanitize_text_field( wp_unslash( $_SERVER[ $source ] ) );
+}
+
+/**
+ * Get the $_SERVER variable names checked for an attribute, in order, using
+ * the configured attribute access method.
+ *
+ * @since 2.5.6
+ * @param string $variable Environment variable.
+ * @return array
+ */
+function shibboleth_getenv_candidates( $variable ) {
+	if ( empty( $variable ) ) {
+		return array();
 	}
 
 	$prefix = shibboleth_get_attribute_prefix();
@@ -116,9 +134,20 @@ function shibboleth_getenv( $variable ) {
 		);
 	}
 
-	foreach ( $check_variables as $check_variable => $true ) {
+	return array_keys( $check_variables );
+}
+
+/**
+ * Get the name of the $_SERVER variable that provides an attribute.
+ *
+ * @since 2.5.6
+ * @param string $variable Environment variable.
+ * @return string|bool The $_SERVER variable name, or false if the attribute is not present.
+ */
+function shibboleth_getenv_source( $variable ) {
+	foreach ( shibboleth_getenv_candidates( $variable ) as $check_variable ) {
 		if ( isset( $_SERVER[ $check_variable ] ) && false !== $_SERVER[ $check_variable ] ) {
-			return sanitize_text_field( wp_unslash( $_SERVER[ $check_variable ] ) );
+			return $check_variable;
 		}
 	}
 
@@ -176,8 +205,14 @@ function shibboleth_is_http_header_variable( $name ) {
 }
 
 /**
- * Determine whether Shibboleth attributes are read from HTTP request headers,
- * which requires a spoof key to protect against header spoofing.
+ * Determine whether the attribute access method reads Shibboleth attributes
+ * from HTTP request headers, which requires a spoof key to protect against
+ * header spoofing.
+ *
+ * Attribute names are intentionally not considered: with the environment
+ * variable methods, a co-located Shibboleth SP (e.g. the IIS module, or
+ * Apache with ShibUseHeaders) may expose attributes as HTTP_* variables and
+ * strips client-supplied copies itself.
  *
  * @since 2.5.5
  * @return bool
@@ -187,17 +222,7 @@ function shibboleth_requires_spoof_check() {
 		return true;
 	}
 
-	$prefix = shibboleth_get_attribute_prefix();
-	if ( shibboleth_is_http_header_variable( $prefix ) ) {
-		return true;
-	}
-
-	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
-	if ( isset( $shib_headers['username']['name'] ) && shibboleth_is_http_header_variable( $prefix . $shib_headers['username']['name'] ) ) {
-		return true;
-	}
-
-	return false;
+	return shibboleth_is_http_header_variable( shibboleth_get_attribute_prefix() );
 }
 
 /**
@@ -474,6 +499,12 @@ function shibboleth_session_active( $auto_login = false ) {
 		$session = shibboleth_getenv( $shib_headers['username']['name'] );
 	}
 
+	// Skip debug logging for automatic login checks without a session, which run on every page load.
+	$debug = shibboleth_debug_enabled() && ( $session || ! $auto_login );
+	if ( $debug ) {
+		shibboleth_log_debug_environment( $auto_login );
+	}
+
 	if ( $session ) {
 		if ( shibboleth_requires_spoof_check() ) {
 			/**
@@ -482,11 +513,29 @@ function shibboleth_session_active( $auto_login = false ) {
 			 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking
 			 */
 			$spoofkey = shibboleth_getoption( 'shibboleth_spoof_key' );
+			$checkkey = false;
 
 			if ( ! empty( $spoofkey ) ) {
 				$checkkey = shibboleth_getenv( 'Shib-Spoof-Check' );
 				if ( $checkkey === $spoofkey ) {
 					$active = true;
+				}
+			}
+
+			if ( $debug ) {
+				$checkkey_source = shibboleth_getenv_source( 'Shib-Spoof-Check' );
+				shibboleth_log_debug( 'Spoof key required because attributes are read from HTTP headers. Spoof key configured: ' . ( empty( $spoofkey ) ? 'no' : 'yes' ) . '; Shib-Spoof-Check received: ' . ( $checkkey_source ? 'yes (' . $checkkey_source . ')' : 'no' ) . '; matches: ' . ( $active ? 'yes' : 'no' ) . '.' );
+
+				if ( ! $active && ! empty( $spoofkey ) && $checkkey_source ) {
+					shibboleth_log_debug_spoof_key_mismatch( $spoofkey, $checkkey_source );
+				}
+
+				if ( ! defined( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING' ) ) {
+					shibboleth_log_debug( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING: not defined.' );
+				} elseif ( ! SHIBBOLETH_BYPASS_SPOOF_CHECKING ) {
+					shibboleth_log_debug( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING: defined but false.' );
+				} else {
+					shibboleth_log_debug( 'SHIBBOLETH_BYPASS_SPOOF_CHECKING: enabled; skipping spoof key validation.' );
 				}
 			}
 
@@ -500,15 +549,52 @@ function shibboleth_session_active( $auto_login = false ) {
 			}
 
 			if ( ! $active && ! $auto_login ) {
+				if ( $debug ) {
+					shibboleth_log_debug( 'Result: failed validation (spoof key missing or incorrect).' );
+				}
+
 				wp_die( esc_html( __( 'The Shibboleth request you submitted failed validation. Please contact your site administrator for further assistance.', 'shibboleth' ) ) );
 			}
 		} else {
 			$active = true;
+
+			if ( $debug ) {
+				shibboleth_log_debug( 'Spoof key not required for this attribute access method.' );
+			}
 		}
+	}
+
+	if ( $debug ) {
+		shibboleth_log_debug( 'Result: Shibboleth session ' . ( $active ? 'active' : 'not active' ) . ( $session ? '' : ' (username attribute not found)' ) . '.' );
 	}
 
 	$active = apply_filters( 'shibboleth_session_active', $active );
 	return $active;
+}
+
+/**
+ * Log likely reasons a received spoof key does not match the configured one.
+ * Only yes/no findings are logged, never the keys or their lengths.
+ *
+ * @since 2.5.6
+ * @param string $spoofkey The configured spoof key.
+ * @param string $checkkey_source The $_SERVER variable that provided Shib-Spoof-Check.
+ */
+function shibboleth_log_debug_spoof_key_mismatch( $spoofkey, $checkkey_source ) {
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared against its sanitized form for diagnostics only; never output.
+	$received = isset( $_SERVER[ $checkkey_source ] ) ? (string) wp_unslash( $_SERVER[ $checkkey_source ] ) : '';
+
+	if ( sanitize_text_field( $spoofkey ) !== $spoofkey ) {
+		shibboleth_log_debug( 'The configured spoof key contains characters (such as < or %) that are removed from received headers, so it can never match. Configure a spoof key without these characters on both the Shibboleth SP and the plugin.' );
+	}
+
+	if ( sanitize_text_field( $received ) !== $received ) {
+		shibboleth_log_debug( 'The received Shib-Spoof-Check value was altered by sanitization because it contains characters such as < or %.' );
+	}
+
+	if ( strlen( $received ) !== strlen( $spoofkey ) ) {
+		shibboleth_log_debug( 'The received and configured spoof keys have different lengths. Check for characters that were dropped or added in the Shibboleth SP configuration (for example, an & removed instead of being written as &amp; in XML).' );
+	}
 }
 
 /**
@@ -556,6 +642,8 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		$user = shibboleth_authenticate_user();
 		if ( $user instanceof WP_User ) {
 			shibboleth_authenticated_user_id( $user->ID );
+		} elseif ( is_wp_error( $user ) && shibboleth_debug_enabled() ) {
+			shibboleth_log_debug( 'Shibboleth session found but authentication failed: ' . $user->get_error_code() . ' (' . $user->get_error_message() . ').' );
 		}
 		return $user;
 	} else {
@@ -579,6 +667,11 @@ function shibboleth_authenticate( $user, $username, $password ) {
 		}
 
 		$initiator_url = shibboleth_session_initiator_url( $redirect_to, $idp );
+
+		if ( shibboleth_debug_enabled() ) {
+			shibboleth_log_debug( 'No Shibboleth session found; redirecting to the session initiator: ' . $initiator_url . ' (if this repeats after logging in at the IdP, WordPress is not receiving the username attribute).' );
+		}
+
 		shibboleth_allow_redirect( $initiator_url );
 		wp_safe_redirect( $initiator_url );
 		exit;
@@ -796,13 +889,72 @@ function shibboleth_log_message( $message_type, $message ) {
 	static $shib_logging;
 
 	if ( ! isset( $shib_logging ) ) {
-		$shib_logging = shibboleth_getoption( 'shibboleth_logging', array() );
+		$shib_logging = (array) shibboleth_getoption( 'shibboleth_logging', array() );
 	}
 
-	if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || in_array( $message_type, $shib_logging, true ) ) {
+	// Debug messages are verbose, so they are only logged when explicitly enabled.
+	$wp_debug = 'debug' !== $message_type && defined( 'WP_DEBUG' ) && WP_DEBUG;
+
+	if ( $wp_debug || in_array( $message_type, $shib_logging, true ) ) {
 		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( '[Shibboleth WordPress Plugin Logging] ' . $message );
 	}
+}
+
+/**
+ * Determine whether debug logging is enabled.
+ *
+ * @since 2.5.6
+ * @return bool
+ */
+function shibboleth_debug_enabled() {
+	return in_array( 'debug', (array) shibboleth_getoption( 'shibboleth_logging', array() ), true );
+}
+
+/**
+ * Log a debug message. Debug messages must never include secrets (such as the
+ * spoof key) or attribute values.
+ *
+ * @since 2.5.6
+ * @param string $message Message.
+ */
+function shibboleth_log_debug( $message ) {
+	shibboleth_log_message( 'debug', 'DEBUG: ' . $message );
+}
+
+/**
+ * Log the attribute access configuration and the Shibboleth-related
+ * variables present in this request, to help diagnose failed logins.
+ * Only variable names are logged, never their values.
+ *
+ * @since 2.5.6
+ * @param bool $auto_login Whether this was triggered by an auto_login request.
+ */
+function shibboleth_log_debug_environment( $auto_login ) {
+	$method = shibboleth_getoption( 'shibboleth_attribute_access_method', 'standard' );
+	$prefix = shibboleth_get_attribute_prefix();
+	$fallback = shibboleth_getoption( 'shibboleth_attribute_access_method_fallback' );
+	$shib_headers = shibboleth_getoption( 'shibboleth_headers', array() );
+
+	shibboleth_log_debug( 'Checking for a Shibboleth session (' . ( $auto_login ? 'automatic login' : 'login request' ) . ').' );
+	shibboleth_log_debug( 'Attribute access method: ' . $method . '; prefix: ' . ( '' === $prefix ? '(none)' : $prefix ) . '; fallback: ' . ( $fallback ? 'enabled' : 'disabled' ) . '.' );
+
+	$attribute_names = array();
+	foreach ( $shib_headers as $field => $header ) {
+		if ( ! empty( $header['name'] ) ) {
+			$source = shibboleth_getenv_source( $header['name'] );
+			$attribute_names[] = $field . ' => ' . $header['name'] . ' (' . ( $source ? 'found in ' . $source : 'not found; checked ' . implode( ', ', shibboleth_getenv_candidates( $header['name'] ) ) ) . ')';
+		}
+	}
+	shibboleth_log_debug( 'Configured attributes: ' . ( $attribute_names ? implode( '; ', $attribute_names ) : '(none)' ) . '.' );
+
+	$shib_variables = array();
+	foreach ( array_keys( $_SERVER ) as $name ) {
+		if ( false !== stripos( $name, 'shib' ) ) {
+			$shib_variables[] = $name;
+		}
+	}
+	shibboleth_log_debug( 'Server variables containing "shib": ' . ( $shib_variables ? implode( ', ', $shib_variables ) : '(none)' ) . '.' );
 }
 
 /**
@@ -1206,6 +1358,11 @@ function shibboleth_local_auth_disabled() {
  */
 function shibboleth_block_local_authenticate( $user ) {
 	if ( $user instanceof WP_User && shibboleth_local_auth_disabled() && shibboleth_authenticated_user_id() !== $user->ID ) {
+		if ( shibboleth_debug_enabled() ) {
+			$channel = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ? 'XML-RPC' : 'wp_authenticate()';
+			shibboleth_log_debug( 'Blocked local authentication for user ' . $user->user_login . ' (ID: ' . $user->ID . ') via ' . $channel . ' because Disable Local Authentication is enabled.' );
+		}
+
 		return new WP_Error( 'shibboleth_local_auth_disabled', __( 'Shibboleth authentication is required.', 'shibboleth' ) );
 	}
 
@@ -1222,7 +1379,14 @@ add_filter( 'authenticate', 'shibboleth_block_local_authenticate', 999 );
  * @return bool
  */
 function shibboleth_disable_application_passwords( $available ) {
+	static $logged = false;
+
 	if ( shibboleth_local_auth_disabled() ) {
+		if ( ! $logged && isset( $_SERVER['PHP_AUTH_USER'] ) && shibboleth_debug_enabled() ) {
+			$logged = true;
+			shibboleth_log_debug( 'Application Passwords are disabled because Disable Local Authentication is enabled; Basic Auth credentials in this request will not be accepted.' );
+		}
+
 		return false;
 	}
 
